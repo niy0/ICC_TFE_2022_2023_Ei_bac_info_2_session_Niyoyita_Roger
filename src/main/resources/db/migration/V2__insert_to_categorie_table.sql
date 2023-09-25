@@ -1,0 +1,16 @@
+INSERT INTO `categorie` (`id`, `cat_nom`) VALUES
+(1, 'Fruits et légumes'),
+(2, 'Viandes et poissons'),
+(3, 'Produits laitiers'),
+(4, 'Boulangerie et pâtisserie'),
+(5, 'Épicerie sèche'),
+(6, 'Boissons'),
+(7, 'Produits surgelés'),
+(8, 'Hygiène personnelle'),
+(9, 'Entretien ménager'),
+(10, 'Produits pour bébés'),
+(11, 'Produits de beauté'),
+(12, 'Articles pour animaux de compagnie'),
+(13, 'Produits bio et santé'),
+(14, 'Électronique et électroménager'),
+(15, 'Articles ménagers');
