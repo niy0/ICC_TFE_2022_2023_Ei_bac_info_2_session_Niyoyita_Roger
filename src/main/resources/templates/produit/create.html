@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="fr"
+      xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajout d'un produit</title>
+    <style>
+        .fieldError{color: red;}
+    </style>
+</head>
+<body>
+<div class="container">
+    <div layout:fragment="content">
+        <div class="container text-center">
+            <h1>Ajout nouveau produit</h1>
+
+            <div style="display:flex;">
+                <div style="width: 40%;display:block;margin-right: 15px;">
+                    <div class="border border-success rounded" style=" margin-left: auto;margin-right: auto;padding: 10px;margin-bottom: 10px;">
+                        <form  th:action="@{/cat/create/newCat}"   method="post" >
+                            <div class="form-group" style="text-align: left;">
+                                <label for="newNom" >Nom</label>
+                                <input type="text" class="form-control" name="nom" id="newNom"  required/><br>
+                            </div>
+                            <p th:style="${message == ''} ? 'display: none;': 'color: red;'">[[${message}]]</p>
+                            <input type="submit" class="btn btn-outline-success" value="Ajouter nouveau catégorie à la liste"   />
+                        </form>
+                    </div>
+
+                    <div class="border border-success rounded" style=" margin-left: auto;margin-right: auto;padding: 10px;margin-bottom: 10px;">
+                        <form  th:action="@{/cat/create/newCat}"   method="post" >
+                            <div class="form-group" style="text-align: left;">
+                                <label for="newNom" >Nom</label>
+                                <input type="text" class="form-control" name="nom" id="newNom"  required/><br>
+                            </div>
+                            <p th:style="${message == ''} ? 'display: none;': 'color: red;'">[[${message}]]</p>
+                            <input type="submit" class="btn btn-outline-success" value="Ajouter nouveau mot clé à la liste"   />
+                        </form>
+                    </div>
+
+                    <div class="border border-success rounded" style=" margin-left: auto;margin-right: auto;padding: 10px;margin-bottom: 10px;">
+                        <form  th:action="@{/cat/create/newCat}"   method="post" >
+                            <div class="form-group" style="text-align: left;">
+                                <label for="newNom" >Nom</label>
+                                <input type="text" class="form-control" name="nom" id="newNom"  required/><br>
+                            </div>
+                            <p th:style="${message == ''} ? 'display: none;': 'color: red;'">[[${message}]]</p>
+                            <input type="submit" class="btn btn-outline-success" value="Ajouter nouvelle marque à la liste"   />
+                        </form>
+                    </div>
+                </div>
+
+                <div class="border border-success rounded" style=" width: 60%;margin-left: auto;margin-right: auto;padding: 10px;">
+                    <form th:action="@{/product/save}" th:object="${produit}" method="post" enctype="multipart/form-data">
+
+                        <input type="hidden" name="id" th:value="${produit.id}" />
+
+
+                        <div class="form-group" style="text-align: left;">
+                            <label for="nom">Nom</label>
+                            <input type="text" class="form-control" name="nom" id="nom" th:field="*{nom}" required />
+                        </div>
+
+                        <div class="form-group" style="text-align: left;">
+                            <label for="prix">Prix</label>
+                            <input type="number" class="form-control" name="prix" id="prix" step="0.01" th:field="*{prix}" required />
+                        </div>
+
+                        <div class="form-group" style="text-align: left;">
+                            <label for="description">Description</label>
+                            <textarea id="description" class="form-control" name="description" th:field="*{description}" required></textarea>
+                        </div>
+
+                        <div class="form-group row" style="text-align: left;">
+                            <label for="cat" class="col-sm-4 col-form-label">Categorie :</label>
+                            <div>
+                                <div class="col-sm-8" >
+                                    <select class="form-control selectpicker" name="cat" id="cat" th:field="*{categorie}" multiple style="width:auto;" onchange="updateHiddenInput()">
+                                        <option th:each="cat: ${catList}" th:value="${cat.id}" th:data-id="${cat.id}" th:text="${cat.nom}"></option>
+                                    </select>
+                                    <input type="hidden" name="catId" id="catId" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="text-align: left;">
+                            <label for="quantite">Quantité</label>
+                            <input type="number" class="form-control" name="quantite" id="quantite" th:field="*{quantite}" required />
+                        </div>
+
+                        <div class="form-group" style="text-align: left;">
+                            <label for="image">Image Principale</label>
+                            <input type="file" class="form-control" id="image" name="image" accept="image/*" />
+                        </div>
+
+                        <div class="form-group" style="text-align: left;">
+                            <label for="marque">Marque</label>
+                            <input type="text" class="form-control" name="marque" id="marque" th:field="*{marque}" />
+                        </div>
+
+                        <div class="form-group" style="text-align: left;">
+                            <label for="motCle">Mots clés</label>
+                            <input type="text" id="motCle" class="form-control" name="motCle" />
+                        </div>
+
+                        <div class="form-group" style="text-align: left;">
+                            <label class="form-check-label" for="disponibilite">Disponibilité</label>
+                            <input type="checkbox" class="form-check-input" id="disponibilite" name="disponibilite" th:field="*{disponibilite}" />
+                        </div>
+
+                        <div class="form-group" style="text-align: left;">
+                            <button type="submit">Créer</button>
+                            <a th:href="${back}">Annuler</a> <!-- Vous pouvez ajouter un lien de retour ou une fonction de réinitialisation ici -->
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <nav><a th:href="@{/artists}">Retour à l'index</a></nav>
+    </div>
+</div>
+</body>
+</html>

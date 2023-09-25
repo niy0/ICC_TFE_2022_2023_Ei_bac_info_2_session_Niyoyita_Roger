@@ -8,7 +8,6 @@ import java.util.Optional;
 
 @Service
 public class ProduitService {
-
     @Autowired
     ProduitRepository produitRepository;
 
@@ -17,7 +16,7 @@ public class ProduitService {
         produit.setNom(produit.capitalize(produit.getNom()));
         produit.setMarque(produit.getMarque().toUpperCase());
         if(produit.getMotsCles() != null)
-            produit.getMotsCles().forEach(mot-> mot.toUpperCase());
+            produit.getMotsCles().forEach(mot-> mot.setNom(mot.getNom().toUpperCase()));
 
         produitRepository.save(produit);
         return produit;

@@ -1,7 +1,12 @@
 package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit;
 
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.categorie.Categorie;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.motCle.MotCle;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
+import java.sql.Blob;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -11,174 +16,149 @@ import java.util.Set;
 @Entity
 @Table(name = "produit")
 public class Produit {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank
     @Column(name = "nom", nullable = false)
     private String nom;
 
+    @NotBlank
     @Column(name = "description", length = 2000, nullable = false)
     private String description;
 
+    @NotNull
     @Column(name = "prix", nullable = false)
-    private double prix;
+    private Double prix;
 
+    @NotNull
     @Column(name = "quantite", nullable = false)
     private Integer quantite;
 
     @Column(name = "marque", length = 40)
-    private String marque; // rendre en objet
+    private String marque;
+
+    @Lob
+    @Column(name = "image_principale")
+    private Blob imagePrincipale;
+
+    @ManyToOne
+    @JoinColumn(name = "categorie_id", nullable = false)
+    private Categorie categorie;
 
 
-    @Column( nullable = false)
-    private String imagePrincipale;
+    @Column(name = "disponibilite", nullable = false)
+    private Boolean disponibilite = true;
 
-
-    @Column(name = "disponibilite")
-    private boolean disponibilite = true; //vérifier binder avec quantité
-
-    //*************admin/manager manage*************
-
-    @Column(name = "min")
-    private Integer minProd = 1;
-
-    @Column(name = "middle")
-    private Integer middleProd = null;
-
-    @Column(name = "max")
-    private Integer maxProd = null;
-
-    private Integer cote = null;
-
-    //***************************
-
-    @Column(name = "date_creation",  nullable = false)
+    @Column(name = "date_creation", nullable = false)
     private LocalDateTime dateCreation;
 
     @Column(name = "date_modification")
     private LocalDateTime dateModification;
 
-    @ElementCollection
-    @CollectionTable(name = "produit_mots_cles", joinColumns = @JoinColumn(name = "produit_id"))
-    @Column(name = "mot_cle",length = 40)
-    private Set<String> motsCles = new HashSet<>(); //modifier pour une entité
-    //*******************
+    @ManyToMany
+    @JoinTable(
+            name = "produit_mots_cles",
+            joinColumns = @JoinColumn(name = "produit_id"),
+            inverseJoinColumns = @JoinColumn(name = "mot_cle_id")
+    )
+    private Set<MotCle> motsCles = new HashSet<>();  // Assuming you have an entity MotCle
 
+    // Constructors
     public Produit() {
-    }
-
-    public Produit(String nom, String description, String prix, String quantite, String bytes) {
-        this.nom = nom;
-        this.description = description;
-        this.prix = Double.parseDouble(prix);
-        this.quantite = Integer.parseInt(quantite);
-        this.imagePrincipale = bytes;
         this.dateCreation = LocalDateTime.now();
     }
 
-    public Produit(String nom, String description, String prix, String quantite, String bytes, String mot) {
+    public Produit(String nom, String description, Double prix, Integer quantite, Blob imagePrincipale) {
         this.nom = nom;
         this.description = description;
-        this.prix = Double.parseDouble(prix);
-        this.quantite = Integer.parseInt(quantite);
-        this.imagePrincipale = bytes;
-        this.motsCles.add(mot);
-        this.dateCreation = LocalDateTime.now();
-
-    }
-
-    //faire un nouveau costruct
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getNom() {
-        return nom;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public double getPrix() {
-        return prix;
-    }
-
-    public Integer getQuantite() {
-        return quantite;
-    }
-
-    public String getMarque() {
-        return marque;
-    }
-
-    public String getImagePrincipale() {
-        return imagePrincipale;
-    }
-    public boolean isDisponibilite() {
-        return disponibilite;
-    }
-
-    public LocalDateTime getDateCreation() {
-        return dateCreation;
-    }
-
-    public LocalDateTime getDateModification() {
-        return dateModification;
-    }
-
-
-
-    public Set<String> getMotsCles() {
-        return motsCles;
-    }
-
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setNom(String nom) {
-        this.nom = nom;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setPrix(double prix) {
         this.prix = prix;
+        this.quantite = quantite;
+        this.imagePrincipale = imagePrincipale;
+        this.dateCreation = LocalDateTime.now();
+        updateDisponibilite();
     }
+
+    // Getters
+    public Long getId() { return id; }
+
+    public String getNom() { return nom; }
+
+    public String getDescription() { return description; }
+
+    public Double getPrix() { return prix; }
+
+    public Integer getQuantite() { return quantite; }
+
+    public String getMarque() { return marque; }
+
+    public Blob getImagePrincipale() { return imagePrincipale; }
+
+    public Categorie getCategorie() { return categorie; }
+
+    public Boolean getDisponibilite() { return disponibilite; }
+
+    public LocalDateTime getDateCreation() { return dateCreation; }
+
+    public LocalDateTime getDateModification() { return dateModification; }
+
+    public Set<MotCle> getMotsCles() { return motsCles; }
+
+    // Setters
+    public void setId(Long id) { this.id = id; }
+
+    public void setNom(String nom) { this.nom = nom; }
+
+    public void setDescription(String description) { this.description = description; }
+
+    public void setPrix(Double prix) { this.prix = prix; }
 
     public void setQuantite(Integer quantite) {
         this.quantite = quantite;
+        updateDisponibilite();
     }
 
-    public void setMarque(String marque) {
-        this.marque = marque;
+    public void setMarque(String marque) { this.marque = marque; }
+
+    public void setImagePrincipale(Blob imagePrincipale) { this.imagePrincipale = imagePrincipale; }
+
+    public void setCategorie(Categorie categorie) { this.categorie = categorie; }
+
+    public void setDisponibilite(Boolean disponibilite) { this.disponibilite = disponibilite; }
+
+    public void setDateCreation(LocalDateTime dateCreation) { this.dateCreation = dateCreation; }
+
+    public void setDateModification(LocalDateTime dateModification) { this.dateModification = dateModification; }
+
+    public void setMotsCles(Set<MotCle> motsCles) { this.motsCles = motsCles; }
+
+    // Additional Methods
+    public void updateDisponibilite() {
+        this.disponibilite = this.quantite > 0;
     }
 
-    public void setImagePrincipale(String imagePrincipale) {
-        this.imagePrincipale = imagePrincipale;
+    @PreUpdate
+    public void onPreUpdate() {
+        this.dateModification = LocalDateTime.now();
     }
 
-    public void setDisponibilite(boolean disponibilite) {
-        this.disponibilite = disponibilite;
-    }
-
-    public void setDateCreation(LocalDateTime dateCreation) {
-        this.dateCreation = dateCreation;
-    }
-
-    public void setDateModification(LocalDateTime dateModification) {
-        this.dateModification = dateModification;
-    }
-
-
-    public void setMotsCles(Set<String> motsCles) {
-        this.motsCles = motsCles;
+    @Override
+    public String toString() {
+        return "Produit{" +
+                "id=" + id +
+                ", nom='" + nom + '\'' +
+                ", description='" + description + '\'' +
+                ", prix=" + prix +
+                ", quantite=" + quantite +
+                ", marque='" + marque + '\'' +
+                ", categorie=" + categorie +
+                ", disponibilite=" + disponibilite +
+                ", dateCreation=" + dateCreation +
+                ", dateModification=" + dateModification +
+                ", motsCles=" + motsCles +
+                '}';
     }
 
     public List<String> listMotsCle(){
@@ -196,38 +176,4 @@ public class Produit {
         }
         return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }
-
-
-    public Integer getMinProd() {
-        return minProd;
-    }
-
-    public Integer getMiddleProd() {
-        return middleProd;
-    }
-
-    public Integer getMaxProd() {
-        return maxProd;
-    }
-
-    public Integer getCote() {
-        return cote;
-    }
-
-    public void setMinProd(Integer minProd) {
-        this.minProd = minProd;
-    }
-
-    public void setMiddleProd(Integer middleProd) {
-        this.middleProd = middleProd;
-    }
-
-    public void setMaxProd(Integer maxProd) {
-        this.maxProd = maxProd;
-    }
-
-    public void setCote(Integer cote) {
-        this.cote = cote;
-    }
-
 }

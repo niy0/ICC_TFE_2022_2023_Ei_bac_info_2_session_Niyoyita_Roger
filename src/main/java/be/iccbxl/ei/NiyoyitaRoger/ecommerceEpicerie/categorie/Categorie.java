@@ -1,5 +1,6 @@
 package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.categorie;
 
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit.Produit;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -13,6 +14,9 @@ public class Categorie {
 
     @Column(name = "cat_nom", length = 40, nullable = false)
     private String nom;
+
+    @OneToMany(mappedBy = "categorie")
+    private List<Produit> produits;
 
     public Categorie() {
     }
@@ -30,6 +34,9 @@ public class Categorie {
         return nom;
     }
 
+    public List<Produit> getProduits() {
+        return produits;
+    }
 
     public void setId(Long id) {
         this.id = id;
@@ -39,6 +46,9 @@ public class Categorie {
         this.nom = nom;
     }
 
+    public void setProduits(List<Produit> produits) {
+        this.produits = produits;
+    }
 
     @Override
     public String toString() {

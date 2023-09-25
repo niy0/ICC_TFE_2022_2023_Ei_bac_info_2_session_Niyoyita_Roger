@@ -3,10 +3,12 @@ package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-public interface ProduitRepository  extends JpaRepository<Produit, Long> {
+@Repository
+public interface ProduitRepository  extends JpaRepository <Produit, Long> {
     @Query("SELECT produit FROM Produit produit WHERE CONCAT(produit.id, '', produit.nom, '', produit.prix) LIKE %?1%")
     public List<Produit> getAllProduct(String mot);
 
