@@ -72,6 +72,8 @@ public class ProduitController {
 
     @GetMapping("/produit/create")
     public String afficherFormulaireNouveauProduit(Model model, HttpServletRequest request) {
+
+        String title = "Ajout d'un nouveau produit.";
         List<Categorie> categorieList = categorieService.getAllCategorie();
 
         //Générer le lien retour pour l'annulation
@@ -82,7 +84,7 @@ public class ProduitController {
         } else {
             model.addAttribute("back", "/produits");
         }
-
+        model.addAttribute("title",title);
         model.addAttribute("produit", new Produit());
         model.addAttribute("catList", categorieList);
         return "produit/create";

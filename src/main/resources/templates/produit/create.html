@@ -7,16 +7,32 @@
     <title>Ajout d'un produit</title>
     <style>
         .fieldError{color: red;}
+        .centered-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 90%; /* 100% - 10% pour laisser l’espace en haut */
+            margin-top: 5%; /* Ajout de marge en haut équivalent à 10% de la hauteur de la vue */
+            margin-bottom: 10px;
+        }
+        .content {
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .title{
+            font-family: Roboto;
+        }
     </style>
 </head>
 <body>
-<div class="container">
-    <div layout:fragment="content">
-        <div class="container text-center">
-            <h1>Ajout nouveau produit</h1>
-
+<div class="container" >
+    <div layout:fragment="content" class="content"   >
+        <div  class="container centered-content">
+            <h1 th:text="${title}" class="title">Ajout nouveau produit</h1>
             <div style="display:flex;">
-                <div style="width: 40%;display:block;margin-right: 15px;">
+                <div style="width: 40%;display:block;margin-right: 250px;">
                     <div class="border border-success rounded" style=" margin-left: auto;margin-right: auto;padding: 10px;margin-bottom: 10px;">
                         <form  th:action="@{/cat/create/newCat}"   method="post" >
                             <div class="form-group" style="text-align: left;">
@@ -51,11 +67,10 @@
                     </div>
                 </div>
 
-                <div class="border border-success rounded" style=" width: 60%;margin-left: auto;margin-right: auto;padding: 10px;">
-                    <form th:action="@{/product/save}" th:object="${produit}" method="post" enctype="multipart/form-data">
+                <div class="border border-success rounded" style="padding: 10px;">
+                    <form th:action="@{/product/save}" th:object="${produit}" method="post" enctype="multipart/form-data" style=" width: 100%;">
 
                         <input type="hidden" name="id" th:value="${produit.id}" />
-
 
                         <div class="form-group" style="text-align: left;">
                             <label for="nom">Nom</label>
@@ -105,19 +120,14 @@
                         </div>
 
                         <div class="form-group" style="text-align: left;">
-                            <label class="form-check-label" for="disponibilite">Disponibilité</label>
-                            <input type="checkbox" class="form-check-input" id="disponibilite" name="disponibilite" th:field="*{disponibilite}" />
-                        </div>
-
-                        <div class="form-group" style="text-align: left;">
                             <button type="submit">Créer</button>
-                            <a th:href="${back}">Annuler</a> <!-- Vous pouvez ajouter un lien de retour ou une fonction de réinitialisation ici -->
+                            <a th:href="${back}">Annuler</a>
                         </div>
                     </form>
                 </div>
             </div>
+            <a th:href="@{/artists}">Retour à l'index</a>
         </div>
-        <nav><a th:href="@{/artists}">Retour à l'index</a></nav>
     </div>
 </div>
 </body>
