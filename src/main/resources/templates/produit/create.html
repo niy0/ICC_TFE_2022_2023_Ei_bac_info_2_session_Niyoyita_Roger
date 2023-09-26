@@ -12,8 +12,8 @@
             flex-direction: column;
             justify-content: flex-start;
             align-items: center;
-            min-height: 90%; /* 100% - 10% pour laisser l’espace en haut */
-            margin-top: 5%; /* Ajout de marge en haut équivalent à 10% de la hauteur de la vue */
+            min-height: 90%;
+            margin-top: 5%;
             margin-bottom: 10px;
         }
         .content {
@@ -28,7 +28,7 @@
 </head>
 <body>
 <div class="container" >
-    <div layout:fragment="content" class="content"   >
+    <div layout:fragment="content" class="content" >
         <div  class="container centered-content">
             <h1 th:text="${title}" class="title">Ajout nouveau produit</h1>
             <div style="display:flex;">

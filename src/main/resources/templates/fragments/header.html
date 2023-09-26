@@ -6,7 +6,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
     <style>
         .fieldError{color: red;}
@@ -16,7 +16,10 @@
 <body>
     <header th:fragment="header" >
         <nav class="navbar navbar-expand-lg navbar-light bg-light"  style="height:10%;position: fixed;top:0px;width:100%;">
-            <a class="navbar-brand font-weight-bold text-warning" href="#" style="left:0px;">L'épicerie de l'houmeau</a>
+            <a class="navbar-brand font-weight-bold text-warning" href="#" style="left:0px;">
+                <i class="fa-solid fa-shop fa-flip-horizontal fa-xl" style="color: #e6c51e;margin-right:10px;"></i>
+                L'épicerie de l'houmeau
+            </a>
             <div class="container" style="display:flex;">
 
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,7 +63,8 @@
                     <!-- Votre formulaire et autres éléments ici... -->
                 </div>
                 <div>
-                    <a class="btn btn-warning"   th:href="@{/panier}" href="#"><i class="fa fa-shopping-cart"></i> Panier</a>
+                    <a class="btn btn-warning"   th:href="@{/panier}" href="#"><i class="fa fa-shopping-cart"></i><i class="fa-solid fa-circle" style="color: #4bd01b;" >1</i> </a>
+                    <a class="btn btn-success" th:href="@{/connexion}" href="#">Connexion</a>
                     <a class="btn btn-success" th:href="@{/connexion}" href="#">Connexion</a>
                 </div>
             </div>
