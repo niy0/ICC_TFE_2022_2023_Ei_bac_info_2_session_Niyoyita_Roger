@@ -63,6 +63,20 @@
 			<version>5.2.3</version>
 		</dependency>
 
+		<!-- Thumbnailator pour la compression d'image -->
+		<dependency>
+			<groupId>net.coobird</groupId>
+			<artifactId>thumbnailator</artifactId>
+			<version>0.4.19</version> <!-- Utilisez la version la plus récente -->
+		</dependency>
+
+		<!-- Apache Commons Lang pour la validation des chaînes -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.12.0</version> <!-- Utilisez la version la plus récente -->
+		</dependency>
+
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>webjars-locator-core</artifactId>

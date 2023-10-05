@@ -1,4 +1,4 @@
-INSERT INTO `motCle` (`id`, `nom`) VALUES
+INSERT INTO `mot_cle` (`id`, `nom`) VALUES
 (1, 'Alimentation'),
 (2, 'Épicerie'),
 (3, 'Boissons'),

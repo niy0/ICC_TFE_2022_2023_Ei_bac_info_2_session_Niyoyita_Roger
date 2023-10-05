@@ -90,11 +90,12 @@
                         <div class="form-group row" style="text-align: left;">
                             <label for="cat" class="col-sm-4 col-form-label">Categorie :</label>
                             <div>
-                                <div class="col-sm-8" >
-                                    <select class="form-control selectpicker" name="cat" id="cat" th:field="*{categorie}" multiple style="width:auto;" onchange="updateHiddenInput()">
-                                        <option th:each="cat: ${catList}" th:value="${cat.id}" th:data-id="${cat.id}" th:text="${cat.nom}"></option>
+                                <div class="col-sm-8">
+                                    <select class="form-control selectpicker" id="cat"  style="width:auto;"
+                                            onchange="var selectElement = document.getElementById('cat'); var selectedOption = selectElement.options[selectElement.selectedIndex]; document.getElementById('catId').value = selectedOption.value;">
+                                        <option th:each="cat: ${catList}"  th:value="${cat.id}" th:data-id="${cat.id}" th:text="${cat.nom}"></option>
                                     </select>
-                                    <input type="hidden" name="catId" id="catId" />
+                                    <input class="form-group" hidden  name="catId" id="catId"/>
                                 </div>
                             </div>
                         </div>
@@ -116,7 +117,7 @@
 
                         <div class="form-group" style="text-align: left;">
                             <label for="motCle">Mots clés</label>
-                            <input type="text" id="motCle" class="form-control" name="motCle" />
+                            <input type="text" id="motCle" class="form-control" name="motCle"  />
                         </div>
 
                         <div class="form-group" style="text-align: left;">
@@ -130,5 +131,6 @@
         </div>
     </div>
 </div>
+
 </body>
 </html>

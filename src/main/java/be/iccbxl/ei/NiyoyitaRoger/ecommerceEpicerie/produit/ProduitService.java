@@ -1,58 +1,55 @@
 package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 public class ProduitService {
+
     @Autowired
-    ProduitRepository produitRepository;
+    private ProduitRepository produitRepository;
 
-
-    public Produit saveProduct(Produit produit) {
-        produit.setNom(produit.capitalize(produit.getNom()));
-        produit.setMarque(produit.getMarque().toUpperCase());
-        if(produit.getMotsCles() != null)
-            produit.getMotsCles().forEach(mot-> mot.setNom(mot.getNom().toUpperCase()));
-
-        produitRepository.save(produit);
-        return produit;
-    }
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public List<Produit> getAllProduct() {
-        return produitRepository.findAll();
+        return (List<Produit>) produitRepository.findAll();
     }
 
     public List<Produit> getAllProduct(String keyword) {
         if(keyword != null) {
             return produitRepository.getAllProduct(keyword);
-        }else {
+        } else {
             return (List<Produit>) produitRepository.findAll();
         }
     }
 
-    public Produit getProductById(String id) throws ProduitNotFoundException {
-        Long idValid = Long.parseLong(id);
-        Optional<Produit> produit_result = produitRepository.findById(idValid);
-        Produit produit = null;
-        if(produit_result.isPresent()) {
-            return produit = produit_result.get();
-        }
-        throw new ProduitNotFoundException("Pas de produit avec ce numéron ID : "+ id);
-    }
-
-    public void deleteProductById(Long id) throws ProduitNotFoundException {
-        Long count = produitRepository.count();
-        if(count == null || count == 0) {
-            throw new ProduitNotFoundException("Produit avec cette Id: "+ id + "n'a pas été supprimé.");
-        }
-        produitRepository.deleteById(id);
-    }
-
-    public void updateProduct(Long id, Produit produit) {
+    public void updateProduit(Produit produit){
         produitRepository.save(produit);
     }
+
+    public Produit getProduitById(Long id) throws ProduitNotFoundException {
+        return produitRepository.findById(id)
+                .orElseThrow(() -> new ProduitNotFoundException("Produit non trouvé avec l'ID : " + id));
+    }
+
+    public Produit findProduitById(Long id) {
+        Produit produit = entityManager.find(Produit.class, id);
+        if(produit != null) {
+            entityManager.clear();
+            entityManager.refresh(produit);
+        }
+        return produit;
+    }
+
+
+    public void deleteProductById(Long id) {
+        produitRepository.deleteById(id);
+    }
 }
+

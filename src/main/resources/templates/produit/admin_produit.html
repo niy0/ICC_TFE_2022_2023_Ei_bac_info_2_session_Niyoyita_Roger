@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr"
+      xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajout d'un produit</title>
+    <style>
+        .fieldError{color: red;}
+        .centered-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 90%;
+            margin-top: 5%;
+            margin-bottom: 10px;
+        }
+        .content {
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .title{
+            font-family: Roboto;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div layout:fragment="content" class="content">
+        <div class="container centered-content">
+            <h1 th:text="${title}" class="title">Ajout nouveau produit</h1>
+            <div style="display: block;">
+                <a class="btn btn-outline-success" th:href="@{/produit/create}">Ajouter nouveau produit</a>
+                <a class="btn btn-outline-success" th:href="@{/produits/user}">User view produits</a>
+                <a class="btn btn-outline-success" th:href="@{/cat/allCat}">List catégorie</a>
+            </div>
+            <table class="table table-hover">
+                <thead class="table-success">
+                <tr>
+                    <th scope="col">Image principale</th>
+                    <th scope="col">Id</th>
+                    <th scope="col">Nom</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Prix</th>
+                    <th scope="col">Marque</th>
+                    <th scope="col">Quantité</th>
+                    <th scope="col">Catégorie</th>
+                    <th scope="col">Date création</th>
+                    <th scope="col">Date modification</th>
+                    <th scope="col">Mots clés</th>
+                    <th scope="col">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="produit : ${listProducts}">
+
+                    <td scope="row">
+                        <img th:src="@{/display(id=${produit.id})}" alt="Image du produit" height="100px" width="auto" />
+                    </td>
+
+                    <td>[[${produit.id}]]</td>
+                    <td>[[${produit.nom}]]</td>
+                    <td>[[${produit.description}]]</td>
+                    <td>[[${produit.prix}]]&euro;</td>
+                    <td>[[${produit.marque}]]</td>
+                    <td>[[${produit.quantite}]]</td>
+                    <td th:if="${produit.categorie != null}">[[${produit.categorie.nom}]]</td>
+                    <td th:if="${produit.categorie == null}">Pas de catégorie</td>
+                    <td>[[${produit.dateCreation}]]</td>
+                    <td>[[${produit.dateModification}]]</td>
+                    <td>[[${produit.motsCles}]]</td>
+
+                    <td>
+                        <a class="btn btn-outline-warning" th:href="@{/produit/{id}/edit(id=${produit.id})}">Edit</a>
+                        <form th:id="|deleteForm-${produit.id}|"
+                              th:action="@{/produit/{id}(id=${produit.id})}" th:method="delete">
+                            <a class="btn btn-outline-danger"
+                               href="#" th:onclick="|if(confirm('Confirm delete produit : ${produit.id}'))
+			                             document.getElementById('deleteForm-${produit.id}').submit();
+			                             return false;|">Delete
+                            </a>
+                        </form>
+                    </td>
+
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

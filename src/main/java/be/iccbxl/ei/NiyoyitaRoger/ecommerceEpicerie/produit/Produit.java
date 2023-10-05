@@ -48,9 +48,9 @@ public class Produit {
     @JoinColumn(name = "categorie_id", nullable = false)
     private Categorie categorie;
 
-
     @Column(name = "disponibilite", nullable = false)
     private Boolean disponibilite = true;
+
 
     @Column(name = "date_creation", nullable = false)
     private LocalDateTime dateCreation;
@@ -153,6 +153,7 @@ public class Produit {
                 ", prix=" + prix +
                 ", quantite=" + quantite +
                 ", marque='" + marque + '\'' +
+                ", imagePrincipale=" + imagePrincipale +
                 ", categorie=" + categorie +
                 ", disponibilite=" + disponibilite +
                 ", dateCreation=" + dateCreation +

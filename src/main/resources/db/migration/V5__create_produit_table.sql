@@ -1,5 +1,5 @@
 CREATE TABLE `produit` (
-    `id` bigint(20) NOT NULL AUTO_INCREMENT,
+    `id` bigint(20) AUTO_INCREMENT,
     `nom` varchar(255) NOT NULL,
     `description` varchar(2000) NOT NULL,
     `prix` double NOT NULL,
