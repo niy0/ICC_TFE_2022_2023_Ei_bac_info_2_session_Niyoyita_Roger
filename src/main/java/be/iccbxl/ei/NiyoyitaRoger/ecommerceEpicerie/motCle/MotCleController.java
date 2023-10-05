@@ -1,5 +1,6 @@
 package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.motCle;
 
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.categorie.Categorie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -40,16 +42,22 @@ public class MotCleController {
     }
 
     @PostMapping("/motCle/create")
-    public String create(@Valid @ModelAttribute("motCle") MotCle motCle,
-                         BindingResult bindingResult,
-                         Model model){
-
-        if(bindingResult.hasErrors()){
-            return "motCle/create";
+    public String create(@RequestParam("nom") String nom,
+                         @RequestParam("env") String env,
+                         RedirectAttributes redirectAttrs){
+        String message = "";
+        if (nom.length() < 2 ) {
+            message = "Erreur le nom dois contenr minimum 2 caractères" ;
         }
 
-        motCleService.save(motCle);
-        return "redirect:/motCle/index";
+        if(!motCleService.motCleExist(nom)){
+            MotCle motCleToSave = new MotCle(nom);
+            motCleService.save(motCleToSave);
+        }else {
+            message = "Erreur le nom [ " + nom.toUpperCase() + " ] existe déjà, veuillez réssayé un autre." ;
+        }
+        redirectAttrs.addFlashAttribute("messageMotCle", message);
+        return "redirect:"+env;
     }
 
     @GetMapping("/motCle/{id}/edit")

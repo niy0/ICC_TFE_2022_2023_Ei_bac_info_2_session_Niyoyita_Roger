@@ -35,7 +35,7 @@ public class MotCleService {
         motCleRepository.deleteById(id);
     }
 
-    public boolean MotCleExist(String nom) {
+    public boolean motCleExist(String nom) {
         return motCleRepository.existsByNom(nom.toUpperCase());
     }
 }

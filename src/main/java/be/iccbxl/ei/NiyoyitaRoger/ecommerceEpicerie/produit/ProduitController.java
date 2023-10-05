@@ -8,12 +8,14 @@ import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.motCle.MotCle;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.motCle.MotCleRepository;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.motCle.MotCleService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -50,13 +52,16 @@ public class ProduitController {
     private MotCleService motCleService;
 
 
+
     @GetMapping("/produits/admin")//faire un autre pour les non admin gérent/manager
     public String showAllProducts(Model model) {
+
         List<Produit> productsList = produitService.getAllProduct();
         List<Categorie> categorieList = categorieService.getAllCategorie();
 
         model.addAttribute("listProducts", productsList);
         model.addAttribute("catList", categorieList);
+
         return "produit/admin_produit";
     }
 
@@ -77,8 +82,10 @@ public class ProduitController {
     @GetMapping("/produit/create")
     public String afficherFormulaireNouveauProduit(Model model, HttpServletRequest request) {
 
+        String message = "";
         String title = "Ajout d'un nouveau produit.";
         List<Categorie> categorieList = categorieService.getAllCategorie();
+        List<MotCle> motCleList = motCleService.getAllMotCle();
 
         //Générer le lien retour pour l'annulation
         String referrer = request.getHeader("Referer");
@@ -91,6 +98,8 @@ public class ProduitController {
         model.addAttribute("title",title);
         model.addAttribute("produit", new Produit());
         model.addAttribute("catList", categorieList);
+        model.addAttribute("motCleList", motCleList);
+        model.addAttribute("message",message);
         return "produit/create";
     }
 
@@ -103,7 +112,7 @@ public class ProduitController {
             @RequestParam("quantite") String quantite,
             @RequestParam("image") MultipartFile image,
             @RequestParam("marque") String marque,
-            @RequestParam("motCle") String motCle,
+            @RequestParam("motCleId") long motCle,
             Model model) throws CategorieNotFoundException {
 
         if (image.isEmpty()) {
@@ -149,11 +158,8 @@ public class ProduitController {
             }
         }
 
-        if(motCle.trim().length() >= 1 && motCle != null){
-            MotCle newMot = new MotCle(motCle);
-            motCleService.save(newMot);
-            produit.getMotsCles().add(newMot);
-        }
+        MotCle newMot = motCleService.getMotCle(motCle);
+        produit.getMotsCles().add(newMot);
 
         produit.setNom(nom);
         produit.setDescription(description);

@@ -34,35 +34,46 @@
             <div style="display:flex;">
                 <div style="width: 40%;display:block;margin-right: 250px;">
                     <div class="border border-success rounded" style=" margin-left: auto;margin-right: auto;padding: 10px;margin-bottom: 10px;">
-                        <form  th:action="@{/cat/create/newCat}"   method="post" >
+                        <form th:action="@{/cat/newCat}" method="post">
                             <div class="form-group" style="text-align: left;">
-                                <label for="newNom" >Nom</label>
-                                <input type="text" class="form-control" name="nom" id="newNom"  required/><br>
+                                <label for="newNom">Nom</label>
+                                <input type="text" class="form-control" minlength="2" name="nom" placeholder="Nouvelle catégorie" id="newNom" required/>
+                                <input type="text" class="form-control" value="/produit/create" hidden name="env" />
                             </div>
-                            <p th:style="${message == ''} ? 'display: none;': 'color: red;'">[[${message}]]</p>
-                            <input type="submit" class="btn btn-outline-success" value="Ajouter nouveau catégorie à la liste"   />
+
+                            <p th:if="${messageCat != null and !messageCat.isEmpty()}" style="color: red;">
+                                &#x26A0;
+                                [[${messageCat}]]
+                            </p>
+                            <input type="submit" class="btn btn-outline-success" value="Ajouter nouvelle catégorie à la liste"/>
                         </form>
                     </div>
 
                     <div class="border border-success rounded" style=" margin-left: auto;margin-right: auto;padding: 10px;margin-bottom: 10px;">
-                        <form  th:action="@{/cat/create/newCat}"   method="post" >
+                        <form  th:action="@{/marque/create}"  method="post" >
                             <div class="form-group" style="text-align: left;">
-                                <label for="newNom" >Nom</label>
-                                <input type="text" class="form-control" name="nom" id="newNom"  required/><br>
+                                <label for="newMarque" >Nom</label>
+                                <input type="text" class="form-control" minlength="2" name="nom" placeholder="Nouvelle marque " id="newMarque" required/>
+                                <input type="text" class="form-control" value="/produit/create" hidden name="env"  />
                             </div>
-                            <p th:style="${message == ''} ? 'display: none;': 'color: red;'">[[${message}]]</p>
-                            <input type="submit" class="btn btn-outline-success" value="Ajouter nouveau mot clé à la liste"   />
-                        </form>
-                    </div>
-
-                    <div class="border border-success rounded" style=" margin-left: auto;margin-right: auto;padding: 10px;margin-bottom: 10px;">
-                        <form  th:action="@{/cat/create/newCat}"   method="post" >
-                            <div class="form-group" style="text-align: left;">
-                                <label for="newNom" >Nom</label>
-                                <input type="text" class="form-control" name="nom" id="newNom"  required/><br>
-                            </div>
-                            <p th:style="${message == ''} ? 'display: none;': 'color: red;'">[[${message}]]</p>
+                            <p th:style="${messageMarque == ''} ? 'display: none;': 'color: red;'">[[${messageMarque}]]</p>
                             <input type="submit" class="btn btn-outline-success" value="Ajouter nouvelle marque à la liste"   />
+                        </form>
+                    </div>
+
+                    <div class="border border-success rounded" style=" margin-left: auto;margin-right: auto;padding: 10px;margin-bottom: 10px;">
+                        <form  th:action="@{/motCle/create}" method="post" >
+                            <div class="form-group" style="text-align: left;">
+                                <label for="newMotCle" >Nom</label>
+                                <input type="text" class="form-control" minlength="2" name="nom" placeholder="Nouveau mot clé " id="newMotCle" required/>
+                                <input type="text" class="form-control" value="/produit/create" hidden name="env"  />
+                                <br>
+                            </div>
+                            <p th:if="${messageMotCle != null and !messageMotCle.isEmpty()}" style="color: red;">
+                                &#x26A0;
+                                [[${messageMotCle}]]
+                            </p>
+                            <input type="submit" class="btn btn-outline-success" value="Ajouter nouveau mot clé à la liste"   />
                         </form>
                     </div>
                 </div>
@@ -88,7 +99,7 @@
                         </div>
 
                         <div class="form-group row" style="text-align: left;">
-                            <label for="cat" class="col-sm-4 col-form-label">Categorie :</label>
+                            <label for="cat" class="col-sm-4 col-form-label">Categorie </label>
                             <div>
                                 <div class="col-sm-8">
                                     <select class="form-control selectpicker" id="cat"  style="width:auto;"
@@ -115,9 +126,17 @@
                             <input type="text" class="form-control" name="marque" id="marque" th:field="*{marque}" />
                         </div>
 
-                        <div class="form-group" style="text-align: left;">
-                            <label for="motCle">Mots clés</label>
-                            <input type="text" id="motCle" class="form-control" name="motCle"  />
+                        <div class="form-group row" >
+                            <label for="mot" class="col-sm-4 col-form-label">Mot clé</label>
+                            <div>
+                                <div class="col-sm-8">
+                                    <select class="form-control selectpicker" id="mot"  style="width:auto;"
+                                            onchange="var selectElement = document.getElementById('mot'); var selectedOption = selectElement.options[selectElement.selectedIndex]; document.getElementById('motCleId').value = selectedOption.value;">
+                                        <option th:each="motcle: ${motCleList}"  th:value="${motcle.id}" th:data-id="${motcle.id}" th:text="${motcle.nom}"></option>
+                                    </select>
+                                    <input class="form-group" hidden  name="motCleId" id="motCleId"/>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="form-group" style="text-align: left;">

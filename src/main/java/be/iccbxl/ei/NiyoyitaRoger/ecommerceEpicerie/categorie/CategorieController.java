@@ -1,5 +1,6 @@
 package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.categorie;
 
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.motCle.MotCle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -45,16 +46,25 @@ public class CategorieController {
     }
 
     @PostMapping("/cat/newCat")//chager le chemin
-    public String newCategorie(@RequestParam("nom") String nom, RedirectAttributes redirectAttrs)  {
+    public String create(@RequestParam("nom") String nom,
+                         @RequestParam("env") String env,
+                         RedirectAttributes redirectAttrs){
         String message = "";
-        if(nom.length() > 2 && !categorieService.categorieExist(nom)){
+        String err = "fa-solid fa-triangle-exclamation";
+        //String err = "<i class=\"fa-solid fa-triangle-exclamation\" style=\"color: #ea4848;\"></i>";
+        if (nom.length() < 2 ) {
+            message = "Erreur le nom dois contenr minimum 2 caractères" ;
+        }
+
+        if( !categorieService.categorieExist(nom)){
             Categorie categorieToSave = new Categorie(nom) ;
             categorieService.saveCategorie(categorieToSave);
         }else {
-            message = "Erreur le nom de la categorie existe déjà !" ;
+            message = "Erreur le nom [ " + nom.toUpperCase() + " ] existe déjà, veuillez réssayé un autre." ;
         }
-        redirectAttrs.addFlashAttribute("message", message);
-        return "redirect:/cat/allCat";
+        redirectAttrs.addFlashAttribute("err", err);
+        redirectAttrs.addFlashAttribute("messageCat", message);
+        return "redirect:"+env;
     }
 
     @PostMapping("/cat/create/newCat")//chager le chemin

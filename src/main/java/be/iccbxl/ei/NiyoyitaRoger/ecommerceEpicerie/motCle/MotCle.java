@@ -2,6 +2,8 @@ package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.motCle;
 
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit.Produit;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -14,7 +16,8 @@ public class MotCle {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @NotEmpty(message = "Le nom ne peut pas ^tre vide.")
+    @Size(min=2, max=60, message = "LE nom dois contenir minimum entre 2 et 60 characters.")
     private String nom;
 
     protected MotCle() {}
