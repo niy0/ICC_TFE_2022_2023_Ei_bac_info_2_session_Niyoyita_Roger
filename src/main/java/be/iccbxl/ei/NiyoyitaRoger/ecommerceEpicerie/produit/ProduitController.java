@@ -67,12 +67,9 @@ public class ProduitController {
 
     @GetMapping("/produit/{id}")
     public String getProduitById(@PathVariable long id, Model model) throws ProduitNotFoundException {
-        //List<Produit> produitList = (List<Produit>) produitRepository.findAll();
-        //Long id = Long.parseLong(idStr);
-        Produit test = produitRepository.getPro(id);
-
-        if(test != null){
-            model.addAttribute("produit", test);
+        Produit produit = produitRepository.getPro(id);
+        if(produit != null){
+            model.addAttribute("produit", produit);
             return "/produit/show";
         }
 
@@ -112,7 +109,7 @@ public class ProduitController {
             @RequestParam("quantite") String quantite,
             @RequestParam("image") MultipartFile image,
             @RequestParam("marque") String marque,
-            @RequestParam("motCleId") long motCle,
+            @RequestParam("motCleIds") List<Long> motCleIds,
             Model model) throws CategorieNotFoundException {
 
         if (image.isEmpty()) {
@@ -137,7 +134,6 @@ public class ProduitController {
             e.printStackTrace();
         }
 
-        System.out.println("**********/test*********cat"+catId+"********************");
         if(catId != null && !catId.trim().isEmpty()) {
             Optional<Categorie> cat = categorieRepository.findById(Long.parseLong(catId));
             if(cat.isPresent()){
@@ -158,8 +154,11 @@ public class ProduitController {
             }
         }
 
-        MotCle newMot = motCleService.getMotCle(motCle);
-        produit.getMotsCles().add(newMot);
+        //Ajout des mots clés
+        for(Long motCleId : motCleIds) {
+            MotCle motCle = motCleService.getMotCle(motCleId);
+            produit.getMotsCles().add(motCle);
+        }
 
         produit.setNom(nom);
         produit.setDescription(description);
@@ -200,9 +199,10 @@ public class ProduitController {
         return "redirect:/produits/admin";
     }
 
-    @GetMapping("produit/{id}/edit")
+    @GetMapping("produit/{id}/edit")//faire attention qu'il existe
     public String edit(Model model, @PathVariable("id") String idStr, HttpServletRequest request) throws ProduitNotFoundException {
         Long id = Long.parseLong(idStr);
+
         Produit validProduit = produitRepository.getPro(id);
         List<Categorie> categorieList = categorieService.getAllCategorie();
         model.addAttribute("produit", validProduit);
@@ -216,7 +216,6 @@ public class ProduitController {
         } else {
             model.addAttribute("back", "/produit/"+validProduit.getId());
         }
-
         return "produit/edit";
     }
 

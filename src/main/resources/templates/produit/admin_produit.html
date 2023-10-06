@@ -62,7 +62,7 @@
 
                     <td>[[${produit.id}]]</td>
                     <td>[[${produit.nom}]]</td>
-                    <td>[[${produit.description}]]</td>
+                    <td><p th:text="${produit.description}"></p></td>
                     <td>[[${produit.prix}]]&euro;</td>
                     <td>[[${produit.marque}]]</td>
                     <td>[[${produit.quantite}]]</td>
@@ -70,7 +70,12 @@
                     <td th:if="${produit.categorie == null}">Pas de catégorie</td>
                     <td>[[${produit.dateCreation}]]</td>
                     <td>[[${produit.dateModification}]]</td>
-                    <td>[[${produit.motsCles}]]</td>
+                    <td>
+                        <span th:each="motCle : ${produit.motsCles}" th:unless="${#lists.isEmpty(produit.motsCles)}">
+                            <span th:text="${motCle.nom} + ' '"></span>
+                        </span>
+                        <span th:if="${#lists.isEmpty(produit.motsCles)}">Pas de mots clés</span>
+                    </td>
 
                     <td>
                         <a class="btn btn-outline-warning" th:href="@{/produit/{id}/edit(id=${produit.id})}">Edit</a>

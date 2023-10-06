@@ -30,7 +30,7 @@
 <div class="container" >
     <div layout:fragment="content" class="content" >
         <div  class="container centered-content">
-            <h1 th:text="${title}" class="title">Ajout nouveau produit</h1>
+            <h1 th:text="${title}" class="title">Nouveau produit</h1>
             <div style="display:flex;">
                 <div style="width: 40%;display:block;margin-right: 250px;">
                     <div class="border border-success rounded" style=" margin-left: auto;margin-right: auto;padding: 10px;margin-bottom: 10px;">
@@ -42,7 +42,7 @@
                             </div>
 
                             <p th:if="${messageCat != null and !messageCat.isEmpty()}" style="color: red;">
-                                &#x26A0;
+                                <i class="fa-solid fa-triangle-exclamation" style="color: #ea4848;"></i>
                                 [[${messageCat}]]
                             </p>
                             <input type="submit" class="btn btn-outline-success" value="Ajouter nouvelle catégorie à la liste"/>
@@ -70,7 +70,7 @@
                                 <br>
                             </div>
                             <p th:if="${messageMotCle != null and !messageMotCle.isEmpty()}" style="color: red;">
-                                &#x26A0;
+                                <i class="fa-solid fa-triangle-exclamation" style="color: #ea4848;"></i>
                                 [[${messageMotCle}]]
                             </p>
                             <input type="submit" class="btn btn-outline-success" value="Ajouter nouveau mot clé à la liste"   />
@@ -89,20 +89,15 @@
                         </div>
 
                         <div class="form-group" style="text-align: left;">
-                            <label for="prix">Prix</label>
-                            <input type="number" class="form-control" name="prix" id="prix" step="0.01" th:field="*{prix}" required />
-                        </div>
-
-                        <div class="form-group" style="text-align: left;">
                             <label for="description">Description</label>
                             <textarea id="description" class="form-control" name="description" th:field="*{description}" required></textarea>
                         </div>
 
                         <div class="form-group row" style="text-align: left;">
-                            <label for="cat" class="col-sm-4 col-form-label">Categorie </label>
-                            <div>
+                            <div style="display:bloc;">
+                                <label for="cat" class="col-sm-4 col-form-label">Categorie </label>
                                 <div class="col-sm-8">
-                                    <select class="form-control selectpicker" id="cat"  style="width:auto;"
+                                    <select class="form-control selectpicker" id="cat" style="width:auto;"
                                             onchange="var selectElement = document.getElementById('cat'); var selectedOption = selectElement.options[selectElement.selectedIndex]; document.getElementById('catId').value = selectedOption.value;">
                                         <option th:each="cat: ${catList}"  th:value="${cat.id}" th:data-id="${cat.id}" th:text="${cat.nom}"></option>
                                     </select>
@@ -112,8 +107,24 @@
                         </div>
 
                         <div class="form-group" style="text-align: left;">
+                            <label for="typePrix">Type de Prix</label>
+                            <select class="form-control" id="typePrix" name="typePrix">
+                                <option value="piece">Prix à la pièce</option>
+                                <option value="kilo">Prix au kilo</option>
+                                <option value="litre">Prix au litre</option>
+                                <option value="promotion">Prix promotionnel</option>
+                                <option value="gros">Prix en gros</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" style="text-align: left;">
+                            <label for="prix">Prix</label>
+                            <input type="number" class="form-control" name="prix" min="0.01" id="prix" step="0.01" th:field="*{prix}" required />
+                        </div>
+
+                        <div class="form-group" style="text-align: left;">
                             <label for="quantite">Quantité</label>
-                            <input type="number" class="form-control" name="quantite" id="quantite" th:field="*{quantite}" required />
+                            <input type="number" class="form-control" min="1" name="quantite" id="quantite" th:field="*{quantite}" required />
                         </div>
 
                         <div class="form-group" style="text-align: left;">
@@ -126,27 +137,26 @@
                             <input type="text" class="form-control" name="marque" id="marque" th:field="*{marque}" />
                         </div>
 
-                        <div class="form-group row" >
-                            <label for="mot" class="col-sm-4 col-form-label">Mot clé</label>
-                            <div>
-                                <div class="col-sm-8">
-                                    <select class="form-control selectpicker" id="mot"  style="width:auto;"
-                                            onchange="var selectElement = document.getElementById('mot'); var selectedOption = selectElement.options[selectElement.selectedIndex]; document.getElementById('motCleId').value = selectedOption.value;">
-                                        <option th:each="motcle: ${motCleList}"  th:value="${motcle.id}" th:data-id="${motcle.id}" th:text="${motcle.nom}"></option>
-                                    </select>
-                                    <input class="form-group" hidden  name="motCleId" id="motCleId"/>
+                        <div class="form-group row" style="display: flex; justify-content: center; align-items: center;">
+                            <div style="display: block; flex: 1;margin:0;padding:0;max-width:100%;max-height:100%;">
+                                <label class="col-sm-4 col-form-label">Mots clés</label>
+                                <div class="col-sm-8" style="margin-left:auto;margin-right:auto;padding:0;">
+                                    <div th:each="motcle: ${motCleList}" style="display: inline-block; margin-right: 10px;">
+                                        <input type="checkbox" th:value="${motcle.id}" name="motCleIds" th:id="${'motCle'+motcle.id}" />
+                                        <label th:for="${'motCle'+motcle.id}" th:text="${motcle.nom}"></label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
+                        
                         <div class="form-group" style="text-align: left;">
-                            <button type="submit">Créer</button>
-                            <a th:href="${back}">Annuler</a>
+                            <button class="btn btn-outline-success" type="submit">Créer</button>
+                            <a class="btn btn-outline-warning" th:href="${back}">Annuler</a>
                         </div>
                     </form>
                 </div>
             </div>
-            <a th:href="@{/artists}">Retour à l'index</a>
+            <a th:href="@{/produits/admin}">Retour à Admin produit</a>
         </div>
     </div>
 </div>
