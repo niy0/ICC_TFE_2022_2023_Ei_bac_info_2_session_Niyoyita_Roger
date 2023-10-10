@@ -6,31 +6,33 @@
     <meta charset="UTF-8">
     <title>Ajout d'un produit</title>
     <style>
-        .fieldError{color: red;}
-        .centered-content {
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            min-height: 90%;
-            margin-top: 5%;
-            margin-bottom: 10px;
-        }
-        .content {
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        .title{
-            font-family: Roboto;
-        }
-    </style>
+            .fieldError{color: red;}
+            .centered-content {
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                min-height: 90%;
+                margin-top: auto; /* Ajustez la marge supérieure pour aligner en haut */
+                margin-bottom: 10px;
+                align-self: flex-start; /* Alignez-vous tout en haut */
+            }
+            .content {
+                width: 100%;
+                max-height: 90vh;
+                overflow-y: auto;
+                margin-top:0;
+            }
+            .title{
+                font-family: Roboto;
+            }
+        </style>
 </head>
 <body>
-<div class="container" >
-    <div layout:fragment="content" class="content" >
+<div class="container">
+    <div layout:fragment="content" class="content">
         <div  class="container centered-content">
-            <h1 th:text="${title}" class="title">Nouveau produit</h1>
+            <h1 th:text="${title}" class="title"></h1>
             <div style="display:flex;">
                 <div style="width: 40%;display:block;margin-right: 250px;">
                     <div class="border border-success rounded" style=" margin-left: auto;margin-right: auto;padding: 10px;margin-bottom: 10px;">
@@ -97,9 +99,15 @@
                             <div style="display:bloc;">
                                 <label for="cat" class="col-sm-4 col-form-label">Categorie </label>
                                 <div class="col-sm-8">
-                                    <select class="form-control selectpicker" id="cat" style="width:auto;"
-                                            onchange="var selectElement = document.getElementById('cat'); var selectedOption = selectElement.options[selectElement.selectedIndex]; document.getElementById('catId').value = selectedOption.value;">
-                                        <option th:each="cat: ${catList}"  th:value="${cat.id}" th:data-id="${cat.id}" th:text="${cat.nom}"></option>
+                                    <select class="form-control selectpicker"  id="cat" style="width:auto;" required
+                                            onchange="var selectElement = document.getElementById('cat'); var selectedOption = selectElement.options[selectElement.selectedIndex];
+                                                      if (selectedOption.value === '') {
+                                                          document.getElementById('catId').value = '${catList[0].id}'; // Prend le premier ID
+                                                      } else {
+                                                          document.getElementById('catId').value = selectedOption.value;
+                                                      }">
+                                        <option value="" selected  >Inséré une catégorie</option> <!-- Option vide -->
+                                        <option  th:each="cat: ${catList}"  th:value="${cat.id}" th:data-id="${cat.id}" th:text="${cat.nom}"></option>
                                     </select>
                                     <input class="form-group" hidden  name="catId" id="catId"/>
                                 </div>
@@ -108,8 +116,8 @@
 
                         <div class="form-group" style="text-align: left;">
                             <label for="typePrix">Type de Prix</label>
-                            <select class="form-control" id="typePrix" name="typePrix">
-                                <option value="piece">Prix à la pièce</option>
+                            <select class="form-control" id="typePrix" name="typePrix" th:field="*{typePrix}" required>
+                                <option value="piece" selected>Prix à la pièce</option>
                                 <option value="kilo">Prix au kilo</option>
                                 <option value="litre">Prix au litre</option>
                                 <option value="promotion">Prix promotionnel</option>
@@ -123,8 +131,28 @@
                         </div>
 
                         <div class="form-group" style="text-align: left;">
-                            <label for="quantite">Quantité</label>
-                            <input type="number" class="form-control" min="1" name="quantite" id="quantite" th:field="*{quantite}" required />
+                            <div style="display: block;">
+                                <label for="quantite">Quantité</label>
+                                <input type="number" class="form-control" min="1" name="quantite" id="quantite" th:field="*{quantite}" required/>
+                            </div>
+                            <div style="display: flex;">
+                                <input type="number" placeholder="min : stock" class="form-control" min="1" name="minStock"  />
+                                <input type="number" placeholder="max : stock" class="form-control" name="maxStock" th:field="*{maxStock}"
+                                       onchange="var maxStockValue = this.value;
+                                         var quantiteValue = document.getElementById('quantite').value;
+                                         var maxStockError = document.getElementById('maxStockError');
+
+                                         if (quantiteValue !== '' && maxStockValue !== '' && parseFloat(maxStockValue) < parseFloat(quantiteValue)) {
+                                             maxStockError.style.display = 'block';
+                                             maxStockError.innerHTML = '<i class=\'fas fa-exclamation-circle\' style=\'color: #ea4848;\'></i> MaxStock doit être plus grand ou égal à quantité : ' + quantiteValue;
+                                         } else {
+                                             maxStockError.style.display = 'none';
+                                         }" />
+                            </div>
+                            <p style="color: red; display: none;" id="maxStockError">
+                                <i class="fas fa-exclamation-circle" style="color: #ea4848;"></i>
+                                MaxStock doit être plus grand ou égal à quantité qui est a : <span id="quantiteValue"></span>
+                            </p>
                         </div>
 
                         <div class="form-group" style="text-align: left;">
@@ -132,9 +160,20 @@
                             <input type="file" class="form-control" id="image" name="image" accept="image/*" />
                         </div>
 
-                        <div class="form-group" style="text-align: left;">
-                            <label for="marque">Marque</label>
-                            <input type="text" class="form-control" name="marque" id="marque" th:field="*{marque}" />
+                        <div class="form-group row">
+                            <div class="col-sm-4" style="display:bloc;">
+                                <label for="marque" class="col-form-label">Marque</label>
+                                <select class="form-control selectpicker" id="marque" style="width:auto;" onchange="var selectElement = document.getElementById('marque'); var selectedOption = selectElement.options[selectElement.selectedIndex]; document.getElementById('marqueId').value = selectedOption.value;">
+                                    <option th:each="marque: ${marqueList}" th:value="${marque.id}" th:data-id="${marque.id}" th:text="${marque.nom}"></option>
+                                </select>
+                                <input class="form-group" hidden name="marqueId" id="marqueId" />
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="actif" class="col-sm-4 col-form-label">Actif (dans le site) </label>
+                            <div class="col-sm-8 d-flex align-items-center">
+                                <input type="checkbox" class="form-check-input custom-checkbox ml-2" id="actif" name="actif" />
+                            </div>
                         </div>
 
                         <div class="form-group row" style="display: flex; justify-content: center; align-items: center;">
@@ -148,18 +187,16 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="form-group" style="text-align: left;">
                             <button class="btn btn-outline-success" type="submit">Créer</button>
-                            <a class="btn btn-outline-warning" th:href="${back}">Annuler</a>
+                            <a th:href="@{/produits/admin}" class="btn btn-outline-warning" >Annuler</a>
                         </div>
                     </form>
                 </div>
             </div>
-            <a th:href="@{/produits/admin}">Retour à Admin produit</a>
         </div>
     </div>
 </div>
-
 </body>
 </html>

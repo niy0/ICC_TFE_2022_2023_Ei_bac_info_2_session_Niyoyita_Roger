@@ -38,16 +38,6 @@ public class ProduitService {
                 .orElseThrow(() -> new ProduitNotFoundException("Produit non trouvé avec l'ID : " + id));
     }
 
-    public Produit findProduitById(Long id) {
-        Produit produit = entityManager.find(Produit.class, id);
-        if(produit != null) {
-            entityManager.clear();
-            entityManager.refresh(produit);
-        }
-        return produit;
-    }
-
-
     public void deleteProductById(Long id) {
         produitRepository.deleteById(id);
     }

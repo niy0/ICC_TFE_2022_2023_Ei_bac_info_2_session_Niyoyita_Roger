@@ -44,9 +44,9 @@
                     <th scope="col">Nom</th>
                     <th scope="col">Description</th>
                     <th scope="col">Prix</th>
-                    <th scope="col">Marque</th>
-                    <th scope="col">Quantité</th>
                     <th scope="col">Catégorie</th>
+                    <th scope="col">Quantité</th>
+                    <th scope="col">Marque</th>
                     <th scope="col">Date création</th>
                     <th scope="col">Date modification</th>
                     <th scope="col">Mots clés</th>
@@ -59,15 +59,13 @@
                     <td scope="row">
                         <img th:src="@{/display(id=${produit.id})}" alt="Image du produit" height="100px" width="auto" />
                     </td>
-
                     <td>[[${produit.id}]]</td>
                     <td>[[${produit.nom}]]</td>
                     <td><p th:text="${produit.description}"></p></td>
                     <td>[[${produit.prix}]]&euro;</td>
-                    <td>[[${produit.marque}]]</td>
+                    <td th:text="${produit.categorie.nom}"></td>
                     <td>[[${produit.quantite}]]</td>
-                    <td th:if="${produit.categorie != null}">[[${produit.categorie.nom}]]</td>
-                    <td th:if="${produit.categorie == null}">Pas de catégorie</td>
+                    <td th:text="${produit.marque != null ? produit.marque.nom : 'Pas de marque'}"></td>
                     <td>[[${produit.dateCreation}]]</td>
                     <td>[[${produit.dateModification}]]</td>
                     <td>

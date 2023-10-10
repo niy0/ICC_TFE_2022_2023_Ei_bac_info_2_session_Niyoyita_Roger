@@ -1,6 +1,7 @@
 package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit;
 
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.categorie.Categorie;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.marque.Marque;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.motCle.MotCle;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -37,11 +38,12 @@ public class Produit {
     @Column(name = "quantite", nullable = false)
     private Integer quantite;
 
-    @Column(name = "marque", length = 40)
-    private String marque;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "marque_id")
+    private Marque marque;
 
     @Lob
-    @Column(name = "image_principale")
+    @Column(name = "image_principale", nullable = false)
     private Blob imagePrincipale;
 
     @ManyToOne
@@ -51,12 +53,33 @@ public class Produit {
     @Column(name = "disponibilite", nullable = false)
     private Boolean disponibilite = true;
 
-
     @Column(name = "date_creation", nullable = false)
     private LocalDateTime dateCreation;
 
     @Column(name = "date_modification")
     private LocalDateTime dateModification;
+
+    //*************admin/manager manage*************
+    //min,middle,max,cote,actif, type de prix
+
+    @Column()
+    private Integer minStock = 1;
+
+    @Column()
+    private Integer middleStock = null;
+
+    @Column()
+    private Integer maxStock = null;
+
+    @Column()
+    private Integer cote = null;
+
+    @Column()
+    private Boolean actif = true;
+
+    @Column(name = "type_prix", nullable = false)
+    private String typePrix;
+    //******************************
 
     @ManyToMany
     @JoinTable(
@@ -92,7 +115,7 @@ public class Produit {
 
     public Integer getQuantite() { return quantite; }
 
-    public String getMarque() { return marque; }
+
 
     public Blob getImagePrincipale() { return imagePrincipale; }
 
@@ -120,7 +143,7 @@ public class Produit {
         updateDisponibilite();
     }
 
-    public void setMarque(String marque) { this.marque = marque; }
+
 
     public void setImagePrincipale(Blob imagePrincipale) { this.imagePrincipale = imagePrincipale; }
 
@@ -144,23 +167,6 @@ public class Produit {
         this.dateModification = LocalDateTime.now();
     }
 
-    @Override
-    public String toString() {
-        return "Produit{" +
-                "id=" + id +
-                ", nom='" + nom + '\'' +
-                ", description='" + description + '\'' +
-                ", prix=" + prix +
-                ", quantite=" + quantite +
-                ", marque='" + marque + '\'' +
-                ", imagePrincipale=" + imagePrincipale +
-                ", categorie=" + categorie +
-                ", disponibilite=" + disponibilite +
-                ", dateCreation=" + dateCreation +
-                ", dateModification=" + dateModification +
-                ", motsCles=" + motsCles +
-                '}';
-    }
 
     public List<String> listMotsCle(){
         List<String> res = new ArrayList<>();
@@ -176,5 +182,87 @@ public class Produit {
             return str;
         }
         return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
+    }
+
+    public Marque getMarque() {
+        return marque;
+    }
+
+    public void setMarque(Marque marque) {
+        this.marque = marque;
+    }
+
+
+
+    public Integer getMinStock() {
+        return minStock;
+    }
+
+    public Integer getMiddleStock() {
+        return middleStock;
+    }
+
+    public Integer getMaxStock() {
+        return maxStock;
+    }
+
+    public Integer getCote() {
+        return cote;
+    }
+
+    public Boolean getActif() {
+        return actif;
+    }
+
+    public String getTypePrix() {
+        return typePrix;
+    }
+
+    public void setMinStock(Integer minStock) {
+        this.minStock = minStock;
+    }
+
+    public void setMiddleStock(Integer middleStock) {
+        this.middleStock = middleStock;
+    }
+
+    public void setMaxStock(Integer maxStock) {
+        this.maxStock = maxStock;
+    }
+
+    public void setCote(Integer cote) {
+        this.cote = cote;
+    }
+
+    public void setActif(Boolean actif) {
+        this.actif = actif;
+    }
+
+    public void setTypePrix(String typePrix) {
+        this.typePrix = typePrix;
+    }
+
+    @Override
+    public String toString() {
+        return "Produit{" +
+                "id=" + id +
+                ", nom='" + nom + '\'' +
+                ", description='" + description + '\'' +
+                ", prix=" + prix +
+                ", quantite=" + quantite +
+                ", marque=" + marque +
+                ", imagePrincipale=" + imagePrincipale +
+                ", categorie=" + categorie +
+                ", disponibilite=" + disponibilite +
+                ", dateCreation=" + dateCreation +
+                ", dateModification=" + dateModification +
+                ", minStock=" + minStock +
+                ", middleStock=" + middleStock +
+                ", maxStock=" + maxStock +
+                ", cote=" + cote +
+                ", actif=" + actif +
+                ", typePrix='" + typePrix + '\'' +
+                ", motsCles=" + motsCles +
+                '}';
     }
 }

@@ -4,6 +4,9 @@ import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.categorie.Categorie;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.categorie.CategorieNotFoundException;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.categorie.CategorieRepository;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.categorie.CategorieService;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.marque.Marque;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.marque.MarqueRepository;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.marque.MarqueService;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.motCle.MotCle;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.motCle.MotCleRepository;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.motCle.MotCleService;
@@ -51,6 +54,12 @@ public class ProduitController {
     @Autowired
     private MotCleService motCleService;
 
+    @Autowired
+    private MarqueRepository marqueRepository;
+
+    @Autowired
+    private MarqueService marqueService;
+
 
 
     @GetMapping("/produits/admin")//faire un autre pour les non admin gérent/manager
@@ -72,17 +81,18 @@ public class ProduitController {
             model.addAttribute("produit", produit);
             return "/produit/show";
         }
-
         return "redirect:/produits/admin";
     }
 
     @GetMapping("/produit/create")
     public String afficherFormulaireNouveauProduit(Model model, HttpServletRequest request) {
-
         String message = "";
-        String title = "Ajout d'un nouveau produit.";
+        String title = "Nouveau produit";
+
+        //Trié les listes par ordre !!
         List<Categorie> categorieList = categorieService.getAllCategorie();
         List<MotCle> motCleList = motCleService.getAllMotCle();
+        List<Marque> marqueList = marqueService.getAllMarque();
 
         //Générer le lien retour pour l'annulation
         String referrer = request.getHeader("Referer");
@@ -96,7 +106,9 @@ public class ProduitController {
         model.addAttribute("produit", new Produit());
         model.addAttribute("catList", categorieList);
         model.addAttribute("motCleList", motCleList);
+        model.addAttribute("marqueList", marqueList);
         model.addAttribute("message",message);
+
         return "produit/create";
     }
 
@@ -108,8 +120,11 @@ public class ProduitController {
             @RequestParam("catId") String catId,
             @RequestParam("quantite") String quantite,
             @RequestParam("image") MultipartFile image,
-            @RequestParam("marque") String marque,
+            @RequestParam("marqueId") String marque,
             @RequestParam("motCleIds") List<Long> motCleIds,
+            @RequestParam("typePrix") String typePrix,
+            @RequestParam("minStock") String minStock,
+            @RequestParam("maxStock") String maxStock,
             Model model) throws CategorieNotFoundException {
 
         if (image.isEmpty()) {
@@ -121,7 +136,6 @@ public class ProduitController {
         try {
             // Lire l'image à l'aide de ImageIO
             BufferedImage bufferedImage = ImageIO.read(image.getInputStream());
-
             // Convertir l'image en format JPEG
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(bufferedImage, "jpeg", baos);
@@ -139,11 +153,14 @@ public class ProduitController {
             if(cat.isPresent()){
                 Categorie catRes = categorieService.getCategorieById(cat.get().getId());
                 produit.setCategorie(catRes);
+            } else {
+                throw new CategorieNotFoundException("Catégorie non trouvée");
             }
         }
 
         System.out.println(produit);
         // Faire de même pour la gestion des mots-clés
+        String errorCat = "";
         if(catId != null && !catId.trim().isEmpty()) {
             Optional<Categorie> cat = categorieRepository.findById(Long.parseLong(catId));
             if(cat.isPresent()){
@@ -159,19 +176,37 @@ public class ProduitController {
             MotCle motCle = motCleService.getMotCle(motCleId);
             produit.getMotsCles().add(motCle);
         }
-
         produit.setNom(nom);
         produit.setDescription(description);
         produit.setPrix(Double.parseDouble(prix));
-        produit.setQuantite(Integer.parseInt(quantite));
         produit.setDisponibilite(true);
-        produit.setMarque(marque);
+        //********test
+        produit.setTypePrix(typePrix);
+        quantite.trim();
+        minStock.trim();
+        maxStock.trim();
+        produit.setQuantite(Integer.parseInt(quantite));
+
+        if(!minStock.isEmpty() && minStock != "") {
+            produit.setMinStock(Integer.parseInt(minStock));
+        }
+        if(!maxStock.isEmpty() && maxStock != ""){
+            produit.setMaxStock(Integer.parseInt(maxStock));
+        }
+        //*********fintest
+
+        if(marque != null && !marque.trim().isEmpty()) {
+            Optional<Marque> marqueRes = Optional.ofNullable(marqueRepository.findById(Long.parseLong(marque)));
+            if(marqueRes.isPresent()) {
+                Marque marque1 = marqueRes.get();
+                produit.setMarque(marque1);
+            }
+            System.out.println(marqueRes+"***************************debug");
+        }
+
         produit.setDateCreation(LocalDateTime.now());
-
         produitService.updateProduit(produit);
-
         model.addAttribute("produit", produit);
-
         return "redirect:/produits/admin";
     }
 
@@ -232,5 +267,4 @@ public class ProduitController {
         }
         return ResponseEntity.noContent().build(); // Notez l'appel à .build() ici
     }
-
 }

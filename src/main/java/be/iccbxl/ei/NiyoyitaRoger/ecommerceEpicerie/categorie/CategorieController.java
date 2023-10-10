@@ -26,6 +26,8 @@ public class CategorieController {
         return "/produit/categorie/index";
     }
 
+    //manque le get pour un
+
     @GetMapping("/cat/nouveau")
     public String afficherFormulaireNouveauCategorie(Model model) {
         model.addAttribute("categorie", new Categorie());

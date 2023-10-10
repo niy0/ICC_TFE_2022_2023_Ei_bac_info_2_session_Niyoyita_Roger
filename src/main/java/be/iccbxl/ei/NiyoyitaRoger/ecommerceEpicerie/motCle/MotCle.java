@@ -16,8 +16,7 @@ public class MotCle {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotEmpty(message = "Le nom ne peut pas ^tre vide.")
-    @Size(min=2, max=60, message = "LE nom dois contenir minimum entre 2 et 60 characters.")
+    @Column(name = "nom", length = 40, nullable = false)
     private String nom;
 
     protected MotCle() {}
