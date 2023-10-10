@@ -125,6 +125,7 @@ public class ProduitController {
             @RequestParam("typePrix") String typePrix,
             @RequestParam("minStock") String minStock,
             @RequestParam("maxStock") String maxStock,
+            @RequestParam(name = "actif", required = false) Boolean actif,
             Model model) throws CategorieNotFoundException {
 
         if (image.isEmpty()) {
@@ -180,7 +181,6 @@ public class ProduitController {
         produit.setDescription(description);
         produit.setPrix(Double.parseDouble(prix));
         produit.setDisponibilite(true);
-        //********test
         produit.setTypePrix(typePrix);
         quantite.trim();
         minStock.trim();
@@ -193,7 +193,10 @@ public class ProduitController {
         if(!maxStock.isEmpty() && maxStock != ""){
             produit.setMaxStock(Integer.parseInt(maxStock));
         }
-        //*********fintest
+
+        if (actif == null) {
+            produit.setActif(false);
+        }
 
         if(marque != null && !marque.trim().isEmpty()) {
             Optional<Marque> marqueRes = Optional.ofNullable(marqueRepository.findById(Long.parseLong(marque)));
