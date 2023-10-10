@@ -11,24 +11,19 @@ import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.motCle.MotCle;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.motCle.MotCleRepository;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.motCle.MotCleService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-
-
 import javax.imageio.ImageIO;
 import java.util.List;
 import java.util.Optional;
@@ -243,8 +238,13 @@ public class ProduitController {
 
         Produit validProduit = produitRepository.getPro(id);
         List<Categorie> categorieList = categorieService.getAllCategorie();
+        List<MotCle> motCleList = motCleService.getAllMotCle();
+        List<Marque> marqueList = marqueService.getAllMarque();
+
         model.addAttribute("produit", validProduit);
         model.addAttribute("catList", categorieList);
+        model.addAttribute("motCleList", motCleList);
+        model.addAttribute("marqueList", marqueList);
 
         //Générer le lien retour pour l'annulation
         String referrer = request.getHeader("Referer");
@@ -256,6 +256,107 @@ public class ProduitController {
         }
         return "produit/edit";
     }
+
+    @PutMapping("/produit/{id}/edit")
+    public String updateProduit(
+            @PathVariable("id") Long id,
+            @RequestParam("nom") String nom,
+            @RequestParam("description") String description,
+            @RequestParam("prix") String prix,
+            @RequestParam("catId") String catId,
+            @RequestParam("quantite") String quantite,
+            @RequestParam("image") MultipartFile image,
+            @RequestParam("marqueId") String marque,
+            @RequestParam("motCleIds") List<Long> motCleIds,
+            @RequestParam("typePrix") String typePrix,
+            @RequestParam("minStock") String minStock,
+            @RequestParam("maxStock") String maxStock,
+            @RequestParam(name = "actif", required = false) Boolean actif,
+            Model model) throws CategorieNotFoundException, ProduitNotFoundException {
+
+        //Produit produit = produitService.getProduitById(id); // Récupérer le produit existant par son ID
+        Produit produit = produitRepository.getPro(id);
+
+        // Vérifier si une nouvelle image a été sélectionnée
+        if (!image.isEmpty()) {
+            try {
+                // Lire l'image à l'aide de ImageIO
+                BufferedImage bufferedImage = ImageIO.read(image.getInputStream());
+                // Convertir l'image en format JPEG
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(bufferedImage, "jpeg", baos);
+                byte[] imageBytes = baos.toByteArray();
+
+                // Enregistrez l'image dans l'objet Produit
+                Blob blob = new javax.sql.rowset.serial.SerialBlob(imageBytes);
+                produit.setImagePrincipale(blob);
+            } catch (IOException | SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (catId != null && !catId.trim().isEmpty()) {
+            // Valider catId avant de le convertir en Long
+            try {
+                Long categoryId = Long.parseLong(catId);
+                Categorie cat = categorieRepository.findById(categoryId).orElse(null);
+                if (cat != null) {
+                    produit.setCategorie(cat);
+                } else {
+                    throw new CategorieNotFoundException("Catégorie non trouvée");
+                }
+            } catch (NumberFormatException e) {
+                // Gérer l'erreur ici, par exemple, afficher un message à l'utilisateur
+            }
+        }
+
+        // Ajout des mots clés
+        produit.getMotsCles().clear(); // Supprimer les mots-clés existants
+        for (Long motCleId : motCleIds) {
+            MotCle motCle = motCleService.getMotCle(motCleId);
+            produit.getMotsCles().add(motCle);
+        }
+
+        produit.setNom(nom);
+        produit.setDescription(description);
+        produit.setPrix(Double.parseDouble(prix));
+        produit.setTypePrix(typePrix);
+        quantite.trim();
+        minStock.trim();
+        maxStock.trim();
+        produit.setQuantite(Integer.parseInt(quantite));
+
+        if (!minStock.isEmpty() && minStock != "") {
+            produit.setMinStock(Integer.parseInt(minStock));
+        }
+        if (!maxStock.isEmpty() && maxStock != "") {
+            produit.setMaxStock(Integer.parseInt(maxStock));
+        }
+
+        if (actif == null) {
+            produit.setActif(false);
+        } else {
+            produit.setActif(actif);
+        }
+
+        if (marque != null && !marque.trim().isEmpty()) {
+            Optional<Marque> marqueRes = Optional.ofNullable(marqueRepository.findById(Long.parseLong(marque)));
+            if (marqueRes.isPresent()) {
+                Marque marque1 = marqueRes.get();
+                produit.setMarque(marque1);
+            }
+        }
+
+        produit.setDateModification(LocalDateTime.now()); // Ajouter une date de modification
+        produitService.updateProduit(produit); // Mettre à jour le produit
+
+        // Ajouter le produit à l'objet Model si nécessaire
+        model.addAttribute("produit", produit);
+
+        // Rediriger l'utilisateur vers une page appropriée après la mise à jour du produit
+        return "redirect:/produits/admin";
+    }
+
 
     @GetMapping("/display")
     public ResponseEntity<byte[]> displayImage(@RequestParam("id") String idString) throws IOException, SQLException, ProduitNotFoundException {
