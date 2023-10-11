@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="fr"
+      xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
       layout:decorate="~{layouts/main}">
 <head>
     <meta charset="UTF-8">
     <title>Vue d'un produit</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
     <style>
-        .fieldError{color: red;}
+        .fieldError { color: red; }
         .centered-content {
             display: flex;
             flex-direction: column;
@@ -14,71 +16,166 @@
             align-items: center;
             min-height: 90%;
             margin-top: 5%;
-            margin-bottom: 10px;
         }
         .content {
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
         }
-        .title{
+        .title {
             font-family: Roboto;
         }
+        .product-card {
+            width: 30rem;
+        }
+        .product-image {
+            max-width: 100%;
+            height: auto;
+        }
+        .product-details {
+            text-align: left;
+        }
+        .product-title {
+            margin: 0;
+            font-weight: bold;
+        }
+        .product-price {
+            margin: 0;
+            font-weight: bold;
+        }
+        .detail-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .rating {
+            direction: rtl;
+        }
+        .rating label {
+            font-size: 20px;
+            color: #ffcc00;
+            cursor: pointer;
+        }
+                /* Cachez l'icône de cœur solide par défaut */
+        .fa-solid.fa-heart {
+            display: none;
+        }
+
+        /* Style pour le bouton */
+        button {
+            border: none;            /* Enlevez le bord */
+            border-radius: 5px;     /* Ajoutez un border-radius pour arrondir les coins */
+            outline: none;          /* Supprimez le contour par défaut lors de la mise au point */
+            cursor: pointer;        /* Affichez un curseur de main lorsque vous survolez */
+            transition: background-color 0.3s;  /* Ajoutez une transition pour un changement de couleur en douceur */
+        }
+
+        button:hover {
+            background-color: #b3b7b5;  /* Changez la couleur de fond au survol pour un effet léger */
+        }
+
+        /* Cachez l'icône de cœur solide par défaut */
+        .fa-solid.fa-heart {
+            display: none;
+        }
+
+        /* Lorsque vous survolez le bouton: */
+        /* Cachez l'icône de cœur régulière */
+        button:hover .fa-regular.fa-heart {
+            display: none;
+        }
+
+        /* Affichez l'icône de cœur solide lorsque vous survolez le bouton */
+        button:hover .fa-solid.fa-heart {
+            display: inline;
+        }
+
+
     </style>
 </head>
+<body>
 <div class="container">
     <div layout:fragment="content" class="content">
-        <div style="display:block; margin-bottom: 20px;">
+        <div class="d-flex justify-content-between mb-4">
             <a class="btn btn-outline-success" th:href="@{/produits}">Liste des produits</a>
             <a class="btn btn-outline-success" th:href="@{/produit/create}">Ajouter nouveau produit</a>
+            <a class="btn btn-primary" th:href="@{/produits/user}">Retour produits</a>
         </div>
 
         <div class="d-flex justify-content-center">
-            <div class="card mb-4" style="width: 30rem;">
-                <img class="card-img-top" th:src="@{${'/display?id=' + produit.id}}" alt="Image du produit">
-                <div class="card-body" style="text-align:left;">
-                    <h5 class="card-title ">[[${produit.nom}]]</h5>
-                    <p class="card-text">
-                    <div>
-                        <p>[[${produit.description}]]</p>
+            <div class="card mb-4 product-card">
+                <img class="card-img-top product-image" th:src="@{${'/display?id=' + produit.id}}" alt="Image du produit">
+                <div class="card-body product-details">
+                    <h1 class="product-title">[[${produit.nom}]]</h1>
+                    <div class="rating">
+                        <!-- Les étoiles... -->
+                        <input type="radio" id="star5" name="rating" value="5" style="display: none;" th:checked="${produit.cote >= 5}">
+                        <label for="star5"><i class="fas fa-star star-filled"></i></label>
+                        <input type="radio" id="star4" name="rating" value="4" style="display: none;" th:checked="${produit.cote >= 4}">
+                        <label for="star4"><i class="fas fa-star star-filled"></i></label>
+                        <input type="radio" id="star3" name="rating" value="3" style="display: none;" th:checked="${produit.cote >= 3}">
+                        <label for="star3"><i class="fas fa-star star-filled"></i></label>
+                        <input type="radio" id="star2" name="rating" value="2" style="display: none;" th:checked="${produit.cote >= 2}">
+                        <label for="star2"><i class="fas fa-star star-filled"></i></label>
+                        <input type="radio" id="star1" name="rating" value="1" style="display: none;" th:checked="${produit.cote >= 1}">
+                        <label for="star1"><i class="fas fa-star star-filled"></i></label>
                     </div>
-                    </p>
-                </div>
-                <ul class="list-group list-group-flush" style="text-align:left;">
-                    <li class="list-group-item">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <p style="margin: 0;">Prix </p>
-                            <p style="margin: 0; font-weight: bold;">[[${produit.prix} ]]&euro;</p>
+                    <p>[[${produit.description}]]</p>
+                    <h2 class="product-price">[[${produit.prix}]]&euro;</h2>
+                    <div class="detail-group mb-3">
+                        <div class="input-group input-spinner">
+                            <div class="input-group-prepend">
+                                <button class="button-minus btn btn-sm btn-outline-success" type="button" data-field="quantity"
+                                        onclick="var input = this.parentElement.nextElementSibling; input.value = parseInt(input.value) - 1; if(input.value < 1) input.value = 1;">
+                                    <i class="fa-solid fa-minus"></i>
+                                </button>
+                            </div>
+                            <input style="width:80px;margin:0;" type="number" disabled step="1" max="10" value="1" name="quantity" class="quantity-field form-control-sm form-input text-center">
+                            <div class="input-group-append">
+                                <button class="button-plus btn btn-sm btn-outline-success" type="button" data-field="quantity"
+                                        onclick="var input = this.parentElement.previousElementSibling; input.value = parseInt(input.value) + 1; if(input.value > 10) input.value = 10;">
+                                    <i class="fa-solid fa-plus"></i>
+                                </button>
+                            </div>
                         </div>
-                    </li>
-                    <li class="list-group-item">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <p style="margin: 0;">Catégorie </p>
-                            <p style="margin: 0;">[[${produit.categorie}]]</p>
-                        </div>
-                    </li>
-                    <li th:if="${produit.marque != ''}" class="list-group-item">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <p style="margin: 0;">Marque </p>
-                            <p style="margin: 0;">[[${produit.marque}]]</p>
-                        </div>
-                    </li>
-                    <li th:if="${produit.motsCles.isEmpty()}" class="list-group-item">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <p style="margin: 0;">Mots clés </p>
-                            <p th:if="${produit.MotsCles != null}" style="margin: 0;">[[${produit.MotsCles}]]</p>
-                        </div>
-                    </li>
-                    <li  class="list-group-item">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <p style="margin: 0;">En stock </p>
-                            <input class="form-check-input" type="checkbox" th:checked="${produit.disponibilite}" disabled="disabled">
-                        </div>
-                    </li>
-                </ul>
-                <div class="card-body" style="text-align:left;">
-                    <a class="card-link btn btn-primary" th:href="@{/produits/user}" >Retour produits</a>
-                    <a href="#!" class="btn btn-success">Dans le panier</a>
+                        <button style="background-color:#cccfce;"  title="Ajouter aux favoris">
+                            <i class="fa-regular fa-heart" style="color: #d91717;"></i>
+                            <i class="fa-solid fa-heart" style="color: #d91717;"></i>
+                        </button>
+                    </div>
+                    <a href="#!" class="btn btn-success w-100 mb-3"><i class="fa fa-shopping-cart"></i> Ajouter </a>
+                    <!-- Le reste de votre code... -->
+                    <ul class="list-group list-group-flush" style="text-align:left;">
+                        <li class="list-group-item">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <p style="margin: 0;">Catégorie </p>
+                                <p style="margin: 0;">[[${produit.categorie.nom}]]</p>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <p style="margin: 0;">Disponibilité </p>
+                                <p th:if="${produit.disponibilite}" style="margin: 0;">En stock</p>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <p style="margin: 0;">Marque </p>
+                                <p style="margin: 0;">
+                                    <span th:if="${produit.marque != null and !#strings.isEmpty(produit.marque.nom)}">[[${produit.marque.nom}]]</span>
+                                    <span th:if="${produit.marque == null or #strings.isEmpty(produit.marque.nom)}">Pas de marque</span>
+                                </p>
+                            </div>
+                        </li>
+                        <li th:if="${!produit.motsCles.isEmpty()}" class="list-group-item">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <p style="margin: 0;">Mots clés </p>
+                                <div>
+                                    <button th:each="motCle : ${produit.motsCles}" type="button" style="margin-left:2px;" class="btn btn-outline-info" th:text="${motCle.nom}"></button>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>

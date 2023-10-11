@@ -72,7 +72,7 @@ public class Produit {
     private Integer maxStock = null;
 
     @Column()
-    private Integer cote = null;
+    private Double cote = 5.;
 
     @Column()
     private Boolean actif = true;
@@ -87,7 +87,7 @@ public class Produit {
             joinColumns = @JoinColumn(name = "produit_id"),
             inverseJoinColumns = @JoinColumn(name = "mot_cle_id")
     )
-    private Set<MotCle> motsCles = new HashSet<>();  // Assuming you have an entity MotCle
+    private Set<MotCle> motsCles = new HashSet<>();
 
     // Constructors
     public Produit() {
@@ -206,7 +206,7 @@ public class Produit {
         return maxStock;
     }
 
-    public Integer getCote() {
+    public Double getCote() {
         return cote;
     }
 
@@ -230,7 +230,7 @@ public class Produit {
         this.maxStock = maxStock;
     }
 
-    public void setCote(Integer cote) {
+    public void setCote(Double cote) {
         this.cote = cote;
     }
 

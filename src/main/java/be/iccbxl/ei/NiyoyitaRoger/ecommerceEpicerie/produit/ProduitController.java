@@ -55,8 +55,6 @@ public class ProduitController {
     @Autowired
     private MarqueService marqueService;
 
-
-
     @GetMapping("/produits/admin")//faire un autre pour les non admin gérent/manager
     public String showAllProducts(Model model) {
 
@@ -356,7 +354,6 @@ public class ProduitController {
         // Rediriger l'utilisateur vers une page appropriée après la mise à jour du produit
         return "redirect:/produits/admin";
     }
-
 
     @GetMapping("/display")
     public ResponseEntity<byte[]> displayImage(@RequestParam("id") String idString) throws IOException, SQLException, ProduitNotFoundException {

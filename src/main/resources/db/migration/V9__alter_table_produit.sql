@@ -4,5 +4,5 @@ ADD COLUMN min_stock INT,
 ADD COLUMN middle_stock INT,
 ADD COLUMN max_stock INT,
 ADD COLUMN actif BOOLEAN,
-ADD COLUMN cote INT,
+ADD COLUMN cote double,
 ADD COLUMN type_prix VARCHAR(255) NOT NULL;
