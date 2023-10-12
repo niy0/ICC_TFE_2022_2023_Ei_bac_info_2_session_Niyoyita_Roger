@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="fr"
+      xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+<head>
+    <meta charset="UTF-8">
+    <title>Ajout d'un produit</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <style>
+        .fieldError, .rating label { color: red; }
+        .product-card {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-title {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            flex-shrink: 0;  /* Pour s'assurer que le titre ne rétrécit pas en dessous de sa taille de contenu. */
+        }
+
+        .product-card:hover {
+            box-shadow: 0 0 20px 5px rgba(0, 0, 0, 0.3);
+            border: 1px solid #28a745;
+        }
+
+        .product-details {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .product-image {
+            width: 90%;
+            margin: auto;
+            height: 200px;
+            object-fit: contain;
+        }
+        .centered-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 90%;
+            margin-top: 5%;
+            margin-bottom: 10px;
+        }
+
+        .row {
+            margin: 0 -5px; /* Réduit l'espacement entre les colonnes */
+        }
+        .row > .col-md-3 {
+            padding: 15px; /* Espacement entre les produits */
+        }
+
+        .col-md-4 {
+            padding: 0 5px;
+        }
+
+        .content {
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .rating-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Ajouté pour séparer les étoiles et la cote */
+        }
+
+        .rating {
+            flex: 1;  /* Assurez-vous qu'il occupe tout l'espace jusqu'à la cote */
+            display: flex;
+            align-items: center;
+        }
+
+        .rating + div {
+            flex-shrink: 0;  /* Assurez-vous que cette div ne rétrécit pas */
+        }
+
+        .rating p {
+            margin: 0;
+            font-size: 0.9rem;  /* ajustez si nécessaire */
+        }
+
+        .rating i {
+            font-size: 20px;
+            color: #ffc107;
+        }
+
+        button {
+            border: none;
+            border-radius: 5px;
+            outline: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #b3b7b5;
+        }
+
+        /* Lorsque vous survolez le bouton: */
+        button:hover .fa-regular.fa-heart {
+            display: none;
+        }
+
+        button:hover .fa-solid.fa-heart {
+            display: inline;
+        }
+        .fa-solid.fa-heart {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-4">
+    <div layout:fragment="content" style="border: 1px solid #d3d3d3; border-radius: 5px;">
+        <h1 th:text="${title}" class="title text-center mb-4">Ajout nouveau produit</h1>
+        <div class="text-center mb-4">
+            <a class="btn btn-outline-success mx-2" th:href="@{/produit/create}">Ajouter nouveau produit</a>
+            <a class="btn btn-outline-success mx-2" th:href="@{/produits/user}">User view produits</a>
+            <a class="btn btn-outline-success mx-2" th:href="@{/cat/allCat}">List catégorie</a>
+        </div>
+        <div class="row justify-content-center">
+            <div th:each="produit : ${listProducts}" class="col-md-3 mb-4">
+                <div class="card product-card">
+                    <img class="card-img-top product-image" th:src="@{${'/display?id=' + produit.id}}" alt="Image du produit">
+                    <div class="card-body product-details" style="padding-bottom:0;padding-top:0;" >
+                        <h2 class="product-title">[[${produit.nom}]]</h2>
+                        <div class="rating-container">
+                            <div class="rating">
+                                <!-- Étoile 1 -->
+                                <i th:class="${produit.cote >= 1 ? 'fas fa-star' : (produit.cote > 0 && produit.cote < 1) ? 'fas fa-star-half-alt' : 'far fa-star'}"></i>
+
+                                <!-- Étoile 2 -->
+                                <i th:class="${produit.cote >= 2 ? 'fas fa-star' : (produit.cote > 1 && produit.cote < 2) ? 'fas fa-star-half-alt' : 'far fa-star'}"></i>
+
+                                <!-- Étoile 3 -->
+                                <i th:class="${produit.cote >= 3 ? 'fas fa-star' : (produit.cote > 2 && produit.cote < 3) ? 'fas fa-star-half-alt' : 'far fa-star'}"></i>
+
+                                <!-- Étoile 4 -->
+                                <i th:class="${produit.cote >= 4 ? 'fas fa-star' : (produit.cote > 3 && produit.cote < 4) ? 'fas fa-star-half-alt' : 'far fa-star'}"></i>
+
+                                <!-- Étoile 5 -->
+                                <i th:class="${produit.cote == 5 ? 'fas fa-star' : (produit.cote > 4 && produit.cote < 5) ? 'fas fa-star-half-alt' : 'far fa-star'}"></i>
+                            </div>
+                            <div>
+                                <p>
+                                    [[${produit.cote}]]
+                                    (nb x)
+                                </p>
+                            </div>
+                        </div>
+                        <h4 class="product-price">[[${produit.prix}]]&euro;</h4>
+                        <div class="detail-group mb-3" style="display:flex;">
+                            <div class="input-group input-spinner">
+                                <div style="display:flex;">
+                                    <div class="input-group-prepend">
+                                        <button class="button-minus btn btn-sm btn-outline-success" type="button" data-field="quantity"
+                                                onclick="var input = this.parentElement.nextElementSibling; input.value = parseInt(input.value) - 1; if(input.value < 1) input.value = 1;">
+                                            <i class="fa-solid fa-minus"></i>
+                                        </button>
+                                    </div>
+                                    <input style="width:80px;margin:0;" type="number" disabled step="1" max="10" value="1" name="quantity" class="quantity-field form-control-sm form-input text-center">
+                                    <div class="input-group-append">
+                                        <button class="button-plus btn btn-sm btn-outline-success" type="button" data-field="quantity"
+                                                onclick="var input = this.parentElement.previousElementSibling; input.value = parseInt(input.value) + 1; if(input.value > 10) input.value = 10;">
+                                            <i class="fa-solid fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <button style="background-color:#cccfce;"  title="Ajouter aux favoris">
+                                    <i class="fa-regular fa-heart" style="color: #d91717;"></i>
+                                    <i class="fa-solid fa-heart" style="color: #d91717;"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <a  href="#!" class="btn btn-success w-100 mb-3"><i class="fa fa-shopping-cart"></i> Ajouter </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="display:flex;align-items:center;">
+            <!-- Pagination -->
+            <nav aria-label="Page navigation" class="mx-auto">
+                <ul class="pagination">
+                    <li class="page-item" th:class="${currentPage == 0 ? 'disabled' : ''}">
+                        <a class="page-link" th:href="@{/produit?page=${currentPage - 1}}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li th:each="pageNumber : ${#numbers.sequence(0, totalPages - 1)}" class="page-item" th:class="${pageNumber == currentPage ? 'active' : ''}">
+                        <a class="page-link" th:href="@{/produit?page=${pageNumber}}">[[${pageNumber + 1}]]</a>
+                    </li>
+                    <li class="page-item" th:class="${currentPage + 1 == totalPages ? 'disabled' : ''}">
+                        <a class="page-link" th:href="@{/produit?page=${currentPage + 1}}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+</body>
+</html>

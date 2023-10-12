@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HelloController {
 
-    @RequestMapping("/")
+    /**@RequestMapping("/")
     public String index() {
         return "Bienevue à L'epicerie de l'houmeau";
-    }
+    }**/
 }

@@ -13,6 +13,9 @@ import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.motCle.MotCleService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -54,6 +57,40 @@ public class ProduitController {
 
     @Autowired
     private MarqueService marqueService;
+
+    @GetMapping("/")//faire un autre pour les non admin gérent/manager
+    public String showIndex(Model model) {
+        List<Produit> productsList = produitService.getAllProduct();
+        List<Categorie> categorieList = categorieService.getAllCategorie();
+
+        model.addAttribute("listProducts", productsList);
+        model.addAttribute("catList", categorieList);
+        return "index";
+    }
+    /**
+    @GetMapping("/produit")
+    public String allProduit(Model model) {
+        List<Produit> productsList = produitService.getAllProduct();
+        List<Categorie> categorieList = categorieService.getAllCategorie();
+
+        model.addAttribute("listProducts", productsList);
+        model.addAttribute("catList", categorieList);
+        return "produit/index_produits";
+    }**/
+
+    @GetMapping("/produit")
+    public String allProduit(Model model, @RequestParam(defaultValue = "0") int page) {
+        Pageable pageable = PageRequest.of(page, 20); // 20 produits par page
+        Page<Produit> productPage = produitRepository.findAll(pageable); // Vous devriez avoir une méthode 'findAll' qui accepte un objet 'Pageable'
+
+        List<Categorie> categorieList = categorieService.getAllCategorie();
+
+        model.addAttribute("listProducts", productPage.getContent());
+        model.addAttribute("catList", categorieList);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", productPage.getTotalPages());
+        return "produit/index_produits";
+    }
 
     @GetMapping("/produits/admin")//faire un autre pour les non admin gérent/manager
     public String showAllProducts(Model model) {
