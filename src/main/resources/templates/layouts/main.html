@@ -13,15 +13,65 @@
         <!-- Font Awesome -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
-        <th:block layout:fragment="css"></th:block>
+        <th:block layout:fragment="css">
+            <style>
+                /* Styles pour que le panier soit positionné fixe tout à droite */
+                body {
+                    display: flex;
+                    flex-direction: column;
+                    min-height: 100vh;
+                    margin: 0;
+                }
+
+                .container.flex-grow-1 {
+                    flex-grow: 1;
+                    margin-right: 20%; /* Ajout de la marge pour laisser de l'espace à la div "panier" */
+                    position: relative; /* Position relative pour z-index */
+                    border: 1px solid #d3d3d3; border-radius: 5px;
+                }
+
+                .panier {
+                    position: fixed;
+                    top: 50px; /* Réglez cette valeur en fonction de la hauteur de votre header */
+                    right: 0;
+                    background-color: red;
+                    width: 20%;
+                    max-height: calc(100% - 50px - 10px); /* 50px pour le header, 10px pour la marge du panier */
+                    padding: 10px;
+                    border: 1px solid #d3d3d3;
+                    border-radius: 5px;
+                    z-index: 1; /* Assurez-vous que le panier est en arrière-plan par rapport au contenu */
+                    overflow-y: auto; /* Ajout d'une barre de défilement si nécessaire */
+                }
+
+                /* Styles pour diviser la page en deux parties */
+                .page-container {
+                    display: flex;
+                    flex-direction: column; /* Changez la direction en colonne pour empiler le header et le contenu */
+                    height: 100%;
+                }
+
+                .content-container {
+                    flex-grow: 1;
+                    display: flex;
+                    flex-direction: column;
+                    overflow: auto; /* Ajout de la barre de défilement si le contenu dépasse */
+                    position: relative;
+                    z-index: 2; /* Assurez-vous que le contenu est au-dessus du panier */
+                }
+            </style>
+        </th:block>
     </head>
 
     <body>
-        <div th:replace="~{fragments/header :: header}">Header here</div>
-
-        <div class="container" layout:fragment="content">Main content will be inserted here.</div>
-
-        <div th:replace="~{fragments/footer :: footer}">&copy; 2016 The Static Templates</div>
+        <div class="page-container">
+            <div class="content-container">
+                <div th:replace="~{fragments/header :: header}">Header here</div>
+                <div class="container flex-grow-1" layout:fragment="content">Main content will be inserted here.</div>
+                <div th:replace="~{fragments/footer :: footer}">&copy; 2016 The Static Templates</div>
+            </div>
+            <div layout:fragment="panier" class="panier"></div>
+        </div>
 
         <!-- Bootstrap JS, Popper.js, and jQuery -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -43,4 +93,5 @@
 
         <th:block layout:fragment="scripts"></th:block>
     </body>
+
 </html>

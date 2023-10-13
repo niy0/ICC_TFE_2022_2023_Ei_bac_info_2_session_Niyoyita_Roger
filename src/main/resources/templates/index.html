@@ -26,32 +26,38 @@
         </style>
     </head>
     <body>
-        <div class="container">
-            <div layout:fragment="content" class="content">
-                <h1>Nos produits</h1>
-                <p>Parcourez notre vaste sélection...</p>
-                <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
-                    <ol class="carousel-indicators">
-                        <li th:each="prod, stat : ${listProducts}"
-                            data-target="#carouselExampleIndicators"
-                            th:data-slide-to="${stat.index}"
-                            th:class="${stat.first} ? 'active' : ''"></li>
-                    </ol>
-                    <div class="carousel-inner">
-                        <div th:each="prod, stat : ${listProducts}"
-                             th:class="${stat.first} ? 'carousel-item active' : 'carousel-item'">
-                            <img th:src="@{${'/display?id=' + prod.id}}" class="d-block w-auto" alt="Image du produit">
-                        </div>
+        <div layout:fragment="content" class="content">
+            <h1>Nos produits</h1>
+            <p>Parcourez notre vaste sélection...</p>
+            <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+                <ol class="carousel-indicators">
+                    <li th:each="prod, stat : ${listProducts}"
+                        data-target="#carouselExampleIndicators"
+                        th:data-slide-to="${stat.index}"
+                        th:class="${stat.first} ? 'active' : ''"></li>
+                </ol>
+                <div class="carousel-inner">
+                    <div th:each="prod, stat : ${listProducts}"
+                         th:class="${stat.first} ? 'carousel-item active' : 'carousel-item'">
+                        <img th:src="@{${'/display?id=' + prod.id}}" class="d-block w-auto" alt="Image du produit">
                     </div>
-                    <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Previous</span>
-                    </a>
-                    <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Next</span>
-                    </a>
                 </div>
+                <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+        </div>
+        <div layout:fragment="panier" >
+            <div class="panier-inner">
+                <i class="fa fa-shopping-cart"></i>
+                <p>
+                    Mon panier
+                </p>
             </div>
         </div>
     </body>
