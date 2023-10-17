@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+<head>
+    <meta charset="UTF-8">
+    <title>Vue d'une ligne de commande</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <div layout:fragment="content" class="content">
+        <h1>Liste des lignes de commande</h1>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Produit</th>
+                <th>Prix unitaire</th>
+                <th>Quantité</th>
+                <th>Montant total</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Utilisez Thymeleaf pour boucler à travers les lignes de commande -->
+            <tr th:each="ligneDeCommande : ${listeLignesDeCommande}">
+                <td th:text="${ligneDeCommande.id}"></td>
+                <td th:text="${ligneDeCommande.produit.nom}"></td>
+                <td th:text="${ligneDeCommande.prixUnitaire}"></td>
+                <td th:text="${ligneDeCommande.quantite}"></td>
+                <td th:text="${ligneDeCommande.montantTotal}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

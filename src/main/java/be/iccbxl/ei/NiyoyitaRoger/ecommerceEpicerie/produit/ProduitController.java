@@ -78,9 +78,11 @@ public class ProduitController {
         return "produit/index_produits";
     }**/
 
+
+    //revoir l'erreur de la pagination !!
     @GetMapping("/produit")
     public String allProduit(Model model, @RequestParam(defaultValue = "0") int page) {
-        Pageable pageable = PageRequest.of(page, 20); // 20 produits par page
+        Pageable pageable = PageRequest.of(page, 24); // 20 produits par page
         Page<Produit> productPage = produitRepository.findAll(pageable); // Vous devriez avoir une méthode 'findAll' qui accepte un objet 'Pageable'
 
         List<Categorie> categorieList = categorieService.getAllCategorie();
