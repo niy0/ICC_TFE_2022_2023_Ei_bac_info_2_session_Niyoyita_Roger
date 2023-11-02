@@ -1,6 +1,7 @@
 package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.marque;
 
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit.Produit;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.Set;
@@ -16,7 +17,9 @@ public class Marque {
     private String nom;
 
     @OneToMany(mappedBy = "marque", cascade = CascadeType.ALL)
+    @JsonIgnore
     private Set<Produit> produits;
+
 
     protected Marque(){}
 

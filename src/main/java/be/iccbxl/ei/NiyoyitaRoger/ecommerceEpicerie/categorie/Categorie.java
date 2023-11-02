@@ -1,6 +1,7 @@
 package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.categorie;
 
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit.Produit;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -16,6 +17,7 @@ public class Categorie {
     private String nom;
 
     @OneToMany(mappedBy = "categorie")
+    @JsonIgnore
     private List<Produit> produits;
 
     public Categorie() {

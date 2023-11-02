@@ -10,18 +10,24 @@ import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.marque.MarqueService;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.motCle.MotCle;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.motCle.MotCleRepository;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.motCle.MotCleService;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.Panier;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.PanierNotFoundException;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.PanierRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.sql.Blob;
@@ -58,6 +64,9 @@ public class ProduitController {
     @Autowired
     private MarqueService marqueService;
 
+    @Autowired
+    private PanierRepository panierRepository;
+
     @GetMapping("/")//faire un autre pour les non admin gérent/manager
     public String showIndex(Model model) {
         List<Produit> productsList = produitService.getAllProduct();
@@ -84,8 +93,19 @@ public class ProduitController {
     public String allProduit(Model model, @RequestParam(defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, 24); // 20 produits par page
         Page<Produit> productPage = produitRepository.findAll(pageable); // Vous devriez avoir une méthode 'findAll' qui accepte un objet 'Pageable'
-
         List<Categorie> categorieList = categorieService.getAllCategorie();
+
+        //panier
+       String s = "1";
+       Long idTest = Long.parseLong(s);
+        Optional<Panier> panier = panierRepository.findById(idTest);
+        //Panier panier = new Panier();
+        //panierRepository.save(panier);
+
+        System.out.println(panier.get().getId()+"******************************************************");
+
+        model.addAttribute("panier",panier.get());
+
 
         model.addAttribute("listProducts", productPage.getContent());
         model.addAttribute("catList", categorieList);
@@ -104,6 +124,26 @@ public class ProduitController {
         model.addAttribute("catList", categorieList);
 
         return "produit/admin_produit";
+    }
+
+    @GetMapping("produit/api/{id}")
+    public ResponseEntity<Produit> getProduitById(@PathVariable Long id) {
+        Produit produit = produitRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produit non trouvé"));
+        return ResponseEntity.ok(produit);
+    }
+
+    @GetMapping("/produits")
+    public ResponseEntity<List<Produit>> getProduitsAvecQuantiteMin() {
+        List<Produit> produits = produitService.getProduitsAvecQuantiteMinEtActif();
+        return ResponseEntity.ok(produits);
+    }
+
+    //a tester
+    @RequestMapping("/quantite-produit/{produitId}")
+    @ResponseBody
+    public int getQuantiteProduit(@PathVariable Long produitId) {
+        return produitService.getQuantiteProduit(produitId);
     }
 
     @GetMapping("/produit/{id}")

@@ -34,7 +34,7 @@ public class CategorieController {
         return "categorie-form";
     }
 
-    @PostMapping("/cat/save/{id}")//chager le chemin
+    @PostMapping("/cat/save/")//chager le chemin
     public String createCategorie(@RequestParam("nom") String nom, @PathVariable("id") String id, RedirectAttributes redirectAttrs)  {
         String message = "";
         if(nom.length() > 2 && !categorieService.categorieExist(nom)){

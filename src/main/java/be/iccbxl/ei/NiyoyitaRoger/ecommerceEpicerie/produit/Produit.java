@@ -1,18 +1,22 @@
 package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Blob;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.categorie.Categorie;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.marque.Marque;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.motCle.MotCle;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
-import java.sql.Blob;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import org.springframework.util.StreamUtils;
 
 @Entity
 @Table(name = "produit")
@@ -42,22 +46,12 @@ public class Produit {
     @JoinColumn(name = "marque_id")
     private Marque marque;
 
+    @JsonIgnore
     @Lob
     @Column(name = "image_principale", nullable = false)
     private Blob imagePrincipale;
 
-    @ManyToOne
-    @JoinColumn(name = "categorie_id", nullable = false)
-    private Categorie categorie;
-
-    @Column(name = "disponibilite", nullable = false)
-    private Boolean disponibilite = true;
-
-    @Column(name = "date_creation", nullable = false)
-    private LocalDateTime dateCreation;
-
-    @Column(name = "date_modification")
-    private LocalDateTime dateModification;
+    private transient byte[] imagePrincipaleJson;
 
     //*************admin/manager manage*************
     //min,middle,max,cote,actif, type de prix
@@ -81,6 +75,19 @@ public class Produit {
     private String typePrix;
     //******************************
 
+    @ManyToOne
+    @JoinColumn(name = "categorie_id", nullable = false)
+    private Categorie categorie;
+
+    @Column(name = "disponibilite", nullable = false)
+    private Boolean disponibilite = true;
+
+    @Column(name = "date_creation", nullable = false)
+    private LocalDateTime dateCreation;
+
+    @Column(name = "date_modification")
+    private LocalDateTime dateModification;
+
     @ManyToMany
     @JoinTable(
             name = "produit_mots_cles",
@@ -89,99 +96,50 @@ public class Produit {
     )
     private Set<MotCle> motsCles = new HashSet<>();
 
-    // Constructors
     public Produit() {
-        this.dateCreation = LocalDateTime.now();
+        // Constructeur vide nécessaire pour JPA
     }
 
-    public Produit(String nom, String description, Double prix, Integer quantite, Blob imagePrincipale) {
+    // Les getters et setters pour tous les attributs
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    public void setNom(String nom) {
         this.nom = nom;
-        this.description = description;
-        this.prix = prix;
-        this.quantite = quantite;
-        this.imagePrincipale = imagePrincipale;
-        this.dateCreation = LocalDateTime.now();
-        updateDisponibilite();
     }
 
-    // Getters
-    public Long getId() { return id; }
+    public String getDescription() {
+        return description;
+    }
 
-    public String getNom() { return nom; }
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-    public String getDescription() { return description; }
+    public Double getPrix() {
+        return prix;
+    }
 
-    public Double getPrix() { return prix; }
+    public void setPrix(Double prix) {
+        this.prix = prix;
+    }
 
-    public Integer getQuantite() { return quantite; }
-
-
-
-    public Blob getImagePrincipale() { return imagePrincipale; }
-
-    public Categorie getCategorie() { return categorie; }
-
-    public Boolean getDisponibilite() { return disponibilite; }
-
-    public LocalDateTime getDateCreation() { return dateCreation; }
-
-    public LocalDateTime getDateModification() { return dateModification; }
-
-    public Set<MotCle> getMotsCles() { return motsCles; }
-
-    // Setters
-    public void setId(Long id) { this.id = id; }
-
-    public void setNom(String nom) { this.nom = nom; }
-
-    public void setDescription(String description) { this.description = description; }
-
-    public void setPrix(Double prix) { this.prix = prix; }
+    public Integer getQuantite() {
+        return quantite;
+    }
 
     public void setQuantite(Integer quantite) {
         this.quantite = quantite;
-        updateDisponibilite();
-    }
-
-
-
-    public void setImagePrincipale(Blob imagePrincipale) { this.imagePrincipale = imagePrincipale; }
-
-    public void setCategorie(Categorie categorie) { this.categorie = categorie; }
-
-    public void setDisponibilite(Boolean disponibilite) { this.disponibilite = disponibilite; }
-
-    public void setDateCreation(LocalDateTime dateCreation) { this.dateCreation = dateCreation; }
-
-    public void setDateModification(LocalDateTime dateModification) { this.dateModification = dateModification; }
-
-    public void setMotsCles(Set<MotCle> motsCles) { this.motsCles = motsCles; }
-
-    // Additional Methods
-    public void updateDisponibilite() {
-        this.disponibilite = this.quantite > 0;
-    }
-
-    @PreUpdate
-    public void onPreUpdate() {
-        this.dateModification = LocalDateTime.now();
-    }
-
-
-    public List<String> listMotsCle(){
-        List<String> res = new ArrayList<>();
-
-        this.getMotsCles().forEach(mot -> res.add(mot+ " "));
-
-        return res;
-    }
-
-    //permet de mettre en maj la première lettre du mot
-    public String capitalize(String str) {
-        if (str == null || str.length() == 0) {
-            return str;
-        }
-        return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }
 
     public Marque getMarque() {
@@ -192,30 +150,95 @@ public class Produit {
         this.marque = marque;
     }
 
-
-
-    public Integer getMinStock() {
-        return minStock;
+    @JsonIgnore
+    public Blob getImagePrincipale() {
+        return imagePrincipale;
     }
 
-    public Integer getMiddleStock() {
-        return middleStock;
+    public void setImagePrincipale(Blob imagePrincipale) {
+        this.imagePrincipale = imagePrincipale;
     }
 
-    public Integer getMaxStock() {
-        return maxStock;
+    @JsonIgnore
+    public byte[] getImagePrincipaleJson() {
+        if (this.imagePrincipaleJson == null) {
+            this.imagePrincipaleJson = this.getImagePrincipaleBytes();
+        }
+        return this.imagePrincipaleJson;
     }
 
-    public Double getCote() {
-        return cote;
+
+    public void setImagePrincipaleJson(byte[] imagePrincipaleJson) {
+        this.imagePrincipaleJson = imagePrincipaleJson;
     }
 
-    public Boolean getActif() {
-        return actif;
+    public Categorie getCategorie() {
+        return categorie;
     }
 
-    public String getTypePrix() {
-        return typePrix;
+    public void setCategorie(Categorie categorie) {
+        this.categorie = categorie;
+    }
+
+    public Boolean getDisponibilite() {
+        return disponibilite;
+    }
+
+    public void setDisponibilite(Boolean disponibilite) {
+        this.disponibilite = disponibilite;
+    }
+
+    public LocalDateTime getDateCreation() {
+        return dateCreation;
+    }
+
+    public void setDateCreation(LocalDateTime dateCreation) {
+        this.dateCreation = dateCreation;
+    }
+
+    public LocalDateTime getDateModification() {
+        return dateModification;
+    }
+
+    public void setDateModification(LocalDateTime dateModification) {
+        this.dateModification = dateModification;
+    }
+
+    public Set<MotCle> getMotsCles() {
+        return motsCles;
+    }
+
+    public void setMotsCles(Set<MotCle> motsCles) {
+        this.motsCles = motsCles;
+    }
+
+    // Méthode pour convertir Blob en byte[]
+    private byte[] getImagePrincipaleBytes() {
+        if (this.imagePrincipale != null) {
+            try (InputStream is = this.imagePrincipale.getBinaryStream()) {
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                int nRead;
+                byte[] data = new byte[1024];
+                while ((nRead = is.read(data, 0, data.length)) != -1) {
+                    buffer.write(data, 0, nRead);
+                }
+                buffer.flush();
+                return buffer.toByteArray();
+            } catch (SQLException | IOException e) {
+                throw new RuntimeException("Erreur lors de la conversion de l'image en byte[]", e);
+            }
+        }
+        return null;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        dateCreation = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        dateModification = LocalDateTime.now();
     }
 
     public void setMinStock(Integer minStock) {
@@ -242,27 +265,31 @@ public class Produit {
         this.typePrix = typePrix;
     }
 
-    @Override
-    public String toString() {
-        return "Produit{" +
-                "id=" + id +
-                ", nom='" + nom + '\'' +
-                ", description='" + description + '\'' +
-                ", prix=" + prix +
-                ", quantite=" + quantite +
-                ", marque=" + marque +
-                ", imagePrincipale=" + imagePrincipale +
-                ", categorie=" + categorie +
-                ", disponibilite=" + disponibilite +
-                ", dateCreation=" + dateCreation +
-                ", dateModification=" + dateModification +
-                ", minStock=" + minStock +
-                ", middleStock=" + middleStock +
-                ", maxStock=" + maxStock +
-                ", cote=" + cote +
-                ", actif=" + actif +
-                ", typePrix='" + typePrix + '\'' +
-                ", motsCles=" + motsCles +
-                '}';
+    public Integer getMinStock() {
+        return minStock;
     }
+
+    public Integer getMiddleStock() {
+        return middleStock;
+    }
+
+    public Integer getMaxStock() {
+        return maxStock;
+    }
+
+    public Double getCote() {
+        return cote;
+    }
+
+    public Boolean getActif() {
+        return actif;
+    }
+
+    public String getTypePrix() {
+        return typePrix;
+    }
+
+    // ... (autres méthodes)
+
+    // equals() et hashCode() si nécessaire, particulièrement si vous utilisez des collections qui requièrent ces méthodes pour fonctionner correctement.
 }

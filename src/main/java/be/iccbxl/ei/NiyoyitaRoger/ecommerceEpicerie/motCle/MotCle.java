@@ -1,6 +1,7 @@
 package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.motCle;
 
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit.Produit;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
@@ -30,6 +31,7 @@ public class MotCle {
     }
 
     @ManyToMany(mappedBy = "motsCles")
+    @JsonIgnore
     private Set<Produit> produits = new HashSet<>();
 
     // Ajoutez des méthodes get et set pour produits si nécessaire

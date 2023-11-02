@@ -2,9 +2,11 @@ package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.ligneDeCommande;
 
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.Panier;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit.Produit;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name="lignedecommande")
 public class LigneDeCommande {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -12,6 +14,7 @@ public class LigneDeCommande {
 
     @ManyToOne
     @JoinColumn(name = "produit_id")
+    @JsonIgnore
     private Produit produit;
 
     @ManyToOne
@@ -24,7 +27,19 @@ public class LigneDeCommande {
 
     private double montantTotal; // Montant total de la ligne de commande
 
+
+    protected LigneDeCommande() {}
+
+    public LigneDeCommande(Produit produit, Panier panier, int quantite, double prixUnitaire, double montantTotal) {
+        this.produit = produit;
+        this.panier = panier;
+        this.quantite = quantite;
+        this.prixUnitaire = prixUnitaire;
+        this.montantTotal = montantTotal;
+    }
+
     // Constructeurs, getters, setters et autres méthodes d'accès
+
 
     public Long getId() {
         return id;
@@ -68,7 +83,7 @@ public class LigneDeCommande {
 
     public double getPrixUnitaire() {
         return prixUnitaire;
-    }
+    } //binder avec Produit.getPrix()m
 
     public void setPrixUnitaire(double prixUnitaire) {
         this.prixUnitaire = prixUnitaire;
@@ -77,10 +92,6 @@ public class LigneDeCommande {
 
     public double getMontantTotal() {
         return montantTotal;
-    }
-
-    public void setMontantTotal(double montantTotal) {
-        this.montantTotal = montantTotal;
     }
 
     public void calculerMontantTotal() {

@@ -29,6 +29,20 @@ public class ProduitService {
         }
     }
 
+    public List<Produit> getProduitsAvecQuantiteMinEtActif() {
+        return produitRepository.findProduitsAvecQuantiteMin();
+    }
+
+
+    //a tester
+    public int getQuantiteProduit(Long produitId) {
+        Produit produit = produitRepository.findById(produitId).orElse(null);
+        if (produit != null) {
+            return produit.getQuantite();
+        }
+        return 0; // ou une autre valeur par défaut si le produit n'est pas trouvé
+    }
+
     public void updateProduit(Produit produit){
         produitRepository.save(produit);
     }
