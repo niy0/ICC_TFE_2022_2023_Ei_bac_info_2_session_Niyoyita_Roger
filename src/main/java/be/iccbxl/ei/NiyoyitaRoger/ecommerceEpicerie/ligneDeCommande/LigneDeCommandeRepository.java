@@ -5,4 +5,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface LigneDeCommandeRepository extends JpaRepository<LigneDeCommande, Long> {
+    LigneDeCommande findByProduitIdAndPanierId(Long produitId, Long panierId);
+
 }

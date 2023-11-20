@@ -9,6 +9,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="js/script.js"></script>
+    <!-- Balises meta pour le jeton CSRF -->
+    <meta name="_csrf.parameterName" th:content="${_csrf.parameterName}" />
+    <meta name="_csrf.token" th:content="${_csrf.token}" />
     <style>
         .fieldError, .rating label { color: red; }
         .product-card {
@@ -288,13 +291,13 @@
     <div layout:fragment="panier" >
         <!-- Panier -->
         <div class="mt-5">
-            <h2><i class="bi bi-cart-fill"></i> Mon panier</h2>
+            <h2><i class="bi bi-cart-fill"></i> Mon panier<button type="submit" class="btn btn-primary">Vider Panier</button></h2>
             <form id="cart-form" th:action="@{/panier/add}" method="post">
                 <table class="table">
                     <thead>
                     <tr>
-                        <th>Nom produit</th>
-                        <th>Prix unitaire</th>
+                        <th>Nom</th>
+                        <th>Prix</th>
                         <th>Quantité</th>
                         <th>Total</th>
                     </tr>

@@ -33,9 +33,6 @@
                             <a class="nav-link" th:href="@{/produit}" href="#">Produits</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" th:href="@{/offres}" href="#">Offres Spéciales</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link" th:href="@{/nouveaux}" href="#">Nouveaux Arrivages</a>
                         </li>
                         <li class="nav-item">
@@ -48,7 +45,6 @@
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" th:href="@{/about}" href="#">À Propos</a>
                                 <a class="dropdown-item" th:href="@{/faq}" href="#">FAQ</a>
-                                <a class="dropdown-item" th:href="@{/temoignages}" href="#">Témoignages</a>
                                 <a class="dropdown-item" th:href="@{/livraison}" href="#">Politique de Livraison</a>
                                 <a class="dropdown-item" th:href="@{/retour}" href="#">Politique de Retour</a>
                                 <a class="dropdown-item" th:href="@{/conditions}" href="#">Conditions d'Utilisation</a>
@@ -59,9 +55,10 @@
                     <!-- Votre formulaire et autres éléments ici... -->
                 </div>
                 <div>
-                    <a class="btn btn-warning"   th:href="@{/panier}" href="#"><i class="fa fa-shopping-cart"></i><i class="fa-solid fa-circle" style="color: #4bd01b;" >1</i> </a>
-                    <a class="btn btn-success" th:href="@{/connexion}" href="#">S'inscrire</a>
-                    <a class="btn btn-success" th:href="@{/connexion}" href="#">Se connecter</a>
+                    <a class="btn btn-warning"   th:href="@{/panier}" href="#"><i class="fa fa-shopping-cart"></i></i> </a>
+                    <a class="btn btn-success" th:href="@{/user/signup}" href="#">S'inscrire</a>
+                    <a class="btn btn-success" th:href="@{/login}" href="#">Se connecter</a>
+                    <a class="btn btn-success" th:href="@{/logout}" href="#">Se déconnecter</a>
                 </div>
             </div>
         </nav>

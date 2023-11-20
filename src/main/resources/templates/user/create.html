@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
+      layout:decorate="~{layouts/main}" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Création d'un user</title>
+    <style>
+.fieldError { color: red; }
+</style>
+</head>
+<body>
+<div class="container">
+    <div layout:fragment="content">
+        <h1>New User</h1>
+
+        <form th:action="@{/user/signup}" th:object="${user}" method="post">
+            <div>
+                <label>Nom:</label>
+                <input type="text" th:field="*{nom}" required>
+                <p th:if="${#fields.hasErrors('nom')}"
+                   th:errors="*{nom}" th:errorclass="fieldError"></p>
+            </div>
+            <div>
+                <label>Prénom:</label>
+                <input type="text" th:field="*{prenom}" required>
+                <p th:if="${#fields.hasErrors('prenom')}"
+                   th:errors="*{lastname}" th:errorclass="fieldError"></p>
+            </div>
+            <div>
+                <label>Email::</label>
+                <input type="text" th:field="*{email}" required>
+                <p th:if="${#fields.hasErrors('email')}"
+                   th:errors="*{email}" th:errorclass="fieldError"></p>
+            </div>
+            <div>
+                <label>Mot de passe::</label>
+                <input type="text" th:field="*{password}" required>
+                <p th:if="${#fields.hasErrors('password')}"
+                   th:errors="*{passeword}" th:errorclass="fieldError"></p>
+            </div>
+            <div class="form-group row">
+                <label for="sexe" class="col-sm-4 col-form-label">Sexe :</label>
+                <div class="col-sm-8">
+                    <select class="form-control" th:field="*{sexe}" id="sexe" required>
+                        <option th:each="langue : ${T(com.pidSpringBoot.pidSpringBoot.user.Langue).values()}"
+                                th:value="${langue}"
+                                th:text="${langue}"
+                                th:selected="${userToEdit.langue == langue}">Language</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <button type="submit" th:text="Enregistrer"></button>
+                <button type="reset" th:text="Réinitialiser">Réinitialiser</button>
+                <a th:href="@{/}">Annuler</a>
+            </div>
+        </form>
+
+        <nav><a th:href="@{/}">Retour à l'index</a></nav>
+    </div>
+</div>
+</body>
+</html>

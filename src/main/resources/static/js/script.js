@@ -1,9 +1,17 @@
 //Avoir la quantite d'un produit
 function getQuantiteProduit(produitId) {
+    // Récupérez le jeton CSRF depuis les balises meta
+        var csrfParameterName = $("meta[name='_csrf.parameterName']").attr("content");
+        var csrfToken = $("meta[name='_csrf.token']").attr("content");
+
+        // Créez un objet d'en-tête avec le jeton CSRF
+        var headers = {};
+        headers[csrfParameterName] = csrfToken;
     $.ajax({
         type: "GET",
         url: "/quantite-produit/" + produitId,
         dataType: "json",
+        headers: headers, // Ajoutez le jeton CSRF dans les en-têtes de la requête
         success: function (quantite) {
             // Faites quelque chose avec la quantité, par exemple, l'afficher
             console.log("Quantité du produit #" + produitId + ": " + quantite);
@@ -18,10 +26,18 @@ function getQuantiteProduit(produitId) {
 // Avoir la quantité d'un produit
 function getQuantiteProduit(produitId) {
     return new Promise(function (resolve, reject) {
+        // Récupérez le jeton CSRF depuis les balises meta
+                var csrfParameterName = $("meta[name='_csrf.parameterName']").attr("content");
+                var csrfToken = $("meta[name='_csrf.token']").attr("content");
+
+                // Créez un objet d'en-tête avec le jeton CSRF
+                var headers = {};
+                headers[csrfParameterName] = csrfToken;
         $.ajax({
             type: "GET",
             url: "/quantite-produit/" + produitId,
             dataType: "json",
+            headers: headers, // Ajoutez le jeton CSRF dans les en-têtes de la requête
             success: function (quantite) {
                 // Résoudre la promesse avec la quantité
                 resolve(quantite);
@@ -33,8 +49,6 @@ function getQuantiteProduit(produitId) {
         });
     });
 }
-
-
 
 
 //Affiche la liste des produits actif et quantite >= 1
@@ -160,7 +174,6 @@ function getProduitDetails2(produitId) {
             console.log('Nom du produit :', nom);
             console.log('Prix du produit :', prix);**/
 
-
            return data;
 
             // Effectuez d'autres actions nécessaires avec les détails du produit
@@ -175,45 +188,25 @@ function getProduitDetails2(produitId) {
 }
 
 
-function addLigneDeCommandeToPanier(produitId, quantite, panierId) {
-    // Créez un objet contenant les données à envoyer
-    var data = {
-        produitId: produitId,
-        quantite: quantite,
-        panierId: panierId
-    };
 
-    // Effectuez la requête Ajax POST
-    $.ajax({
-        url: '/addToCart', // Remplacez par l'URL correcte pour votre endpoint
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(data),
-        success: function (response) {
-            // La requête a réussi, vous pouvez traiter la réponse ici
-            console.log('Ligne de commande ajoutée avec succès:', response);
-            getProduitDetails(produitId);
-            // Effacer le contenu de l'élément #cart-items
-            // Réalisez les actions nécessaires en cas de succès, par exemple, mettre à jour l'affichage du panier
-            // ou afficher un message de succès à l'utilisateur.
-        },
-        error: function (error) {
-            // Une erreur s'est produite lors de la requête Ajax
-            console.error('Erreur lors de l\'ajout de la ligne de commande:', error);
-
-            // Réalisez les actions nécessaires en cas d'erreur, par exemple, afficher un message d'erreur à l'utilisateur.
-        }
-    });
-}
 
 // Fonction pour récupérer le panier en spécifiant l'ID du panier
 function getPanier(idPanier) {
     var idPanierval = parseInt(idPanier);
 
+    // Récupérez le jeton CSRF depuis les balises meta
+        var csrfParameterName = $("meta[name='_csrf.parameterName']").attr("content");
+        var csrfToken = $("meta[name='_csrf.token']").attr("content");
+
+        // Créez un objet d'en-tête avec le jeton CSRF
+        var headers = {};
+        headers[csrfParameterName] = csrfToken;
+
     $.ajax({
         url: '/panier/api/' + idPanierval, // Utilisez l'ID du panier spécifié
         type: 'GET',
         dataType: 'json',
+        headers: headers, // Ajoutez le jeton CSRF dans les en-têtes de la requête
         success: function (panierData) {
             // La réponse a été reçue avec succès
             console.log('Panier récupéré avec succès :', panierData);
@@ -225,47 +218,23 @@ function getPanier(idPanier) {
     });
 }
 
-/**
-//permet d'afficher le contenu d'un panier
-function getListLigneDeCommandePanier(panierId) {
-    var panierIdValue = parseInt(panierId);
-    $.ajax({
-        type: "GET",
-        url: "/api/" + panierIdValue + "/lignesdecommande",
-        dataType: "json",
-        success: function (data) {
-            // La variable "data" contient la réponse JSON de la requête
-            // Vous pouvez maintenant traiter les données et les afficher
-            console.log(data); // Affichez les données dans la console à des fins de débogage
-            // Effacer le contenu de l'élément #cart-items
-            $("#cart-items").empty();
-            // Créez une nouvelle ligne pour chaque élément de data
-            $.each(data, function (index, ligneDeCommande) {
-                var newRow = '<tr>' +
-                    '<td>' + ligneDeCommande.nomProduit + '</td>' +
-                    '<td>' + ligneDeCommande.prixUnitaire.toFixed(2) + ' €</td>' +
-                    '<td>' + ligneDeCommande.quantite + '</td>' +
-                    '<td>' + ligneDeCommande.montantTotal.toFixed(2) + ' €</td>' +
-                    '</tr>';
-                // Ajouter la ligne au panier
-                $("#cart-items").append(newRow);
-            });
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-            console.error("Erreur de requête Ajax: " + errorThrown);
-        }
-    });
-}**/
-
 function getListLigneDeCommandePanier(panierId) {
     var panierIdValue = parseInt(panierId);
     var totalPanier = 0.0; // Variable pour stocker le total du panier
 
+     // Récupérez le jeton CSRF depuis les balises meta
+        var csrfParameterName = $("meta[name='_csrf.parameterName']").attr("content");
+        var csrfToken = $("meta[name='_csrf.token']").attr("content");
+
+        // Créez un objet d'en-tête avec le jeton CSRF
+        var headers = {};
+        headers[csrfParameterName] = csrfToken;
 
     $.ajax({
         type: "GET",
         url: "/api/" + panierIdValue + "/lignesdecommande",
         dataType: "json",
+        headers: headers, // Ajoutez le jeton CSRF dans les en-têtes de la requête
         success: function (data) {
             // Effacer le contenu de l'élément #cart-items
             $("#cart-items").empty();
@@ -300,10 +269,49 @@ function getListLigneDeCommandePanier(panierId) {
         }
     });
 }
-
-
-// Fonction pour ajouter au panier
 /**
+function addLigneDeCommandeToPanier(produitId, quantite, panierId) {
+    // Créez un objet contenant les données à envoyer
+    var data = {
+        produitId: produitId,
+        quantite: quantite,
+        panierId: panierId
+    };
+
+    alert("produiID : "+produitId + " Qty:"+ quantite + " panierId:" + panierId);
+
+    // Récupérez le jeton CSRF depuis les balises meta
+        var csrfParameterName = $("meta[name='_csrf.parameterName']").attr("content");
+        var csrfToken = $("meta[name='_csrf.token']").attr("content");
+
+        // Créez un objet d'en-tête avec le jeton CSRF
+        var headers = {};
+        headers[csrfParameterName] = csrfToken;
+
+    // Effectuez la requête Ajax POST
+    $.ajax({
+        url: '/addToCart', // Remplacez par l'URL correcte pour votre endpoint
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        headers: headers, // Ajoutez le jeton CSRF dans les en-têtes de la requête
+        success: function (response) {
+            // La requête a réussi, vous pouvez traiter la réponse ici
+            console.log('Ligne de commande ajoutée avec succès:', response);
+            //getProduitDetails(produitId);
+            // Effacer le contenu de l'élément #cart-items
+            // Réalisez les actions nécessaires en cas de succès, par exemple, mettre à jour l'affichage du panier
+            // ou afficher un message de succès à l'utilisateur.
+        },
+        error: function (error) {
+            // Une erreur s'est produite lors de la requête Ajax
+            console.error('Erreur lors de l\'ajout de la ligne de commande:', error);
+
+            // Réalisez les actions nécessaires en cas d'erreur, par exemple, afficher un message d'erreur à l'utilisateur.
+        }
+    });
+}
+
 function addToCart(produitId) {
     // Convertir produitId en un Long
     var produitIdValue = parseInt(produitId);
@@ -312,7 +320,6 @@ function addToCart(produitId) {
     var quantiteInput = $("#quantite-" + produitIdValue);
     var quantite = parseInt(quantiteInput.val());
     var panierId = $("#panierId").val();
-
     //alert("qty:" + quantite + ":" + panierId + "produitId:" + produitId + "panier id: " + panierId);
 
     // Appeler la fonction pour ajouter la ligne de commande au panier
@@ -321,14 +328,54 @@ function addToCart(produitId) {
     // Réinitialiser la quantité à 1
     quantiteInput.val(1);
 
-    //Mettre a jour la quantite maximum après ajout dans le panier
-    getProduitDetails(produitIdValue);
-
-    getProduitActif();
-
     // Affiche le panier actuel
     getListLigneDeCommandePanier(panierId);
 }**/
+
+
+
+/**
+function addOrUpdateLigneDeCommande(produitId, quantite, panierId) {
+    // Créez un objet contenant les données à envoyer
+    var data = {
+        produitId: produitId,
+        quantite: quantite,
+        panierId: panierId
+    };
+
+    // Récupérez le jeton CSRF depuis les balises meta
+    var csrfParameterName = $("meta[name='_csrf.parameterName']").attr("content");
+    var csrfToken = $("meta[name='_csrf.token']").attr("content");
+
+    // Créez un objet d'en-tête avec le jeton CSRF
+    var headers = {};
+    headers[csrfParameterName] = csrfToken;
+
+    // Effectuez la requête Ajax POST
+    $.ajax({
+        url: '/addToCart', // Remplacez par l'URL correcte pour votre endpoint
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        headers: headers, // Ajoutez le jeton CSRF dans les en-têtes de la requête
+        success: function (response) {
+            // La requête a réussi, vous pouvez traiter la réponse ici
+            console.log('Ligne de commande ajoutée avec succès:', response);
+            //getProduitDetails(produitId);
+            // Effacer le contenu de l'élément #cart-items
+            // Réalisez les actions nécessaires en cas de succès, par exemple, mettre à jour l'affichage du panier
+            // ou afficher un message de succès à l'utilisateur.
+        },
+        error: function (error) {
+            // Une erreur s'est produite lors de la requête Ajax
+            console.error('Erreur lors de l\'ajout de la ligne de commande:', error);
+
+            // Réalisez les actions nécessaires en cas d'erreur, par exemple, afficher un message d'erreur à l'utilisateur.
+        }
+    });
+}
+
+// Utilisation de la fonction combinée
 function addToCart(produitId) {
     // Convertir produitId en un Long
     var produitIdValue = parseInt(produitId);
@@ -337,10 +384,59 @@ function addToCart(produitId) {
     var quantiteInput = $("#quantite-" + produitIdValue);
     var quantite = parseInt(quantiteInput.val());
     var panierId = $("#panierId").val();
-    //alert("qty:" + quantite + ":" + panierId + "produitId:" + produitId + "panier id: " + panierId);
 
-    // Appeler la fonction pour ajouter la ligne de commande au panier
-    addLigneDeCommandeToPanier(produitIdValue, quantite, panierId);
+    // Appeler la fonction pour ajouter ou mettre à jour la ligne de commande au panier
+    addOrUpdateLigneDeCommande(produitIdValue, quantite, panierId);
+
+    // Réinitialiser la quantité à 1
+    quantiteInput.val(1);
+
+    // Affiche le panier actuel
+    getListLigneDeCommandePanier(panierId);
+}**/
+
+function addToCart(produitId) {
+    // Vérifiez si produitId peut être converti en un entier
+    var produitIdValue = parseInt(produitId);
+    if (isNaN(produitIdValue)) {
+        console.error('Erreur : produitId invalide');
+        return;
+    }
+
+    // Obtenez la quantité depuis l'élément input dans la même div
+    var quantiteInput = $("#quantite-" + produitIdValue);
+    var quantite = parseInt(quantiteInput.val());
+    var panierId = $("#panierId").val();
+
+    // Récupérez le jeton CSRF depuis les balises meta
+    var csrfToken = $("meta[name='_csrf']").attr("content");
+
+    // Créez un objet contenant les données à envoyer
+    var data = {
+        produitId: produitIdValue,
+        quantite: quantite,
+        panierId: panierId
+    };
+
+    // Effectuez la requête Ajax POST
+    $.ajax({
+        url: '/addToCart',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        beforeSend: function(xhr) {
+            // Ajoutez le jeton CSRF aux en-têtes de la requête
+            xhr.setRequestHeader('X-XSRF-TOKEN', csrfToken);
+        },
+        success: function (response) {
+            console.log('Ligne de commande ajoutée avec succès :', response);
+            // Réalisez les actions nécessaires en cas de succès
+        },
+        error: function (error) {
+            console.error('Erreur lors de l\'ajout de la ligne de commande :', error);
+            // Réalisez les actions nécessaires en cas d'erreur
+        }
+    });
 
     // Réinitialiser la quantité à 1
     quantiteInput.val(1);
@@ -349,12 +445,29 @@ function addToCart(produitId) {
     getListLigneDeCommandePanier(panierId);
 }
 
+
+
+
+
 // Fonction pour obtenir les détails du produit, y compris la quantité mise à jour
+
 function getProduitDetails(produitId) {
+    // Convertir produitId en un Long
+    var produitIdValue = parseInt(produitId);
+
+    // Récupérer le jeton CSRF depuis les balises meta
+    var csrfParameterName = $("meta[name='_csrf.parameterName']").attr("content");
+    var csrfToken = $("meta[name='_csrf.token']").attr("content");
+
+    // Créer un objet d'en-tête avec le jeton CSRF
+    var headers = {};
+    headers[csrfParameterName] = csrfToken;
+
     $.ajax({
         type: "GET",
-        url: "/produit/api/" + produitId,
+        url: "/produit/api/" + produitIdValue,
         dataType: "json",
+        headers: headers, // Ajoutez le jeton CSRF dans les en-têtes de la requête
         success: function (data) {
             var nouvelleQuantite = data.quantite; // Assurez-vous que la propriété "quantite" correspond à la nouvelle quantité
 

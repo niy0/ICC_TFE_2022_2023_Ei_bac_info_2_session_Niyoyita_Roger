@@ -10,31 +10,32 @@ public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
+
+    private String nom;
 
     protected Role(){}
 
-    public Role(String name) {
-        this.name = name;
+    public Role(String nom) {
+        this.nom = nom;
     }
 
     public Long getId() {
         return id;
     }
 
-    public String getName() {
-        return name;
+    public String getNom() {
+        return nom;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNom(String nom) {
+        this.nom = nom;
     }
 
     @Override
     public String toString() {
         return "Role{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
+                ", name='" + nom + '\'' +
                 '}';
     }
 }

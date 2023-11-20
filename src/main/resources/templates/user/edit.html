@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
+      layout:decorate="~{layouts/main}" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+  <meta charset="UTF-8">
+  <title>Modifier le profil</title>
+  <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+</head>
+<body>
+<div class="container">
+  <div layout:fragment="content">
+
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Modifier le profil</h5>
+        <h6 class="card-subtitle mb-2 text-muted" th:text="${user.nom} +' '+ ${user.prenom}"></h6>
+        <form th:object="${user}" th:action="@{'/user/' + ${user.id} + '/profile/edit'}" method="post">
+          <input type="text" th:field="*{id}" name="id" class="form-control" hidden />
+          <p class="card-text">
+            <strong>Nom:</strong>
+            <input type="text" th:field="*{nom}" class="form-control" name="nom" required="required" />
+          </p>
+          <p class="card-text">
+            <strong>Prénom:</strong>
+            <input type="text" th:field="*{prenom}" class="form-control" name="prenom" required="required" />
+          </p>
+          <p class="card-text">
+            <strong>Email:</strong>
+            <input type="email" th:field="*{email}" class="form-control" name="email" required="required" />
+          </p>
+          <p class="card-text">
+            <strong>Sexe:</strong>
+            <select class="form-control selectpicker" th:field="*{sexe}" id="sexe" name="sexe" required multiple style="width:auto;">
+              <option th:each="s : ${T(be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.Sexe).values()}"
+                      th:value="${s}"
+                      th:text="${s}"></option>
+            </select>
+          </p>
+
+          <p class="card-text">
+            <strong>Téléphone:</strong>
+            <input type="text" th:field="*{telephone}" class="form-control" />
+          </p>
+          <!-- Ajoutez d'autres champs selon les besoins -->
+
+          <button type="submit" class="btn btn-primary">Enregistrer</button>
+        </form>
+
+        <a class="btn btn-outline-warning" th:href="@{'/user/' + ${user.id}+'/profile'}">Annuler</a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

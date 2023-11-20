@@ -3,7 +3,8 @@ CREATE TABLE `panier` (
     `id` bigint(20) AUTO_INCREMENT PRIMARY KEY,
     `actif` tinyint(1) NOT NULL,
     `date_creation` datetime(6) NOT NULL,
-    `date_modification` datetime(6)
+    `date_modification` datetime(6),
+    `user_id` bigint(20) -- Colonne pour stocker la relation avec l'utilisateur
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Créez la table pour LigneDeCommande

@@ -13,7 +13,11 @@ import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.motCle.MotCleService;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.Panier;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.PanierNotFoundException;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.PanierRepository;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.CustomUserDetails;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.User;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,6 +26,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +37,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.security.Principal;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -67,6 +75,9 @@ public class ProduitController {
     @Autowired
     private PanierRepository panierRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @GetMapping("/")//faire un autre pour les non admin gérent/manager
     public String showIndex(Model model) {
         List<Produit> productsList = produitService.getAllProduct();
@@ -89,6 +100,7 @@ public class ProduitController {
 
 
     //revoir l'erreur de la pagination !!
+    /**
     @GetMapping("/produit")
     public String allProduit(Model model, @RequestParam(defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, 24); // 20 produits par page
@@ -100,7 +112,7 @@ public class ProduitController {
        Long idTest = Long.parseLong(s);
         Optional<Panier> panier = panierRepository.findById(idTest);
         //Panier panier = new Panier();
-        //panierRepository.save(panier);
+        panierRepository.save(panier.get());
 
         System.out.println(panier.get().getId()+"******************************************************");
 
@@ -112,7 +124,108 @@ public class ProduitController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", productPage.getTotalPages());
         return "produit/index_produits";
+    }**/
+
+    @GetMapping("/produit")
+    public String allProduit(Model model, @RequestParam(defaultValue = "0") int page, Principal principal, HttpSession session) {
+        Pageable pageable = PageRequest.of(page, 24); // 20 produits par page
+        Page<Produit> productPage = produitRepository.findAll(pageable); // Vous devriez avoir une méthode 'findAll' qui accepte un objet 'Pageable'
+        List<Categorie> categorieList = categorieService.getAllCategorie();
+
+        Panier panier = null;
+
+        if (principal != null && principal instanceof UsernamePasswordAuthenticationToken) {
+            System.out.println("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww");
+
+            UsernamePasswordAuthenticationToken authenticationToken = (UsernamePasswordAuthenticationToken) principal;
+
+            System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+            //CustomUserDetails customUserDetails = (CustomUserDetails) principal;
+            CustomUserDetails customUserDetails = (CustomUserDetails) authenticationToken.getPrincipal();
+            System.out.println(customUserDetails.getEmailUser());
+            User user = userRepository.findByEmail(customUserDetails.getEmailUser());
+            model.addAttribute("userConnecte",user);
+            System.out.println(user);
+
+            // Récupérez ou créez le panier de l'utilisateur connecté
+            panier = user.getPanier(); // Assurez-vous d'avoir une méthode getPanier() dans votre modèle User
+            System.out.println("panier ::::::::::::::" + panier);
+            // Récupérez le panier temporaire de la session s'il existe
+            Panier panierTemporaire = (Panier) session.getAttribute("panierTemporaire");
+            if (panierTemporaire != null) {
+                // Fusionnez le panier temporaire avec le panier de l'utilisateur connecté
+                panier.mergeWith(panierTemporaire);
+                // Supprimez le panier temporaire de la session
+                session.removeAttribute("panierTemporaire");
+            }
+
+        } else {
+            // L'utilisateur n'est pas connecté, récupérez le panier temporaire de la session
+            System.out.println(" TEst Utilisateur visiteur non connecté !!! :)");
+            panier = (Panier) session.getAttribute("panierTemporaire");
+            if (panier == null) {
+                // Si l'utilisateur non connecté n'a pas de panier temporaire dans la session, créez-en un nouveau
+                panier = new Panier();
+                panierRepository.save(panier);
+                // ... Initialisation du panier temporaire ...
+                session.setAttribute("panierTemporaire", panier);
+            }
+            System.out.println(" TEst Utilisateur visiteur non connecté !!! son panier :" + panier);
+        }
+
+        model.addAttribute("listProducts", productPage.getContent());
+        model.addAttribute("catList", categorieList);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", productPage.getTotalPages());
+        model.addAttribute("panier", panier);
+
+        return "produit/index_produits";
     }
+
+
+
+    @GetMapping("/produit2")
+    public String allProduit2(Model model, @RequestParam(defaultValue = "0") int page, Principal principal, HttpSession session) {
+        Pageable pageable = PageRequest.of(page, 24); // 20 produits par page
+        Page<Produit> productPage = produitRepository.findAll(pageable);
+        List<Categorie> categorieList = categorieService.getAllCategorie();
+
+        Panier panier = null;
+
+        if (principal != null) {
+            System.out.println("laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa*****************************");
+            // L'utilisateur est connecté, utilisez Spring Security pour obtenir l'utilisateur connecté
+            // Vous devrez peut-être ajuster votre configuration Spring Security
+           // User user = (User) ((Authentication) principal).getPrincipal();
+            // L'utilisateur est connecté, utilisez Spring Security pour obtenir l'utilisateur connecté
+            CustomUserDetails userDetails = (CustomUserDetails) ((Authentication) principal).getPrincipal();
+
+            System.out.println(userDetails.getUser(userDetails.getEmailUser())+"laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+            // Récupérez ou créez le panier de l'utilisateur connecté
+            //panier = user.getPanier(); // Assurez-vous d'avoir une méthode getPanier() dans votre modèle User
+            panier = userDetails.getUser(userDetails.getEmailUser()).getPanier(); // Assurez-vous que CustomUserDetails contient une référence à User
+
+        } else {
+            // L'utilisateur n'est pas connecté, récupérez le panier temporaire de la session
+            panier = (Panier) session.getAttribute("panierTemporaire");
+            if (panier == null) {
+                // Si l'utilisateur non connecté n'a pas de panier temporaire dans la session, créez-en un nouveau
+                panier = new Panier();
+                // ... Initialisation du panier temporaire ...
+                session.setAttribute("panierTemporaire", panier);
+            }
+        }
+
+        model.addAttribute("listProducts", productPage.getContent());
+        model.addAttribute("catList", categorieList);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", productPage.getTotalPages());
+        model.addAttribute("panier", panier);
+
+        return "produit/index_produits";
+    }
+
+
 
     @GetMapping("/produits/admin")//faire un autre pour les non admin gérent/manager
     public String showAllProducts(Model model) {

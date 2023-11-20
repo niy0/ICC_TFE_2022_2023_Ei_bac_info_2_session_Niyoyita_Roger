@@ -31,39 +31,34 @@ public class PanierService {
 
     @Transactional
     public void addLigneDeCommandeToPanier(Long panierId, Long produitId, int quantite) throws ProduitNotFoundException, QuantiteInsuffisanteException {
-        // Obtenez le panier correspondant à l'ID
         Panier panier = panierRepository.findById(panierId)
                 .orElseThrow(() -> new PanierNotFoundException("Panier non trouvé avec l'ID : " + panierId));
 
-        // Obtenez le produit correspondant à l'ID
         Produit produit = produitRepository.findById(produitId)
                 .orElseThrow(() -> new ProduitNotFoundException("Produit non trouvé avec l'ID : " + produitId));
 
-        // Vérifiez si une ligne de commande pour ce produit existe déjà dans le panier
-        LigneDeCommande existingLigneDeCommande = panier.getLignesDeCommande().stream()
-                .filter(ligne -> ligne.getProduit().getId().equals(produitId))
-                .findFirst()
-                .orElse(null);
+        if (panier != null && produit != null && quantite > produit.getQuantite()) {
+            throw new QuantiteInsuffisanteException("Quantité insuffisante pour le produit : " + produit.getNom());
+        }
+
+        LigneDeCommande existingLigneDeCommande = ligneDeCommandeRepository.findByProduitIdAndPanierId(produitId, panierId);
 
         if (existingLigneDeCommande != null) {
-            // Si une ligne de commande existe déjà pour ce produit, mettez à jour la quantité
             existingLigneDeCommande.setQuantite(existingLigneDeCommande.getQuantite() + quantite);
+            ligneDeCommandeRepository.save(existingLigneDeCommande);
+            System.out.println("existe deeeeeeeeejjaaa"+ existingLigneDeCommande);
         } else {
-            // Sinon, vérifiez si la quantité demandée est disponible
-            if (quantite > produit.getQuantite()) {
-                throw new QuantiteInsuffisanteException("Quantité insuffisante pour le produit : " + produit.getNom());
-            }
-
-            // Créez une nouvelle ligne de commande
             LigneDeCommande nouvelleLigneDeCommande = new LigneDeCommande(produit, panier, quantite, produit.getPrix(), produit.getPrix() * quantite);
             ligneDeCommandeRepository.save(nouvelleLigneDeCommande);
 
             panier.getLignesDeCommande().add(nouvelleLigneDeCommande);
+
+            System.out.println("nouvellle ligne rajouter*************"+panier);
         }
 
-        // Mettez à jour le panier dans la base de données
         panierRepository.save(panier);
     }
+
 
 
     public List<LigneDeCommandeDTO> getLignesDeCommande(Long panierId) {

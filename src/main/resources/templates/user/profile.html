@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
+      layout:decorate="~{layouts/main}" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+  <meta charset="UTF-8">
+  <title>Bienvenue dans le page Membre</title>
+  <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+  <style>
+    /* Styles pour la barre de navigation latérale */
+
+    .card {
+      margin-left: 250px;
+      background-color: #f8f9fa;
+    }
+    .sidenav {
+      margin: 0;
+      height: 100%;
+      width: 200px;
+      position: absolute;
+      padding-top: 20px;
+      overflow-y: auto;
+      background-color: #f8f9fa;
+      border: 1px solid #28a745;
+      border-radius: 5px;
+    }
+
+    .sidenav a {
+      padding: 8px 8px 8px 16px;
+      text-decoration: none;
+      font-size: 18px;
+      color: #333;
+      display: block;
+    }
+
+    .sidenav a:hover {
+      color: #007bff;
+    }
+
+    .content {
+      margin-left: 250px;
+      padding: 20px;
+      position: relative;
+    }
+  </style>
+
+</head>
+<body >
+    <div layout:fragment="content">
+      <div class="sidenav">
+        <a href="#">Profile</a>
+        <a href="#">Mes commandes</a>
+        <a href="#">Mes produits favoris</a>
+      </div>
+
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Page profile</h5>
+          <h6 class="card-subtitle mb-2 text-muted" th:text="${user.nom} +' '+ ${user.prenom}"></h6>
+          <p class="card-text"><strong>Nom:</strong> <span th:text="${user.nom}"></span></p>
+          <p class="card-text"><strong>Prénom:</strong> <span th:text="${user.prenom}"></span></p>
+          <p class="card-text"><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+          <p class="card-text"><strong>Sexe:</strong> <span th:text="${user.sexe}"></span></p>
+          <p class="card-text"><strong>Téléphone:</strong>
+            <span th:if="${user.telephone} != null" th:text="${user.telephone}"></span>
+            <span th:if="${user.telephone} == null">Pas de numéro enregistré</span>
+          </p>
+          <p class="card-text"><strong>Date de création:</strong> <span th:text="${user.dateCreation}"></span></p>
+          <p class="card-text"><strong>Rôles:</strong>
+            <span th:each="role : ${user.roles}" th:text="${role.nom} + ' '"></span>
+          </p>
+          <p class="card-text"><strong>Adresses:</strong>
+            <span th:if="${user.adresses.size() == 0}">Adresse vide</span>
+            <span th:each="adresse : ${user.adresses}">
+              <br/><span th:text="${adresse.rue}, ${adresse.codePostal}, ${adresse.ville}, ${adresse.pays}"></span>
+            </span>
+          </p>
+
+          <a class="btn btn-outline-warning" th:href="@{'/user/'+ ${user.id}}+ '/profile/edit'">Modifier profile</a>
+        </div>
+      </div>
+    </div>
+</body>
+</html>

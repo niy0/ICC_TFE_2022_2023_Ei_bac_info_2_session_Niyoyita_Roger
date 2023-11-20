@@ -1,19 +1,20 @@
 package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier;
 
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.ligneDeCommande.LigneDeCommande;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Panier {
+public class Panier implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
 
     @OneToMany(mappedBy = "panier", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
@@ -32,6 +33,9 @@ public class Panier {
     @Transient // Pour indiquer à JPA de ne pas persister cet attribut en base de données
     private double montantTotalPanier;
 
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User utilisateur;
 
     public Panier() {
         this.dateCreation = LocalDateTime.now();
@@ -105,5 +109,29 @@ public class Panier {
     // Ajoutez un getter pour récupérer le montant total du panier
     public double getMontantTotalPanier() {
         return montantTotalPanier;
+    }
+
+    public void mergeWith(Panier panierTemporaire) {
+    }
+
+    public void setMontantTotalPanier(double montantTotalPanier) {
+        this.montantTotalPanier = montantTotalPanier;
+    }
+
+    public void setUtilisateur(User utilisateur) {
+        this.utilisateur = utilisateur;
+    }
+
+    @Override
+    public String toString() {
+        return "Panier{" +
+                "id=" + id +
+                ", lignesDeCommande=" + lignesDeCommande +
+                ", actif=" + actif +
+                ", dateCreation=" + dateCreation +
+                ", dateModification=" + dateModification +
+                ", montantTotalPanier=" + montantTotalPanier +
+                ", utilisateur=" + utilisateur +
+                '}';
     }
 }

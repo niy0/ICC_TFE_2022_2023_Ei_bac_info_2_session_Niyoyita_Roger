@@ -46,20 +46,40 @@
                 }
 
                 /* Styles pour diviser la page en deux parties */
-                .page-container {
-                    display: flex;
-                    flex-direction: column; /* Changez la direction en colonne pour empiler le header et le contenu */
-                    height: 100%;
-                }
+                /* Ajoutez ces styles pour le "sticky footer" */
+.page-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
-                .content-container {
-                    flex-grow: 1;
-                    display: flex;
-                    flex-direction: column;
-                    overflow: auto; /* Ajout de la barre de défilement si le contenu dépasse */
-                    position: relative;
-                    z-index: 2; /* Assurez-vous que le contenu est au-dessus du panier */
-                }
+/* Ajoutez ces styles pour que la content-container s'étende jusqu'au haut du footer */
+.content-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  position: relative;
+  z-index: 2;
+  margin-bottom: 0; /* Ajoutez cette ligne pour supprimer la marge inférieure */
+  min-height: calc(100vh - 20px); /* Ajustez la valeur en fonction de la hauteur du footer */
+}
+
+
+.container.flex-grow-1 {
+  flex-grow: 1;
+}
+
+/* Style du footer */
+.page-footer {
+  padding: 20px; /* Ajoutez la marge intérieure désirée */
+  background-color: #f8f9fa; /* Couleur de fond du footer */
+  text-align: center;
+  position: sticky;
+  bottom: 0;
+  z-index: 3; /* Assurez-vous que le footer est au-dessus de tout */
+}
+
     </style>
 
     <th:block layout:fragment="css"></th:block>
@@ -73,11 +93,13 @@
     <!-- Contenu principal -->
     <div class="content-container">
         <div class="container flex-grow-1" layout:fragment="content"></div>
-        <div th:replace="~{fragments/footer :: footer}"></div>
     </div>
-
     <!-- Panier -->
     <div layout:fragment="panier" class="panier"></div>
+    <!-- Footer -->
+    <div class="page-footer">
+        <div th:replace="~{fragments/footer :: footer}"></div>
+    </div>
 </div>
 
 <!-- jQuery (Nécessaire pour les fonctionnalités JavaScript de Bootstrap) -->

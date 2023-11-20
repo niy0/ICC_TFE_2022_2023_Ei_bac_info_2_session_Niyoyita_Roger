@@ -3,12 +3,12 @@ CREATE TABLE `user` (
     `id` bigint(20) AUTO_INCREMENT PRIMARY KEY,
     `nom` varchar(50) NOT NULL,
     `prenom` varchar(50) NOT NULL,
-    `email` varchar(255) NOT NULL,
+    `email` varchar(255) unique NOT NULL ,
     `password` varchar(255) NOT NULL,
     `is_logged_in` tinyint(1) NOT NULL,
     `telephone` varchar(15),
     `sexe` varchar(10) NOT NULL,
-    `date_creation` datetime(6) NOT NULL,
+    `date_creation` datetime(6) ,
     `date_modification` datetime(6)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

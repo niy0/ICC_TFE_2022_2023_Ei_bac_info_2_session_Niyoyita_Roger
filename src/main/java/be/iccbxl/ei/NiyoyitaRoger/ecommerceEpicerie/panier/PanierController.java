@@ -9,10 +9,15 @@ import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit.ProduitNotFoundExcep
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit.ProduitRepository;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit.ProduitService;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -96,8 +101,9 @@ public class PanierController {
         }
     }
 
+
     @PostMapping("/addToCart")
-    public ResponseEntity<String> addToCart(@RequestBody LigneDeCommandeData ligneDeCommandeDTO) {
+    public ResponseEntity<String> addToCart(@RequestBody LigneDeCommandeData ligneDeCommandeDTO, HttpServletRequest request) {
         try {
             // Récupérez le produit en fonction de l'ID du produit
             Produit produit = produitRepository.getPro(ligneDeCommandeDTO.getProduitId());
@@ -106,8 +112,26 @@ public class PanierController {
             int quantiteDemandee = ligneDeCommandeDTO.getQuantite();
 
             // Vérifiez si la quantité demandée est inférieure à la quantité en stock du produit
-            if (quantiteDemandee <= produit.getQuantite() && quantiteDemandee > 0) {
+            if (produit != null && quantiteDemandee <= produit.getQuantite() && quantiteDemandee > 0) {
+
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                if (auth != null) {
+                    for (GrantedAuthority authority : auth.getAuthorities()) {
+                        System.out.println("Authority: " + authority.getAuthority());
+                    }
+                }
+
+                // Vérifiez si le jeton CSRF est inclus dans les en-têtes de la requête
+                String csrfHeader = request.getHeader("X-XSRF-TOKEN");
+                if (csrfHeader != null) {
+                    System.out.println("Jeton CSRF inclus dans les en-têtes de la requête : " + csrfHeader);
+                } else {
+                    System.out.println("Aucun jeton CSRF trouvé dans les en-têtes de la requête.");
+                }
+
+
                 // Utilisez votre service pour ajouter la ligne de commande au panier
+
                 panierService.addLigneDeCommandeToPanier(
                         ligneDeCommandeDTO.getPanierId(),
                         ligneDeCommandeDTO.getProduitId(),
@@ -115,8 +139,11 @@ public class PanierController {
                 );
 
                 int testQ1 = produit.getQuantite();
+
+                System.out.println();
+
                 //Diminuer la quantite ajouter dans la bd pour le produit
-                produit.setQuantite(produit.getQuantite() - quantiteDemandee);
+               // a la création d'une commande produit.setQuantite(produit.getQuantite() - quantiteDemandee);
 
                 //Si la quantite du produit est à 0, l'enlever du site
                 //à faire!!
