@@ -3,6 +3,7 @@ package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -36,7 +37,7 @@ public class Produit {
 
     @NotNull
     @Column(name = "prix", nullable = false)
-    private Double prix;
+    private BigDecimal prix;
 
     @NotNull
     @Column(name = "quantite", nullable = false)
@@ -126,11 +127,11 @@ public class Produit {
         this.description = description;
     }
 
-    public Double getPrix() {
+    public BigDecimal getPrix() {
         return prix;
     }
 
-    public void setPrix(Double prix) {
+    public void setPrix(BigDecimal prix) {
         this.prix = prix;
     }
 
@@ -166,7 +167,6 @@ public class Produit {
         }
         return this.imagePrincipaleJson;
     }
-
 
     public void setImagePrincipaleJson(byte[] imagePrincipaleJson) {
         this.imagePrincipaleJson = imagePrincipaleJson;

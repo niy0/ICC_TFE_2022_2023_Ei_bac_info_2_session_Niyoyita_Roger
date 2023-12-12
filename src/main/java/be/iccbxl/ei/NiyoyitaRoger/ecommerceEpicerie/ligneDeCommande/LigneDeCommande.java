@@ -4,9 +4,10 @@ import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.Panier;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit.Produit;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
-@Table(name="lignedecommande")
+@Table(name = "lignedecommande")
 public class LigneDeCommande {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,23 +24,22 @@ public class LigneDeCommande {
 
     private int quantite;
 
-    private double prixUnitaire; // Prix unitaire du produit au moment de la commande
+    private BigDecimal prixUnitaire; // Prix unitaire du produit au moment de la commande
 
-    private double montantTotal; // Montant total de la ligne de commande
+    private BigDecimal montantTotal; // Montant total de la ligne de commande
 
+    protected LigneDeCommande() {
+    }
 
-    protected LigneDeCommande() {}
-
-    public LigneDeCommande(Produit produit, Panier panier, int quantite, double prixUnitaire, double montantTotal) {
+    public LigneDeCommande(Produit produit, Panier panier, int quantite, BigDecimal prixUnitaire) {
         this.produit = produit;
         this.panier = panier;
         this.quantite = quantite;
-        this.prixUnitaire = prixUnitaire;
-        this.montantTotal = montantTotal;
+        setPrixUnitaire(prixUnitaire); // Utilisation de la méthode setter pour initialiser le prix unitaire
+        calculerMontantTotal();
     }
 
     // Constructeurs, getters, setters et autres méthodes d'accès
-
 
     public Long getId() {
         return id;
@@ -57,9 +57,9 @@ public class LigneDeCommande {
         this.produit = produit;
         // Mettre à jour automatiquement le prix unitaire lorsque le produit est défini
         if (produit != null) {
-            this.prixUnitaire = produit.getPrix();
+            setPrixUnitaire(produit.getPrix());
         } else {
-            this.prixUnitaire = 1.0; // Mettez la valeur par défaut que vous souhaitez ici
+            setPrixUnitaire(BigDecimal.valueOf(1.0)); // Mettez la valeur par défaut que vous souhaitez ici
         }
         calculerMontantTotal(); // Appel de la méthode pour recalculer le montant total
     }
@@ -81,21 +81,20 @@ public class LigneDeCommande {
         calculerMontantTotal(); // Appel de la méthode pour recalculer le montant total
     }
 
-    public double getPrixUnitaire() {
+    public BigDecimal getPrixUnitaire() {
         return prixUnitaire;
-    } //binder avec Produit.getPrix()m
+    }
 
-    public void setPrixUnitaire(double prixUnitaire) {
+    public void setPrixUnitaire(BigDecimal prixUnitaire) {
         this.prixUnitaire = prixUnitaire;
         calculerMontantTotal(); // Appel de la méthode pour recalculer le montant total
     }
 
-    public double getMontantTotal() {
+    public BigDecimal getMontantTotal() {
         return montantTotal;
     }
 
     public void calculerMontantTotal() {
-        montantTotal = quantite * prixUnitaire;
+        montantTotal = prixUnitaire.multiply(BigDecimal.valueOf(quantite));
     }
 }
-

@@ -35,6 +35,21 @@ public class EcommerceController {
     }
 
 
+    //("/info-contact","/info-livraison","/info-retour","/info-utilisation","/info-confidentialite","/addToCart").permitAll()
+    @GetMapping("/info-contact")
+    public String contactPage(){
+        return "user/profile";
+    }
+
+    @GetMapping("/info-livraison")
+    public String infoLivraisonPage(){
+        return "user/profile";
+    }
+
+    @GetMapping("/info-retour")
+    public String infoRetourPage(){
+        return "user/profile";
+    }
 
     /**
 
@@ -81,6 +96,9 @@ public class EcommerceController {
         return "redirect:/";
     }
 
+
+
+    //A refaire !!
     @GetMapping("/passer-commande")
     public String passerCommande(Model model, HttpSession session) {
         List<Produit> panier = (List<Produit>) session.getAttribute("panier");
@@ -92,7 +110,7 @@ public class EcommerceController {
         // Vous pouvez implémenter ici le processus de paiement, l'adresse de livraison, etc.
 
         // Créer une commande avec les produits du panier
-        Commande commande = new Commande();
+        //Commande commande = new Commande();
 
         // a faire commande.setProduits(panier);
 

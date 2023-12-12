@@ -1,5 +1,6 @@
 package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier;
 
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.categorie.Categorie;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.ligneDeCommande.LigneDeCommande;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.ligneDeCommande.LigneDeCommandeDTO;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.ligneDeCommande.LigneDeCommandeData;
@@ -8,27 +9,37 @@ import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit.Produit;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit.ProduitNotFoundException;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit.ProduitRepository;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit.ProduitService;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.CustomUserDetails;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.User;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.UserRepository;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Controller
+@SessionAttributes("panier")
 public class PanierController {
 
     @Autowired
@@ -45,6 +56,97 @@ public class PanierController {
 
     @Autowired
     private LigneDeCommandeRepository ligneDeCommandeRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    //
+    @ModelAttribute("panier")
+    public Panier getPanier() {
+        return new Panier();
+    }
+
+    @GetMapping("/ajouter-au-panier/{produitId}")
+    public String ajouterAuPanier(@PathVariable Long produitId, @ModelAttribute("panier") Panier panier) {
+        // Ajouter le produit au panier
+        // par exemple: panier.ajouterProduit(produitService.trouverParId(produitId));
+        return "redirect:/liste-produits";
+    }
+
+    @PostMapping("/viderPanier")
+    public String viderPanier(@RequestParam("idPanier") String panierId){
+        Long idPanier = Long.parseLong(panierId);
+        panierService.deleteAllLigneDeCommande(idPanier);
+        return "redirect:/produit";
+    }
+
+    //
+    @GetMapping("/panier")
+    public String showPanier(Model model, Principal principal, HttpSession session) {
+        Panier panier = getOrCreatePanier(principal, session);
+        model.addAttribute("panier", panier);
+        return "panier/panier";
+    }
+
+    private Panier getOrCreatePanier(Principal principal, HttpSession session) {
+        if (principal != null) {
+            return getOrCreateAuthenticatedUserPanier(principal, session);
+        } else {
+            return getOrCreateSessionPanier(session);
+        }
+    }
+
+    private Panier getOrCreateAuthenticatedUserPanier(Principal principal, HttpSession session) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) ((UsernamePasswordAuthenticationToken) principal).getPrincipal();
+        User user = userRepository.findByEmail(customUserDetails.getEmailUser());
+        Panier panier = user.getPanier();
+
+        Panier panierTemporaire = (Panier) session.getAttribute("panierTemporaire");
+        if (panierTemporaire != null) {
+            panier.mergeWith(panierTemporaire);
+            session.removeAttribute("panierTemporaire");
+        }
+
+        return panier;
+    }
+
+    private Panier getOrCreateSessionPanier(HttpSession session) {
+        Long panierId = (Long) session.getAttribute("panierTemporaireId");
+        Panier panier;
+
+        if (panierId == null) {
+            panier = new Panier();
+            panierRepository.save(panier); // Assurez-vous que le panier est persisté pour obtenir un ID
+            session.setAttribute("panierTemporaireId", panier.getId());
+        } else {
+            panier = panierRepository.findById(panierId)
+                    .orElseThrow(() -> new RuntimeException("Panier non trouvé"));
+        }
+
+        return panier;
+    }
+
+    //
+
+
+    @GetMapping("/panier/{id}")
+    public String voirPanier(Model model, @PathVariable("id")long idPanier) {
+        String errorMessage = "";
+        Optional<Panier> panier = panierRepository.findById(idPanier);
+        if(panier.isPresent()) {
+            model.addAttribute("panier",panier.get());
+        }else {
+            errorMessage = "Panier introuvable";
+        }
+        return "panier/panier";
+    }
+
+    @GetMapping("/vider-panier")
+    public String viderPanier(SessionStatus status) {
+        status.setComplete();
+        return "redirect:/liste-produits";
+    }
+    //
 
 
 
@@ -192,7 +294,7 @@ public class PanierController {
 
         // Créez une nouvelle ligne de commande
         //Produit produit, Panier panier, int quantite, double prixUnitaire, double montantTotal
-        LigneDeCommande ligneDeCommande = new LigneDeCommande(produit,panier.get(),qty,produit.getPrix(),panier.get().getMontantTotalPanier());
+        LigneDeCommande ligneDeCommande = new LigneDeCommande(produit,panier.get(),qty,produit.getPrix());
         ligneDeCommande.setProduit(produit);
         ligneDeCommande.setQuantite(1); // Vous pouvez ajuster la quantité comme vous le souhaitez
 
@@ -203,29 +305,13 @@ public class PanierController {
         return "redirect:/panier/show";
     }
 
-    public double getMontantTotalPanier(Long panierId) {
+    /**public BigDecimal getMontantTotalPanier(Long panierId) {
         Panier panier = panierRepository.findById(panierId).orElse(null);
         if (panier != null) {
-            double montantTotalPanier = panier.getMontantTotalPanier();
-            return montantTotalPanier;
+            return panier.getMontantTotalPanier();
         }
-        return 0.0; // Si le panier n'existe pas ou est vide
-    }
-
-    /**
-    @PostMapping("/valider")
-    public String validerPanier(HttpSession session, Principal principal) {
-        Panier panier = (Panier) session.getAttribute("panier");
-        Utilisateur utilisateur = utilisateurRepository.findByNom(principal.getName());
-
-        if (panier != null && utilisateur != null) {
-            Commande commande = new Commande();
-            commande.setUtilisateur(utilisateur);
-            commande.setLignesDeCommande(new ArrayList<>(panier.getLignesDeCommande()));
-            commandeRepository.save(commande);
-            session.removeAttribute("panier");
-        }
-
-        return "redirect:/";
+        return BigDecimal.ZERO; // Si le panier n'existe pas ou est vide, retourne BigDecimal.ZERO
     }**/
+
+
 }

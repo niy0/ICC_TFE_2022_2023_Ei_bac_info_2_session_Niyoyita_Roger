@@ -32,18 +32,19 @@
 
                 .panier {
                     position: fixed;
-                    top: 50px; /* Réglez cette valeur en fonction de la hauteur de votre header */
+                    top: 50px;
                     right: 0;
-                    margin-top:5px;
+                    margin-top: 5px;
                     background-color: red;
                     width: 20%;
-                    max-height: calc(100% - 50px - 10px); /* 50px pour le header, 10px pour la marge du panier */
+                    max-height: calc(100% - 50px - 10px);
                     padding: 10px;
                     border: 1px solid #d3d3d3;
                     border-radius: 5px;
-                    z-index: 1; /* Assurez-vous que le panier est en arrière-plan par rapport au contenu */
-                    overflow-y: auto; /* Ajout d'une barre de défilement si nécessaire */
+                    z-index: 1000; /* Valeur augmentée pour s'assurer qu'elle est au-dessus des autres éléments */
+                    overflow-y: auto;
                 }
+
 
                 /* Styles pour diviser la page en deux parties */
                 /* Ajoutez ces styles pour le "sticky footer" */

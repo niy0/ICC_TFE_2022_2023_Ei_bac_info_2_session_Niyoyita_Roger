@@ -50,12 +50,10 @@ function getQuantiteProduit(produitId) {
     });
 }
 
-
 //Affiche la liste des produits actif et quantite >= 1
 function getProduitActif() {
     var addedProductIds = new Set(); // Ensemble pour stocker les IDs des produits déjà ajoutés
     var listeProduits = $('#liste-produits');
-
 
     $.ajax({
         type: "GET",
@@ -188,8 +186,6 @@ function getProduitDetails2(produitId) {
 }
 
 
-
-
 // Fonction pour récupérer le panier en spécifiant l'ID du panier
 function getPanier(idPanier) {
     var idPanierval = parseInt(idPanier);
@@ -220,180 +216,40 @@ function getPanier(idPanier) {
 
 function getListLigneDeCommandePanier(panierId) {
     var panierIdValue = parseInt(panierId);
-    var totalPanier = 0.0; // Variable pour stocker le total du panier
-
-     // Récupérez le jeton CSRF depuis les balises meta
-        var csrfParameterName = $("meta[name='_csrf.parameterName']").attr("content");
-        var csrfToken = $("meta[name='_csrf.token']").attr("content");
-
-        // Créez un objet d'en-tête avec le jeton CSRF
-        var headers = {};
-        headers[csrfParameterName] = csrfToken;
+    var totalPanier = 0.0;
 
     $.ajax({
         type: "GET",
         url: "/api/" + panierIdValue + "/lignesdecommande",
         dataType: "json",
-        headers: headers, // Ajoutez le jeton CSRF dans les en-têtes de la requête
         success: function (data) {
-            // Effacer le contenu de l'élément #cart-items
             $("#cart-items").empty();
-
-            // Créez une nouvelle ligne pour chaque élément de data
-            $.each(data, function (index, ligneDeCommande) {
-                var montantTotal = ligneDeCommande.quantite * ligneDeCommande.prixUnitaire;
-                totalPanier += montantTotal; // Ajoutez le montant total au total du panier
-
-                var newRow = '<tr>' +
-                    '<td>' + ligneDeCommande.nomProduit + '</td>' +
-                    '<td>' + ligneDeCommande.prixUnitaire.toFixed(2) + ' €</td>' +
-                    '<td>' + ligneDeCommande.quantite + '</td>' +
-                    '<td>' + ligneDeCommande.montantTotal.toFixed(2) + ' €</td>' +
-                    '</tr>';
-                // Ajouter la ligne au panier
-                $("#cart-items").append(newRow);
-            });
-
-            // Ajoutez une ligne pour afficher le total du panier centrée horizontalement
-            var totalRow = '<tr>' +
-                '<td colspan="4" style="text-align: center;"><strong>Total : ' + totalPanier.toFixed(2) + ' €</strong></td>' +
-                '</tr>';
-            $("#cart-items").append(totalRow);
-
-            // Ajoutez un bouton "Voir panier"
-            var voirPanierButton = '<button class="btn btn-primary" onclick="confirmerPanier()"><i class="bi bi-cart-check"></i> Confirmer le panier</button>';
-            $("#cart-items").append('<tr><td colspan="4">' + voirPanierButton + '</td></tr>');
+            if (data.length === 0) {
+                $("#cart-items").append('<tr><td colspan="4">Votre panier est vide7778888.</td></tr>');
+            } else {
+                $.each(data, function (index, ligneDeCommande) {
+                    var montantTotal = ligneDeCommande.quantite * ligneDeCommande.prixUnitaire;
+                    totalPanier += montantTotal;
+                    var newRow = '<tr>' +
+                        '<td>' + ligneDeCommande.nomProduit + '</td>' +
+                        '<td>' + ligneDeCommande.prixUnitaire.toFixed(2) + ' €</td>' +
+                        '<td>' + ligneDeCommande.quantite + '</td>' +
+                        '<td>' + montantTotal.toFixed(2) + ' €</td>' +
+                        '</tr>';
+                    $("#cart-items").append(newRow);
+                });
+            }
+            // Mettre à jour le total du panier
+            $("#panier-total").text(totalPanier.toFixed(2));
         },
         error: function (jqXHR, textStatus, errorThrown) {
-            console.error("Erreur de requête Ajax: " + errorThrown);
-        }
-    });
-}
-/**
-function addLigneDeCommandeToPanier(produitId, quantite, panierId) {
-    // Créez un objet contenant les données à envoyer
-    var data = {
-        produitId: produitId,
-        quantite: quantite,
-        panierId: panierId
-    };
-
-    alert("produiID : "+produitId + " Qty:"+ quantite + " panierId:" + panierId);
-
-    // Récupérez le jeton CSRF depuis les balises meta
-        var csrfParameterName = $("meta[name='_csrf.parameterName']").attr("content");
-        var csrfToken = $("meta[name='_csrf.token']").attr("content");
-
-        // Créez un objet d'en-tête avec le jeton CSRF
-        var headers = {};
-        headers[csrfParameterName] = csrfToken;
-
-    // Effectuez la requête Ajax POST
-    $.ajax({
-        url: '/addToCart', // Remplacez par l'URL correcte pour votre endpoint
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(data),
-        headers: headers, // Ajoutez le jeton CSRF dans les en-têtes de la requête
-        success: function (response) {
-            // La requête a réussi, vous pouvez traiter la réponse ici
-            console.log('Ligne de commande ajoutée avec succès:', response);
-            //getProduitDetails(produitId);
-            // Effacer le contenu de l'élément #cart-items
-            // Réalisez les actions nécessaires en cas de succès, par exemple, mettre à jour l'affichage du panier
-            // ou afficher un message de succès à l'utilisateur.
-        },
-        error: function (error) {
-            // Une erreur s'est produite lors de la requête Ajax
-            console.error('Erreur lors de l\'ajout de la ligne de commande:', error);
-
-            // Réalisez les actions nécessaires en cas d'erreur, par exemple, afficher un message d'erreur à l'utilisateur.
+            console.error("Erreur de requête Ajax: " + textStatus + ", " + errorThrown);
+            alert("Une erreur est survenue lors de la récupération des lignes de commande du panier.");
         }
     });
 }
 
-function addToCart(produitId) {
-    // Convertir produitId en un Long
-    var produitIdValue = parseInt(produitId);
 
-    // Obtenir la quantité depuis l'élément input à l'intérieur de la même div
-    var quantiteInput = $("#quantite-" + produitIdValue);
-    var quantite = parseInt(quantiteInput.val());
-    var panierId = $("#panierId").val();
-    //alert("qty:" + quantite + ":" + panierId + "produitId:" + produitId + "panier id: " + panierId);
-
-    // Appeler la fonction pour ajouter la ligne de commande au panier
-    addLigneDeCommandeToPanier(produitIdValue, quantite, panierId);
-
-    // Réinitialiser la quantité à 1
-    quantiteInput.val(1);
-
-    // Affiche le panier actuel
-    getListLigneDeCommandePanier(panierId);
-}**/
-
-
-
-/**
-function addOrUpdateLigneDeCommande(produitId, quantite, panierId) {
-    // Créez un objet contenant les données à envoyer
-    var data = {
-        produitId: produitId,
-        quantite: quantite,
-        panierId: panierId
-    };
-
-    // Récupérez le jeton CSRF depuis les balises meta
-    var csrfParameterName = $("meta[name='_csrf.parameterName']").attr("content");
-    var csrfToken = $("meta[name='_csrf.token']").attr("content");
-
-    // Créez un objet d'en-tête avec le jeton CSRF
-    var headers = {};
-    headers[csrfParameterName] = csrfToken;
-
-    // Effectuez la requête Ajax POST
-    $.ajax({
-        url: '/addToCart', // Remplacez par l'URL correcte pour votre endpoint
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify(data),
-        headers: headers, // Ajoutez le jeton CSRF dans les en-têtes de la requête
-        success: function (response) {
-            // La requête a réussi, vous pouvez traiter la réponse ici
-            console.log('Ligne de commande ajoutée avec succès:', response);
-            //getProduitDetails(produitId);
-            // Effacer le contenu de l'élément #cart-items
-            // Réalisez les actions nécessaires en cas de succès, par exemple, mettre à jour l'affichage du panier
-            // ou afficher un message de succès à l'utilisateur.
-        },
-        error: function (error) {
-            // Une erreur s'est produite lors de la requête Ajax
-            console.error('Erreur lors de l\'ajout de la ligne de commande:', error);
-
-            // Réalisez les actions nécessaires en cas d'erreur, par exemple, afficher un message d'erreur à l'utilisateur.
-        }
-    });
-}
-
-// Utilisation de la fonction combinée
-function addToCart(produitId) {
-    // Convertir produitId en un Long
-    var produitIdValue = parseInt(produitId);
-
-    // Obtenir la quantité depuis l'élément input à l'intérieur de la même div
-    var quantiteInput = $("#quantite-" + produitIdValue);
-    var quantite = parseInt(quantiteInput.val());
-    var panierId = $("#panierId").val();
-
-    // Appeler la fonction pour ajouter ou mettre à jour la ligne de commande au panier
-    addOrUpdateLigneDeCommande(produitIdValue, quantite, panierId);
-
-    // Réinitialiser la quantité à 1
-    quantiteInput.val(1);
-
-    // Affiche le panier actuel
-    getListLigneDeCommandePanier(panierId);
-}**/
 
 function addToCart(produitId) {
     // Vérifiez si produitId peut être converti en un entier
@@ -431,22 +287,28 @@ function addToCart(produitId) {
         success: function (response) {
             console.log('Ligne de commande ajoutée avec succès :', response);
             // Réalisez les actions nécessaires en cas de succès
+            getListLigneDeCommandePanier(panierId);
+
+            // Rafraîchir la page uniquement pour le premier produit ajouté
+            // Vérifiez si le panier était initialement vide et si c'est le cas, rechargez la page
+            if ($("#cart-items").children().length === 0) {
+                setTimeout(function() {
+                    location.reload(); // Rafraîchit la page actuelle
+                }, 500); // Délai avant le rechargement
+            } else {
+                getListLigneDeCommandePanier(panierId);
+            }
         },
         error: function (error) {
             console.error('Erreur lors de l\'ajout de la ligne de commande :', error);
             // Réalisez les actions nécessaires en cas d'erreur
+            alert("Erreur lors de l'ajout du produit au panier. Veuillez réessayer.");
         }
     });
 
     // Réinitialiser la quantité à 1
     quantiteInput.val(1);
-
-    // Affiche le panier actuel
-    getListLigneDeCommandePanier(panierId);
 }
-
-
-
 
 
 // Fonction pour obtenir les détails du produit, y compris la quantité mise à jour
@@ -476,6 +338,8 @@ function getProduitDetails(produitId) {
         },
         error: function (error) {
             console.error('Erreur lors de la récupération des détails du produit :', error);
+             // Afficher un message d'erreur à l'utilisateur
+             alert("Erreur lors de l'ajout du produit au panier. Veuillez réessayer.");
         }
     });
 }
@@ -512,7 +376,7 @@ $(document).ready(function () {
 });
 
 
-// Gestionnaire d'événement pour le bouton "-"
+    // Gestionnaire d'événement pour le bouton "-"
     $('.button-minusJs').on('click', function () {
         var productId = $(this).data('product-id');
         var input = $(`#quantite-${productId}`);
@@ -534,7 +398,7 @@ $(document).ready(function () {
         }
     });
 
-// Sélectionnez tous les boutons "-" et ajoutez-leur des écouteurs d'événements
+    // Sélectionnez tous les boutons "-" et ajoutez-leur des écouteurs d'événements
     $('.button-minus').click(function () {
         var input = $(this).closest('.input-group').find('input.form-input');
         var value = parseInt(input.val());

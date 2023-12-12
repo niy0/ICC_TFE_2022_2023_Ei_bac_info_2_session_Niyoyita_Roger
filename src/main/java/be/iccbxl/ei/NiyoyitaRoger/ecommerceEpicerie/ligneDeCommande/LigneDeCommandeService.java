@@ -45,6 +45,7 @@ public class LigneDeCommandeService {
         }
     }
 
+    //Methode supprimer une ligne de commande (dans un panier)
     public void deleteLigneDeCommande(Long id) {
         ligneDeCommandeRepository.deleteById(id);
     }

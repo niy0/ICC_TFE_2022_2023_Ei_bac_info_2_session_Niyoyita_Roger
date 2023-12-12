@@ -8,6 +8,7 @@
     <title>Ajout d'un produit</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <script src="js/script.js"></script>
     <!-- Balises meta pour le jeton CSRF -->
     <meta name="_csrf.parameterName" th:content="${_csrf.parameterName}" />
@@ -252,8 +253,6 @@
                                     </div>
                                 </div>
                             </div>
-
-
                             <div>
                                 <button style="background-color: #cccfce;" title="Ajouter aux favoris">
                                     <i class="fa-regular fa-heart" style="color: #d91717;"></i>
@@ -288,26 +287,59 @@
             </nav>
         </div>
     </div>
-    <div layout:fragment="panier" >
+    <div layout:fragment="panier">
         <!-- Panier -->
         <div class="mt-5">
-            <h2><i class="bi bi-cart-fill"></i> Mon panier<button type="submit" class="btn btn-primary">Vider Panier</button></h2>
-            <form id="cart-form" th:action="@{/panier/add}" method="post">
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th>Nom</th>
-                        <th>Prix</th>
-                        <th>Quantité</th>
-                        <th>Total</th>
-                    </tr>
-                    </thead>
-                    <tbody id="cart-items">
-                    <!-- Les éléments du panier seront ajoutés ici dynamiquement en JavaScript -->
-                    </tbody>
-                </table>
-                <button type="submit" class="btn btn-primary"><i class="bi bi-cart4"></i> Voir Panier</button>
-            </form>
+            <h2><i class="bi bi-cart-fill"></i> Mon panier</h2>
+
+            <!-- Bloc conditionnel si le panier contient des lignes de commande -->
+            <div th:if="${not #lists.isEmpty(panier.lignesDeCommande)}">
+                <!-- Formulaire pour vider le panier -->
+                <form th:action="@{/viderPanier}" method="post">
+                    <input type="hidden" th:value="${panier.id}" name="idPanier">
+                    <button type="submit" class="btn btn-primary">Vider Panier</button>
+                </form>
+
+                <!-- Formulaire pour ajouter des produits au panier -->
+                <form id="cart-form" th:action="@{/panier/add}" method="post">
+                    <table class="table">
+                        <h4 th:text="${panier.id}" class="title text-center mb-4">Ajout nouveau produit</h4>
+                        <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Prix</th>
+                            <th>Quantité</th>
+                            <th>Total</th>
+                        </tr>
+                        </thead>
+                        <tbody id="cart-items">
+                        <tr th:each="ligne : ${panier.lignesDeCommande}">
+                            <td th:text="${ligne.produit.nom}">Nom du produit</td>
+                            <td th:text="${ligne.produit.prix}">Prix</td>
+                            <td th:text="${ligne.quantite}">Quantité</td>
+                            <td th:text="${ligne.produit.prix * ligne.quantite}">Total</td>
+                        </tr>
+                        </tbody>
+                        <tfoot>
+                        <tr class="total" style="text-align: center;">
+                            <td colspan="4">
+                                <strong>Total du panier : <span id="panier-total" th:text="${montantTotalPanier}"></span> €</strong>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-cart4"></i> Confirmer Panier</button>
+                </form>
+
+                <!-- Lien pour voir le panier -->
+                <a th:href="@{/panier}" class="btn btn-primary"><i class="bi bi-cart4"></i> Voir Panier</a>
+            </div>
+
+            <!-- Bloc conditionnel si le panier est vide -->
+            <div th:unless="${not #lists.isEmpty(panier.lignesDeCommande)}">
+                <h4 th:text="${panier.id}" class="title text-center mb-4">Ajout nouveau produit</h4>
+                <p>Votre panier est vide.</p>
+            </div>
         </div>
     </div>
 </div>

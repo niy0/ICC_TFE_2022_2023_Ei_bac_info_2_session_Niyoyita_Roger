@@ -1,13 +1,15 @@
 package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.ligneDeCommande;
 
+import java.math.BigDecimal;
+
 public class LigneDeCommandeDTO {
     private String nomProduit;
     private int quantite;
-    private double prixUnitaire;
-    private double montantTotal;
+    private BigDecimal prixUnitaire;
+    private BigDecimal montantTotal;
     private Long idPanier;
 
-    public LigneDeCommandeDTO(String nomProduit, int quantite, double prixUnitaire, double montantTotal, Long idPanier) {
+    public LigneDeCommandeDTO(String nomProduit, int quantite, BigDecimal prixUnitaire, BigDecimal montantTotal, Long idPanier) {
         this.nomProduit = nomProduit;
         this.quantite = quantite;
         this.prixUnitaire = prixUnitaire;
@@ -31,21 +33,20 @@ public class LigneDeCommandeDTO {
         this.quantite = quantite;
     }
 
-    public double getMontantTotal() {
+    public BigDecimal getMontantTotal() {
         return montantTotal;
     }
 
-    public void setMontantTotal(double montantTotal) {
+    public void setMontantTotal(BigDecimal montantTotal) {
         this.montantTotal = montantTotal;
     }
 
 
-
-    public double getPrixUnitaire() {
+    public BigDecimal getPrixUnitaire() {
         return prixUnitaire;
     }
 
-    public void setPrixUnitaire(double prixUnitaire) {
+    public void setPrixUnitaire(BigDecimal prixUnitaire) {
         this.prixUnitaire = prixUnitaire;
     }
 

@@ -1,7 +1,7 @@
 -- Créez la table pour Panier
 CREATE TABLE `panier` (
     `id` bigint(20) AUTO_INCREMENT PRIMARY KEY,
-    `actif` tinyint(1) NOT NULL,
+    `actif` tinyint(1),
     `date_creation` datetime(6) NOT NULL,
     `date_modification` datetime(6),
     `user_id` bigint(20) -- Colonne pour stocker la relation avec l'utilisateur

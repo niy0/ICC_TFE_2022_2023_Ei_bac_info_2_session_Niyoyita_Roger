@@ -1,17 +1,22 @@
 package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier;
 
-import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.ligneDeCommande.LigneDeCommande;
-import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.ligneDeCommande.LigneDeCommandeDTO;
-import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.ligneDeCommande.LigneDeCommandeData;
-import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.ligneDeCommande.LigneDeCommandeRepository;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.ligneDeCommande.*;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit.Produit;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit.ProduitNotFoundException;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit.ProduitRepository;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.User;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.UserEmailNotFoundException;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,14 +25,40 @@ import java.util.Map;
 @Service
 public class PanierService {
 
-    @Autowired
     private final PanierRepository panierRepository;
 
-    @Autowired
     private LigneDeCommandeRepository ligneDeCommandeRepository;
 
-    @Autowired
     private ProduitRepository produitRepository;
+
+    private UserRepository userRepository;
+
+    // Durée d'inactivité après laquelle les paniers sont considérés comme non utilisés (en minutes)
+    private static final long DELAI_INACTIVITE = 60; // par exemple, 1 heure
+
+    @Autowired
+    public PanierService(PanierRepository panierRepository,
+                         LigneDeCommandeRepository ligneDeCommandeRepository,
+                         ProduitRepository produitRepository,
+                         UserRepository userRepository) {
+
+        this.panierRepository = panierRepository;
+        this.ligneDeCommandeRepository = ligneDeCommandeRepository;
+        this.produitRepository = produitRepository;
+        this.userRepository = userRepository;
+    }
+
+    @Scheduled(fixedRate = 3600000) // Exécute cette méthode toutes les heures
+    public void nettoyerPaniersInactifs() {
+        LocalDateTime seuil = LocalDateTime.now().minusMinutes(DELAI_INACTIVITE);
+        List<Panier> paniersInactifs = panierRepository.findByDateModificationBefore(seuil);
+
+        for (Panier panier : paniersInactifs) {
+            if (panier.getUtilisateur() == null) { // Vérifiez s'il s'agit d'un panier de visiteur non enregistré
+                panierRepository.delete(panier);
+            }
+        }
+    }
 
     @Transactional
     public void addLigneDeCommandeToPanier(Long panierId, Long produitId, int quantite) throws ProduitNotFoundException, QuantiteInsuffisanteException {
@@ -48,7 +79,7 @@ public class PanierService {
             ligneDeCommandeRepository.save(existingLigneDeCommande);
             System.out.println("existe deeeeeeeeejjaaa"+ existingLigneDeCommande);
         } else {
-            LigneDeCommande nouvelleLigneDeCommande = new LigneDeCommande(produit, panier, quantite, produit.getPrix(), produit.getPrix() * quantite);
+            LigneDeCommande nouvelleLigneDeCommande = new LigneDeCommande(produit, panier, quantite, produit.getPrix());
             ligneDeCommandeRepository.save(nouvelleLigneDeCommande);
 
             panier.getLignesDeCommande().add(nouvelleLigneDeCommande);
@@ -58,8 +89,6 @@ public class PanierService {
 
         panierRepository.save(panier);
     }
-
-
 
     public List<LigneDeCommandeDTO> getLignesDeCommande(Long panierId) {
         Panier panier = panierRepository.getPanier(panierId);
@@ -96,7 +125,7 @@ public class PanierService {
                     .orElse(null);
 
             if (premiereLigne != null) {
-                double montantTotal = quantiteTotale * premiereLigne.getProduit().getPrix();
+                BigDecimal montantTotal = BigDecimal.valueOf(quantiteTotale).multiply(premiereLigne.getProduit().getPrix());
                 LigneDeCommandeDTO ligneDTO = new LigneDeCommandeDTO(
                         premiereLigne.getProduit().getNom(),
                         quantiteTotale,
@@ -110,7 +139,6 @@ public class PanierService {
 
         return lignesDeCommandeDataList;
     }
-
 
     public void addToCart(LigneDeCommande ligneDeCommande) {
         // Récupérez le panier actif de l'utilisateur (vous devrez implémenter cette logique)
@@ -132,24 +160,34 @@ public class PanierService {
     }
 
     // Implémentez la logique pour récupérer le panier actif de l'utilisateur
-    // Cette méthode dépendra de la structure de votre application
-    private Panier getPanierActifDeLUtilisateur() {
-        // Implémentez la logique pour récupérer le panier actif de l'utilisateur
-        // Par exemple, vous pourriez utiliser le Spring Security pour obtenir l'utilisateur
-        // et ensuite récupérer son panier actif à partir de la base de données
-        // En fonction de votre application, cela peut varier.
-        return null; // Remplacez par la logique de récupération réelle
-    }
+    public Panier getPanierActifDeLUtilisateur() throws UserEmailNotFoundException {
+        // Obtenez l'utilisateur authentifié
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-    public PanierService(PanierRepository panierRepository) {
-        this.panierRepository = panierRepository;
+        if (principal instanceof UserDetails) {
+            String username = ((UserDetails) principal).getUsername();
+            User user = userRepository.findByEmail(username);
+
+            if (user == null) {
+                throw new UserEmailNotFoundException("Aucun utilisateur authentifié trouvé.");
+            }
+
+            // Récupérez le panier actif de l'utilisateur
+            Panier panier = panierRepository.getPanierUser(user.getId());
+
+            if (panier != null) {
+                // Effectuez des opérations avec le panier
+                return panier;
+            } else {
+                throw new PanierNotFoundException("Aucun panier actif trouvé pour l'utilisateur.");
+            }
+
+        } else {
+            throw new UserEmailNotFoundException("Aucun utilisateur authentifié trouvé.");
+        }
     }
 
     // Ajoutez des méthodes pour gérer le panier, par exemple, ajouter, mettre à jour, supprimer, etc.
-
-    public List<Panier> getAllPaniers() {
-        return panierRepository.findAll();
-    }
 
     public Panier getPanierById(Long id) {
         return panierRepository.findById(id).orElseThrow(EntityNotFoundException::new);
@@ -165,5 +203,19 @@ public class PanierService {
 
     public void deletePanier(Long id) {
         panierRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteAllLigneDeCommande(Long panierId) {
+        Panier panier = panierRepository.findById(panierId)
+                .orElseThrow(() -> new PanierNotFoundException("Panier non trouvé avec l'ID : " + panierId));
+
+        if (!panier.getLignesDeCommande().isEmpty()) {
+            for (LigneDeCommande ligneDeCommande : panier.getLignesDeCommande()) {
+                ligneDeCommandeRepository.delete(ligneDeCommande);
+            }
+            panier.getLignesDeCommande().clear();
+            panierRepository.save(panier);
+        }
     }
 }

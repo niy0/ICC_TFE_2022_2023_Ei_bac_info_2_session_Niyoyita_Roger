@@ -30,6 +30,7 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
 
             if( customUserDetails.hasRole("Admin")) {
                 redirecturl += "/user/"+customUserDetails.getId()+"/profile";
+                System.out.println("je suis connecté");
             } else if( customUserDetails.hasRole("User")) {
                 redirecturl += "/user/"+customUserDetails.getId()+"/profile";
             } else  if(customUserDetails.hasRole("Employee")) {

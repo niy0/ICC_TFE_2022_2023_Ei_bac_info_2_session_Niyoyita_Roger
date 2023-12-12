@@ -37,6 +37,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.security.Principal;
 import java.sql.Blob;
 import java.sql.SQLException;
@@ -126,6 +127,7 @@ public class ProduitController {
         return "produit/index_produits";
     }**/
 
+    /**
     @GetMapping("/produit")
     public String allProduit(Model model, @RequestParam(defaultValue = "0") int page, Principal principal, HttpSession session) {
         Pageable pageable = PageRequest.of(page, 24); // 20 produits par page
@@ -135,11 +137,8 @@ public class ProduitController {
         Panier panier = null;
 
         if (principal != null && principal instanceof UsernamePasswordAuthenticationToken) {
-            System.out.println("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww");
-
             UsernamePasswordAuthenticationToken authenticationToken = (UsernamePasswordAuthenticationToken) principal;
 
-            System.out.println("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
             //CustomUserDetails customUserDetails = (CustomUserDetails) principal;
             CustomUserDetails customUserDetails = (CustomUserDetails) authenticationToken.getPrincipal();
             System.out.println(customUserDetails.getEmailUser());
@@ -180,8 +179,70 @@ public class ProduitController {
         model.addAttribute("panier", panier);
 
         return "produit/index_produits";
+    }**/
+
+    //*******************
+    @GetMapping("/produit")
+    public String allProduit(Model model, @RequestParam(defaultValue = "0") int page, Principal principal, HttpSession session) {
+        Pageable pageable = PageRequest.of(page, 24);
+        Page<Produit> productPage = produitRepository.findAll(pageable);
+        List<Categorie> categorieList = categorieService.getAllCategorie();
+
+        Panier panier = getOrCreatePanier(principal, session);
+
+        BigDecimal montantTotal = panier.getLignesDeCommande().stream()
+                .map(ligne -> ligne.getProduit().getPrix().multiply(new BigDecimal(ligne.getQuantite())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        model.addAttribute("listProducts", productPage.getContent());
+        model.addAttribute("catList", categorieList);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", productPage.getTotalPages());
+        model.addAttribute("panier", panier);
+        model.addAttribute("montantTotalPanier", montantTotal);
+
+        return "produit/index_produits";
     }
 
+    private Panier getOrCreatePanier(Principal principal, HttpSession session) {
+        if (principal != null) {
+            return getOrCreateAuthenticatedUserPanier(principal, session);
+        } else {
+            return getOrCreateSessionPanier(session);
+        }
+    }
+
+    private Panier getOrCreateAuthenticatedUserPanier(Principal principal, HttpSession session) {
+        CustomUserDetails customUserDetails = (CustomUserDetails) ((UsernamePasswordAuthenticationToken) principal).getPrincipal();
+        User user = userRepository.findByEmail(customUserDetails.getEmailUser());
+        Panier panier = user.getPanier();
+
+        Panier panierTemporaire = (Panier) session.getAttribute("panierTemporaire");
+        if (panierTemporaire != null) {
+            panier.mergeWith(panierTemporaire);
+            session.removeAttribute("panierTemporaire");
+        }
+
+        return panier;
+    }
+
+    private Panier getOrCreateSessionPanier(HttpSession session) {
+        Long panierId = (Long) session.getAttribute("panierTemporaireId");
+        Panier panier;
+
+        if (panierId == null) {
+            panier = new Panier();
+            panierRepository.save(panier); // Assurez-vous que le panier est persisté pour obtenir un ID
+            session.setAttribute("panierTemporaireId", panier.getId());
+        } else {
+            panier = panierRepository.findById(panierId)
+                    .orElseThrow(() -> new RuntimeException("Panier non trouvé"));
+        }
+
+        return panier;
+    }
+
+    //*********************
 
 
     @GetMapping("/produit2")
@@ -364,7 +425,7 @@ public class ProduitController {
         }
         produit.setNom(nom);
         produit.setDescription(description);
-        produit.setPrix(Double.parseDouble(prix));
+        produit.setPrix(new BigDecimal(prix));
         produit.setDisponibilite(true);
         produit.setTypePrix(typePrix);
         quantite.trim();
@@ -509,7 +570,7 @@ public class ProduitController {
 
         produit.setNom(nom);
         produit.setDescription(description);
-        produit.setPrix(Double.parseDouble(prix));
+        produit.setPrix(new BigDecimal(prix));
         produit.setTypePrix(typePrix);
         quantite.trim();
         minStock.trim();

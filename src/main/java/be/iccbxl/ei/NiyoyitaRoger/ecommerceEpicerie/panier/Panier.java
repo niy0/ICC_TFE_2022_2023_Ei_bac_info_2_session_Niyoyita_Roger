@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +23,11 @@ public class Panier implements Serializable {
     @JsonIgnore
     private List<LigneDeCommande> lignesDeCommande = new ArrayList<>();
 
-    @Column(nullable = false)
-    private boolean actif = true;
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User utilisateur;
+
+    private Boolean actif = true;
 
     @Column(name = "date_creation", nullable = false)
     private LocalDateTime dateCreation;
@@ -29,32 +35,37 @@ public class Panier implements Serializable {
     @Column(name = "date_modification")
     private LocalDateTime dateModification;
 
-    // champ pour stocker le montant total du panier
-    @Transient // Pour indiquer à JPA de ne pas persister cet attribut en base de données
-    private double montantTotalPanier;
-
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private User utilisateur;
+    @Transient
+    private BigDecimal montantTotalPanier;
 
     public Panier() {
         this.dateCreation = LocalDateTime.now();
         this.dateModification = LocalDateTime.now();
-        // Initialisez le montant total du panier avec 0.0 par défaut
-        this.montantTotalPanier = 0.0;
+        this.montantTotalPanier = BigDecimal.ZERO;
+    }
+
+    private BigDecimal calculerMontantTotal() {
+        return lignesDeCommande.stream()
+                .map(LigneDeCommande::getMontantTotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public void addLigneDeCommande(LigneDeCommande ligneDeCommande) {
         lignesDeCommande.add(ligneDeCommande);
         ligneDeCommande.setPanier(this);
-        recalculerMontantTotalPanier(); // Mettez à jour le montant total du panier
+        recalculerMontantTotalPanier();
     }
 
     public void removeLigneDeCommande(LigneDeCommande ligneDeCommande) {
         lignesDeCommande.remove(ligneDeCommande);
         ligneDeCommande.setPanier(null);
-        recalculerMontantTotalPanier(); // Mettez à jour le montant total du panier
+        recalculerMontantTotalPanier();
     }
+
+
+
+    // ... autres getters et setters ...
+
 
     public Long getId() {
         return id;
@@ -70,14 +81,21 @@ public class Panier implements Serializable {
 
     public void setLignesDeCommande(List<LigneDeCommande> lignesDeCommande) {
         this.lignesDeCommande = lignesDeCommande;
-        recalculerMontantTotalPanier(); // Mettez à jour le montant total du panier lorsque la liste change
     }
 
-    public boolean isActif() {
+    public User getUtilisateur() {
+        return utilisateur;
+    }
+
+    public void setUtilisateur(User utilisateur) {
+        this.utilisateur = utilisateur;
+    }
+
+    public Boolean getActif() {
         return actif;
     }
 
-    public void setActif(boolean actif) {
+    public void setActif(Boolean actif) {
         this.actif = actif;
     }
 
@@ -97,29 +115,36 @@ public class Panier implements Serializable {
         this.dateModification = dateModification;
     }
 
-    // Ajoutez cette méthode pour recalculer et mettre à jour le montant total du panier
     public void recalculerMontantTotalPanier() {
-        double montantTotalPanier = 0.0;
-        for (LigneDeCommande ligneDeCommande : lignesDeCommande) {
-            montantTotalPanier += ligneDeCommande.getMontantTotal();
-        }
+        montantTotalPanier = calculerMontantTotal();
+    }
+
+    public BigDecimal getMontantTotalPanier() {
+        return montantTotalPanier.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    public void setMontantTotalPanier(BigDecimal montantTotalPanier) {
         this.montantTotalPanier = montantTotalPanier;
     }
 
-    // Ajoutez un getter pour récupérer le montant total du panier
-    public double getMontantTotalPanier() {
-        return montantTotalPanier;
-    }
+    // ... autres getters et setters ...
 
     public void mergeWith(Panier panierTemporaire) {
-    }
-
-    public void setMontantTotalPanier(double montantTotalPanier) {
-        this.montantTotalPanier = montantTotalPanier;
-    }
-
-    public void setUtilisateur(User utilisateur) {
-        this.utilisateur = utilisateur;
+        for (LigneDeCommande ligneTemp : panierTemporaire.getLignesDeCommande()) {
+            boolean found = false;
+            for (LigneDeCommande ligneCourante : this.getLignesDeCommande()) {
+                if (ligneCourante.getId().equals(ligneTemp.getId())) {
+                    int nouvelleQuantite = ligneCourante.getQuantite() + ligneTemp.getQuantite();
+                    ligneCourante.setQuantite(nouvelleQuantite);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                this.addLigneDeCommande(ligneTemp);
+            }
+        }
+        recalculerMontantTotalPanier();
     }
 
     @Override

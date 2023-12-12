@@ -61,7 +61,7 @@ public class LigneDeCommandeController {
         // Vérification du nombre de stock produit
         if (quantite <= produit.getQuantite()) {
             // Créez une nouvelle instance de LigneDeCommande
-            LigneDeCommande nouvelleLigneDeCommande = new LigneDeCommande(produit, panier, quantite, produit.getPrix(), quantite * produit.getPrix());
+            LigneDeCommande nouvelleLigneDeCommande = new LigneDeCommande(produit, panier, quantite, produit.getPrix());
 
             // Enregistrez la nouvelle ligne de commande dans votre base de données
             ligneDeCommandeService.save(nouvelleLigneDeCommande);
@@ -139,7 +139,6 @@ public class LigneDeCommandeController {
         }
     }
 
-
     @PostMapping("/add5")
     public ResponseEntity<String> createLigneDeCommande(
             @RequestParam("produitId") Long produitId,
@@ -162,7 +161,7 @@ public class LigneDeCommandeController {
             }
 
             LigneDeCommande nouvelleLigne = new LigneDeCommande(
-                    produit, panier, quantite, produit.getPrix(), panier.getMontantTotalPanier()
+                    produit, panier, quantite, produit.getPrix()
             );
 
             ligneDeCommandeService.save(nouvelleLigne);
@@ -174,7 +173,6 @@ public class LigneDeCommandeController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de l'ajout de la ligne de commande.");
         }
     }
-
 
     @GetMapping("/{id}")
     public String viewLigneDeCommande(@PathVariable Long id, Model model) {

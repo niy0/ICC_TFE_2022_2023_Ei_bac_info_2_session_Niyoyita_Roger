@@ -35,6 +35,11 @@ public class Commande {
     @OneToMany(mappedBy = "commande")
     private List<ChangementStatutCommande> historiqueStatuts;
 
+    protected  Commande() {}
+
+    public Commande(Panier panier) {
+        this.panier = panier;
+    }
 
     /**
      * <dependency>

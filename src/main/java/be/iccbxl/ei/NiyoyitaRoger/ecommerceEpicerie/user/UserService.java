@@ -57,11 +57,6 @@ public class UserService {
         Panier panier = new Panier();
         panier.setUtilisateur(user);
         panierRepository.save(panier);
-
-        //On enregistre le panier dans l'user
-        //user.setPanier(panier);
-        //user.setDateModification(LocalDateTime.now());
-        //this.save(user);
     }
 
     public String updateUser(Long userId, User updatedUser) {
