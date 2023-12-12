@@ -84,7 +84,14 @@ public class PanierController {
     @GetMapping("/panier")
     public String showPanier(Model model, Principal principal, HttpSession session) {
         Panier panier = getOrCreatePanier(principal, session);
+
+        BigDecimal montantTotal = panier.getLignesDeCommande().stream()
+                .map(ligne -> ligne.getProduit().getPrix().multiply(new BigDecimal(ligne.getQuantite())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         model.addAttribute("panier", panier);
+        model.addAttribute("montantTotalPanier", montantTotal);
+
         return "panier/panier";
     }
 

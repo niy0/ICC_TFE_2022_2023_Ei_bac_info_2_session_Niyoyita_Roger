@@ -10,13 +10,14 @@
       <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
     </head>
     <body>
-      <div class="container">
-        <div layout:fragment="content" class="content">
-          <h2>Panier</h2>
+      <div class="container mt-4">
+        <div layout:fragment="content" >
           <div  class="mt-5">
             <h2><i class="bi bi-cart-fill"></i> Mon panier</h2>
             <div th:if="${not #lists.isEmpty(panier.lignesDeCommande)}">
+              <!-- Formulaire pour vider le panier -->
               <form th:action="@{/viderPanier}" method="post">
+                <input type="hidden" th:value="${panier.id}" name="idPanier">
                 <button type="submit" class="btn btn-primary">Vider Panier</button>
               </form>
               <form id="cart-form" th:action="@{/panier/add}" method="post">
@@ -24,26 +25,44 @@
                   <h4 th:text="${panier.id}" class="title text-center mb-4">Ajout nouveau produit</h4>
                   <thead>
                   <tr>
+                    <th>Image Produit</th>
                     <th>Nom</th>
                     <th>Prix</th>
                     <th>Quantité</th>
                     <th>Total</th>
+                    <th>Action</th>
                   </tr>
                   </thead>
                   <tbody id="cart-items">
-                  <tr th:each="ligne : ${panier.lignesDeCommande}">
-                    <td th:text="${ligne.produit.nom}">Nom du produit</td>
-                    <td th:text="${ligne.produit.prix}">Prix</td>
-                    <td th:text="${ligne.quantite}">Quantité</td>
-                    <td th:text="${ligne.produit.prix * ligne.quantite}">Total</td>
-                  </tr>
+                    <tr th:each="ligne : ${panier.lignesDeCommande}">
+                      <td scope="row">
+                        <img th:src="@{/display(id=${ligne.produit.id})}" alt="Image du produit" height="100px" />
+                      </td>
+                      <td th:text="${ligne.produit.nom}">Nom du produit</td>
+                      <td th:text="${ligne.produit.prix}">Prix</td>
+                      <td>
+                        <input type="number" th:value="${ligne.quantite}" min="1" class="form-control" th:name="'quantite_' + ${ligne.produit.id}"  style="width:85px;"/>
+                      </td>
+                      <td th:text="${ligne.produit.prix * ligne.quantite}">Total</td>
+                      <td>
+                        <button>Voir produit</button>
+                        <button>Supprimer du panier</button>
+                      </td>
+                    </tr>
                   </tbody>
+                  <tfoot>
+                    <tr class="total" style="text-align: center;">
+                      <td colspan="4">
+                        <strong>Total du panier : <span id="panier-total" th:text="${montantTotalPanier}"></span> €</strong>
+                      </td>
+                    </tr>
+                  </tfoot>
                 </table>
                 <button type="submit" class="btn btn-primary"><i class="bi bi-cart4"></i> Confirmer Panier</button>
               </form>
             </div>
             <div th:unless="${not #lists.isEmpty(panier.lignesDeCommande)}">
-              <p>Votre panier est vide.77</p>
+              <p>Votre panier est vide.</p>
               <h4 th:text="${errorMessage}" class="title text-center mb-4"></h4>
               <h4 th:text="${panier.id}" class="title text-center mb-4">Ajout nouveau produit</h4>
             </div>

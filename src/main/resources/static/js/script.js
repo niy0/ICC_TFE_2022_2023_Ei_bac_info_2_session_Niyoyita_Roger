@@ -292,9 +292,7 @@ function addToCart(produitId) {
             // Rafraîchir la page uniquement pour le premier produit ajouté
             // Vérifiez si le panier était initialement vide et si c'est le cas, rechargez la page
             if ($("#cart-items").children().length === 0) {
-                setTimeout(function() {
-                    location.reload(); // Rafraîchit la page actuelle
-                }, 500); // Délai avant le rechargement
+                location.reload(); // Rafraîchit la page actuelle
             } else {
                 getListLigneDeCommandePanier(panierId);
             }

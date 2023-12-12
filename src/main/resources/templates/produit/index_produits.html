@@ -3,345 +3,345 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
       layout:decorate="~{layouts/main}">
-<head>
-    <meta charset="UTF-8">
-    <title>Ajout d'un produit</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <script src="js/script.js"></script>
-    <!-- Balises meta pour le jeton CSRF -->
-    <meta name="_csrf.parameterName" th:content="${_csrf.parameterName}" />
-    <meta name="_csrf.token" th:content="${_csrf.token}" />
-    <style>
-        .fieldError, .rating label { color: red; }
-        .product-card {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
+    <head>
+        <meta charset="UTF-8">
+        <title>Ajout d'un produit</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <link rel="icon" href="/favicon.ico" type="image/x-icon">
+        <script src="js/script.js"></script>
+        <!-- Balises meta pour le jeton CSRF -->
+        <meta name="_csrf.parameterName" th:content="${_csrf.parameterName}" />
+        <meta name="_csrf.token" th:content="${_csrf.token}" />
+        <style>
+            .fieldError, .rating label { color: red; }
+            .product-card {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+            }
 
-        .product-title {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 100%;
-            flex-shrink: 0;  /* Pour s'assurer que le titre ne rétrécit pas en dessous de sa taille de contenu. */
-        }
+            .product-title {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 100%;
+                flex-shrink: 0;  /* Pour s'assurer que le titre ne rétrécit pas en dessous de sa taille de contenu. */
+            }
 
-        .product-card:hover {
-            box-shadow: 0 0 20px 5px rgba(0, 0, 0, 0.3);
-            border: 1px solid #28a745;
-        }
+            .product-card:hover {
+                box-shadow: 0 0 20px 5px rgba(0, 0, 0, 0.3);
+                border: 1px solid #28a745;
+            }
 
-        .product-details {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
+            .product-details {
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
 
-        .product-image {
-            width: 90%;
-            margin: auto;
-            height: 200px;
-            object-fit: contain;
-        }
+            .product-image {
+                width: 90%;
+                margin: auto;
+                height: 200px;
+                object-fit: contain;
+            }
 
-        .centered-content {
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            min-height: 90%;
-            margin-top: 5%;
-            margin-bottom: 10px;
-        }
+            .centered-content {
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                min-height: 90%;
+                margin-top: 5%;
+                margin-bottom: 10px;
+            }
 
-        .row {
-            margin: 0 -5px; /* Réduit l'espacement entre les colonnes */
-        }
+            .row {
+                margin: 0 -5px; /* Réduit l'espacement entre les colonnes */
+            }
 
-        .row > .col-md-3 {
-            padding: 15px; /* Espacement entre les produits */
-        }
+            .row > .col-md-3 {
+                padding: 15px; /* Espacement entre les produits */
+            }
 
-        .col-md-4 {
-            padding: 0 5px;
-        }
+            .col-md-4 {
+                padding: 0 5px;
+            }
 
-        .content {
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
+            .content {
+                width: 100%;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
 
-        .rating-container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between; /* Ajouté pour séparer les étoiles et la cote */
-        }
+            .rating-container {
+                display: flex;
+                align-items: center;
+                justify-content: space-between; /* Ajouté pour séparer les étoiles et la cote */
+            }
 
-        .rating {
-            flex: 1;  /* Assurez-vous qu'il occupe tout l'espace jusqu'à la cote */
-            display: flex;
-            align-items: center;
-        }
+            .rating {
+                flex: 1;  /* Assurez-vous qu'il occupe tout l'espace jusqu'à la cote */
+                display: flex;
+                align-items: center;
+            }
 
-        .rating + div {
-            flex-shrink: 0;  /* Assurez-vous que cette div ne rétrécit pas */
-        }
+            .rating + div {
+                flex-shrink: 0;  /* Assurez-vous que cette div ne rétrécit pas */
+            }
 
-        .rating p {
-            margin: 0;
-            font-size: 0.9rem;  /* ajustez si nécessaire */
-        }
+            .rating p {
+                margin: 0;
+                font-size: 0.9rem;  /* ajustez si nécessaire */
+            }
 
-        .rating i {
-            font-size: 20px;
-            color: #ffc107;
-        }
+            .rating i {
+                font-size: 20px;
+                color: #ffc107;
+            }
 
-        button {
-            border: none;
-            border-radius: 5px;
-            outline: none;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
+            button {
+                border: none;
+                border-radius: 5px;
+                outline: none;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
 
-        button:hover {
-            background-color: #b3b7b5;
-        }
+            button:hover {
+                background-color: #b3b7b5;
+            }
 
-        /* Lorsque vous survolez le bouton: */
-        button:hover .fa-regular.fa-heart {
-            display: none;
-        }
+            /* Lorsque vous survolez le bouton: */
+            button:hover .fa-regular.fa-heart {
+                display: none;
+            }
 
-        button:hover .fa-solid.fa-heart {
-            display: inline;
-        }
+            button:hover .fa-solid.fa-heart {
+                display: inline;
+            }
 
-        .fa-solid.fa-heart {
-            display: none;
-        }
+            .fa-solid.fa-heart {
+                display: none;
+            }
 
-        /* Pagination styles */
-        .pagination {
-            margin: 0;
-            padding: 0;
-            list-style-type: none;
-            display: flex;
-            justify-content: center;
-        }
+            /* Pagination styles */
+            .pagination {
+                margin: 0;
+                padding: 0;
+                list-style-type: none;
+                display: flex;
+                justify-content: center;
+            }
 
-        .page-item {
-            margin: 0 5px;
-            display: flex;
-        }
+            .page-item {
+                margin: 0 5px;
+                display: flex;
+            }
 
-        .page-link {
-            color: #007bff;
-            text-decoration: none;
-            background-color: transparent;
-            border: none;
-            cursor: pointer;
-        }
+            .page-link {
+                color: #007bff;
+                text-decoration: none;
+                background-color: transparent;
+                border: none;
+                cursor: pointer;
+            }
 
-        .page-link:hover {
-            text-decoration: underline;
-        }
+            .page-link:hover {
+                text-decoration: underline;
+            }
 
-        .active .page-link {
-            background-color: #007bff;
-            color: #fff;
-        }
+            .active .page-link {
+                background-color: #007bff;
+                color: #fff;
+            }
 
-        .disabled .page-link {
-            pointer-events: none;
-            color: #6c757d;
-        }
+            .disabled .page-link {
+                pointer-events: none;
+                color: #6c757d;
+            }
 
-        .panier-inner {
-            display: flex;
-            align-items: center;
-        }
+            .panier-inner {
+                display: flex;
+                align-items: center;
+            }
 
-        .panier-inner i {
-            margin-right: 5px;
-        }
-    </style>
-</head>
-<body>
-<div class="container mt-4">
-    <div layout:fragment="content">
+            .panier-inner i {
+                margin-right: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container mt-4">
+            <div layout:fragment="content">
 
-        <h1 th:text="${title}" class="title text-center mb-4">Ajout nouveau produit</h1>
-        <div class="text-center mb-4">
-            <a class="btn btn-outline-success mx-2" th:href="@{/produit/create}">Ajouter nouveau produit</a>
-            <a class="btn btn-outline-success mx-2" th:href="@{/produits/user}">User view produits</a>
-            <a class="btn btn-outline-success mx-2" th:href="@{/cat/allCat}">List catégorie</a>
-        </div>
-        <div class="input-group">
-            <div id="search-autocomplete" class="form-outline">
-                <input type="search" id="form1" class="form-control" />
-                <label class="form-label" for="form1">Search</label>
+                <h1 th:text="${title}" class="title text-center mb-4">Ajout nouveau produit</h1>
+                <div class="text-center mb-4">
+                    <a class="btn btn-outline-success mx-2" th:href="@{/produit/create}">Ajouter nouveau produit</a>
+                    <a class="btn btn-outline-success mx-2" th:href="@{/produits/user}">User view produits</a>
+                    <a class="btn btn-outline-success mx-2" th:href="@{/cat/allCat}">List catégorie</a>
+                </div>
+                <div class="input-group">
+                    <div id="search-autocomplete" class="form-outline">
+                        <input type="search" id="form1" class="form-control" />
+                        <label class="form-label" for="form1">Search</label>
+                    </div>
+                    <button type="button" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+                <div class="row justify-content-center" id="liste-produits">
+                    <div th:each="produit : ${listProducts}" class="col-md-3 mb-4" >
+                        <div class="card product-card">
+                            <input type="hidden" th:value="${produit.id}" th:id="'produitId-' + ${produit.id}" name="produitId">
+                            <input type="hidden" th:value="${panier.id}" name="panierId" id="panierId">
+
+                            <img class="card-img-top product-image" th:src="@{${'/display?id=' + produit.id}}" alt="Image du produit">
+                            <div class="card-body product-details" style="padding-bottom:0;padding-top:0;">
+                                <h2 class="product-title" th:text="${produit.nom}"></h2>
+                                <div class="rating-container">
+                                    <div class="rating">
+                                        <!-- Étoiles ici... -->
+                                        <div class="rating">
+                                            <!-- Étoile 1 -->
+                                            <i th:class="${produit.cote >= 1 ? 'fas fa-star' : (produit.cote > 0 && produit.cote < 1) ? 'fas fa-star-half-alt' : 'far fa-star'}"></i>
+
+                                            <!-- Étoile 2 -->
+                                            <i th:class="${produit.cote >= 2 ? 'fas fa-star' : (produit.cote > 1 && produit.cote < 2) ? 'fas fa-star-half-alt' : 'far fa-star'}"></i>
+
+                                            <!-- Étoile 3 -->
+                                            <i th:class="${produit.cote >= 3 ? 'fas fa-star' : (produit.cote > 2 && produit.cote < 3) ? 'fas fa-star-half-alt' : 'far fa-star'}"></i>
+
+                                            <!-- Étoile 4 -->
+                                            <i th:class="${produit.cote >= 4 ? 'fas fa-star' : (produit.cote > 3 && produit.cote < 4) ? 'fas fa-star-half-alt' : 'far fa-star'}"></i>
+
+                                            <!-- Étoile 5 -->
+                                            <i th:class="${produit.cote == 5 ? 'fas fa-star' : (produit.cote > 4 && produit.cote < 5) ? 'fas fa-star-half-alt' : 'far fa-star'}"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p>
+                                            <span th:text="${produit.cote}"></span>
+                                            (nb x)
+                                        </p>
+                                    </div>
+                                </div>
+                                <h4 class="product-price" th:text="${produit.prix} + '&euro;'"></h4>
+                                <div class="form-group mb-3" style="display: flex;">
+                                    <div class="input-group input-spinner">
+                                        <div style="display: flex;">
+                                            <div class="input-group-prepend">
+                                                <button id="button-minus-${produit.id}" class="button-minus btn btn-sm btn-outline-success" type="button" data-field="quantity">
+                                                    <i class="fa-solid fa-minus"></i>
+                                                </button>
+                                            </div>
+                                            <!-- Champ de texte caché avec la valeur de produit.quantite -->
+                                            <input type="hidden" th:value="${produit.quantite}">
+                                            <!-- Champ de nombre avec une valeur initiale de 1 et un maximum lié à produit.quantite -->
+                                            <input style="width: 80px; margin: 0;" type="number" step="1" min="1" th:max="${produit.quantite}" value="1"
+                                                   th:id="'quantite-' + ${produit.id}" name="quantite" th:attr="data-productId=${produit.id}"
+                                                   class="form-control form-control-sm form-input text-center" >
+                                            <div class="input-group-append">
+                                                <button id="button-plus-${produit.id}" class="button-plus btn btn-sm btn-outline-success" type="button" data-field="quantity">
+                                                    <i class="fa-solid fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <button style="background-color: #cccfce;" title="Ajouter aux favoris">
+                                            <i class="fa-regular fa-heart" style="color: #d91717;"></i>
+                                            <i class="fa-solid fa-heart" style="color: #d91717;"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <button class="btn btn-success" th:onclick="'addToCart(' + ${produit.id} + ')'" ><i class="bi bi-cart-plus"></i>Ajouter au panier</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display:flex;align-items:center;">
+                    <!-- Pagination -->
+                    <nav aria-label="Page navigation" class="mx-auto">
+                        <ul class="pagination">
+                            <li class="page-item" th:class="${currentPage == 0 ? 'disabled' : ''}">
+                                <a class="page-link" th:href="@{/produit?page=${currentPage - 1}}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <li th:each="pageNumber : ${#numbers.sequence(0, totalPages - 1)}" class="page-item" th:class="${pageNumber == currentPage ? 'active' : ''}">
+                                <a class="page-link" th:href="@{/produit?page=${pageNumber}}">[[${pageNumber + 1}]]</a>
+                            </li>
+                            <li class="page-item" th:class="${currentPage + 1 == totalPages ? 'disabled' : ''}">
+                                <a class="page-link" th:href="@{/produit?page=${currentPage + 1}}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
             </div>
-            <button type="button" class="btn btn-primary">
-                <i class="fas fa-search"></i>
-            </button>
-        </div>
-        <div class="row justify-content-center" id="liste-produits">
-            <div th:each="produit : ${listProducts}" class="col-md-3 mb-4" >
-                <div class="card product-card">
-                    <input type="hidden" th:value="${produit.id}" th:id="'produitId-' + ${produit.id}" name="produitId">
-                    <input type="hidden" th:value="${panier.id}" name="panierId" id="panierId">
+            <div layout:fragment="panier">
+                <!-- Panier -->
+                <div class="mt-5">
+                    <h2><i class="bi bi-cart-fill"></i> Mon panier</h2>
 
-                    <img class="card-img-top product-image" th:src="@{${'/display?id=' + produit.id}}" alt="Image du produit">
-                    <div class="card-body product-details" style="padding-bottom:0;padding-top:0;">
-                        <h2 class="product-title" th:text="${produit.nom}"></h2>
-                        <div class="rating-container">
-                            <div class="rating">
-                                <!-- Étoiles ici... -->
-                                <div class="rating">
-                                    <!-- Étoile 1 -->
-                                    <i th:class="${produit.cote >= 1 ? 'fas fa-star' : (produit.cote > 0 && produit.cote < 1) ? 'fas fa-star-half-alt' : 'far fa-star'}"></i>
+                    <!-- Bloc conditionnel si le panier contient des lignes de commande -->
+                    <div th:if="${not #lists.isEmpty(panier.lignesDeCommande)}">
+                        <!-- Formulaire pour vider le panier -->
+                        <form th:action="@{/viderPanier}" method="post">
+                            <input type="hidden" th:value="${panier.id}" name="idPanier">
+                            <button type="submit" class="btn btn-primary">Vider Panier</button>
+                        </form>
 
-                                    <!-- Étoile 2 -->
-                                    <i th:class="${produit.cote >= 2 ? 'fas fa-star' : (produit.cote > 1 && produit.cote < 2) ? 'fas fa-star-half-alt' : 'far fa-star'}"></i>
+                        <!-- Formulaire pour ajouter des produits au panier -->
+                        <form id="cart-form" th:action="@{/panier/add}" method="post">
+                            <table class="table">
+                                <h4 th:text="${panier.id}" class="title text-center mb-4">Ajout nouveau produit</h4>
+                                <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Prix</th>
+                                    <th>Quantité</th>
+                                    <th>Total</th>
+                                </tr>
+                                </thead>
+                                <tbody id="cart-items">
+                                <tr th:each="ligne : ${panier.lignesDeCommande}">
+                                    <td th:text="${ligne.produit.nom}">Nom du produit</td>
+                                    <td th:text="${ligne.produit.prix}">Prix</td>
+                                    <td th:text="${ligne.quantite}">Quantité</td>
+                                    <td th:text="${ligne.produit.prix * ligne.quantite}">Total</td>
+                                </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr class="total" style="text-align: center;">
+                                        <td colspan="4">
+                                            <strong>Total du panier : <span id="panier-total" th:text="${montantTotalPanier}"></span> €</strong>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-cart4"></i> Confirmer Panier</button>
+                        </form>
 
-                                    <!-- Étoile 3 -->
-                                    <i th:class="${produit.cote >= 3 ? 'fas fa-star' : (produit.cote > 2 && produit.cote < 3) ? 'fas fa-star-half-alt' : 'far fa-star'}"></i>
+                        <!-- Lien pour voir le panier -->
+                        <a th:href="@{/panier}" class="btn btn-primary"><i class="bi bi-cart4"></i> Voir/Modifier Panier</a>
+                    </div>
 
-                                    <!-- Étoile 4 -->
-                                    <i th:class="${produit.cote >= 4 ? 'fas fa-star' : (produit.cote > 3 && produit.cote < 4) ? 'fas fa-star-half-alt' : 'far fa-star'}"></i>
-
-                                    <!-- Étoile 5 -->
-                                    <i th:class="${produit.cote == 5 ? 'fas fa-star' : (produit.cote > 4 && produit.cote < 5) ? 'fas fa-star-half-alt' : 'far fa-star'}"></i>
-                                </div>
-                            </div>
-                            <div>
-                                <p>
-                                    <span th:text="${produit.cote}"></span>
-                                    (nb x)
-                                </p>
-                            </div>
-                        </div>
-                        <h4 class="product-price" th:text="${produit.prix} + '&euro;'"></h4>
-                        <div class="form-group mb-3" style="display: flex;">
-                            <div class="input-group input-spinner">
-                                <div style="display: flex;">
-                                    <div class="input-group-prepend">
-                                        <button id="button-minus-${produit.id}" class="button-minus btn btn-sm btn-outline-success" type="button" data-field="quantity">
-                                            <i class="fa-solid fa-minus"></i>
-                                        </button>
-                                    </div>
-                                    <!-- Champ de texte caché avec la valeur de produit.quantite -->
-                                    <input type="hidden" th:value="${produit.quantite}">
-                                    <!-- Champ de nombre avec une valeur initiale de 1 et un maximum lié à produit.quantite -->
-                                    <input style="width: 80px; margin: 0;" type="number" step="1" min="1" th:max="${produit.quantite}" value="1"
-                                           th:id="'quantite-' + ${produit.id}" name="quantite" th:attr="data-productId=${produit.id}"
-                                           class="form-control form-control-sm form-input text-center" >
-                                    <div class="input-group-append">
-                                        <button id="button-plus-${produit.id}" class="button-plus btn btn-sm btn-outline-success" type="button" data-field="quantity">
-                                            <i class="fa-solid fa-plus"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <button style="background-color: #cccfce;" title="Ajouter aux favoris">
-                                    <i class="fa-regular fa-heart" style="color: #d91717;"></i>
-                                    <i class="fa-solid fa-heart" style="color: #d91717;"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <button class="btn btn-success" th:onclick="'addToCart(' + ${produit.id} + ')'" ><i class="bi bi-cart-plus"></i>Ajouter au panier</button>
+                    <!-- Bloc conditionnel si le panier est vide -->
+                    <div th:unless="${not #lists.isEmpty(panier.lignesDeCommande)}">
+                        <h4 th:text="${panier.id}" class="title text-center mb-4">Ajout nouveau produit</h4>
+                        <p>Votre panier est vide.</p>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div style="display:flex;align-items:center;">
-            <!-- Pagination -->
-            <nav aria-label="Page navigation" class="mx-auto">
-                <ul class="pagination">
-                    <li class="page-item" th:class="${currentPage == 0 ? 'disabled' : ''}">
-                        <a class="page-link" th:href="@{/produit?page=${currentPage - 1}}" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                    <li th:each="pageNumber : ${#numbers.sequence(0, totalPages - 1)}" class="page-item" th:class="${pageNumber == currentPage ? 'active' : ''}">
-                        <a class="page-link" th:href="@{/produit?page=${pageNumber}}">[[${pageNumber + 1}]]</a>
-                    </li>
-                    <li class="page-item" th:class="${currentPage + 1 == totalPages ? 'disabled' : ''}">
-                        <a class="page-link" th:href="@{/produit?page=${currentPage + 1}}" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-    </div>
-    <div layout:fragment="panier">
-        <!-- Panier -->
-        <div class="mt-5">
-            <h2><i class="bi bi-cart-fill"></i> Mon panier</h2>
-
-            <!-- Bloc conditionnel si le panier contient des lignes de commande -->
-            <div th:if="${not #lists.isEmpty(panier.lignesDeCommande)}">
-                <!-- Formulaire pour vider le panier -->
-                <form th:action="@{/viderPanier}" method="post">
-                    <input type="hidden" th:value="${panier.id}" name="idPanier">
-                    <button type="submit" class="btn btn-primary">Vider Panier</button>
-                </form>
-
-                <!-- Formulaire pour ajouter des produits au panier -->
-                <form id="cart-form" th:action="@{/panier/add}" method="post">
-                    <table class="table">
-                        <h4 th:text="${panier.id}" class="title text-center mb-4">Ajout nouveau produit</h4>
-                        <thead>
-                        <tr>
-                            <th>Nom</th>
-                            <th>Prix</th>
-                            <th>Quantité</th>
-                            <th>Total</th>
-                        </tr>
-                        </thead>
-                        <tbody id="cart-items">
-                        <tr th:each="ligne : ${panier.lignesDeCommande}">
-                            <td th:text="${ligne.produit.nom}">Nom du produit</td>
-                            <td th:text="${ligne.produit.prix}">Prix</td>
-                            <td th:text="${ligne.quantite}">Quantité</td>
-                            <td th:text="${ligne.produit.prix * ligne.quantite}">Total</td>
-                        </tr>
-                        </tbody>
-                        <tfoot>
-                        <tr class="total" style="text-align: center;">
-                            <td colspan="4">
-                                <strong>Total du panier : <span id="panier-total" th:text="${montantTotalPanier}"></span> €</strong>
-                            </td>
-                        </tr>
-                        </tfoot>
-                    </table>
-                    <button type="submit" class="btn btn-primary"><i class="bi bi-cart4"></i> Confirmer Panier</button>
-                </form>
-
-                <!-- Lien pour voir le panier -->
-                <a th:href="@{/panier}" class="btn btn-primary"><i class="bi bi-cart4"></i> Voir Panier</a>
-            </div>
-
-            <!-- Bloc conditionnel si le panier est vide -->
-            <div th:unless="${not #lists.isEmpty(panier.lignesDeCommande)}">
-                <h4 th:text="${panier.id}" class="title text-center mb-4">Ajout nouveau produit</h4>
-                <p>Votre panier est vide.</p>
-            </div>
-        </div>
-    </div>
-</div>
-</body>
+    </body>
 </html>
