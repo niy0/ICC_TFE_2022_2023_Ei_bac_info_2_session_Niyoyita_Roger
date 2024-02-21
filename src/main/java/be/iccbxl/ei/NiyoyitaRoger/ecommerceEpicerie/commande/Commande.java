@@ -41,6 +41,13 @@ public class Commande {
         this.panier = panier;
     }
 
+    public Commande(User user){
+        this.utilisateur = user;
+        this.panier = user.getPanier();
+        this.dateCommande = new Date();// a changer
+        this.statut = StatutCommande.EN_COURS;
+    }
+
     /**
      * <dependency>
      *     <groupId>org.springframework.boot</groupId>
@@ -54,5 +61,7 @@ public class Commande {
      * spring.mail.properties.mail.smtp.auth=true
      * spring.mail.properties.mail.smtp.starttls.enable=true
      */
-}
 
+
+
+}

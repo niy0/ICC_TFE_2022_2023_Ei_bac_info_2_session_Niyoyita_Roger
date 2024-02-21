@@ -36,7 +36,6 @@ public class LigneDeCommandeController {
         this.panierRepository = panierRepository;
     }
 
-
     // méthode pour ajouter une ligne de commande
     @PostMapping("/add88")
     public String addLigneDeCommande(@ModelAttribute("ligneDeCommande") LigneDeCommande ligneDeCommande,
@@ -79,7 +78,6 @@ public class LigneDeCommandeController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null); // Par exemple
         }
     }
-
 
     @PostMapping("/add")
     public String add(
@@ -197,10 +195,13 @@ public class LigneDeCommandeController {
         return "redirect:/lignedecommande/list";
     }
 
-    @GetMapping("/delete/{id}")
+    @PostMapping("/delete/{id}")
     public String deleteLigneDeCommande(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        LigneDeCommande ligneDeCommande = ligneDeCommandeService.getLigneDeCommandeById(id);
+        System.out.println(ligneDeCommande + "tessssssstttttttttssssssstttttttte ligne de com*****************"+ ":"+id);
+
         ligneDeCommandeService.deleteLigneDeCommande(id);
         redirectAttributes.addFlashAttribute("successMessage", "Ligne de commande supprimée avec succès.");
-        return "redirect:/lignedecommande/list";
+        return "redirect:/panier";
     }
 }

@@ -28,6 +28,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -37,6 +38,7 @@ import java.security.Principal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import org.apache.commons.lang3.math.NumberUtils;
 
 @Controller
 @SessionAttributes("panier")
@@ -66,13 +68,6 @@ public class PanierController {
         return new Panier();
     }
 
-    @GetMapping("/ajouter-au-panier/{produitId}")
-    public String ajouterAuPanier(@PathVariable Long produitId, @ModelAttribute("panier") Panier panier) {
-        // Ajouter le produit au panier
-        // par exemple: panier.ajouterProduit(produitService.trouverParId(produitId));
-        return "redirect:/liste-produits";
-    }
-
     @PostMapping("/viderPanier")
     public String viderPanier(@RequestParam("idPanier") String panierId){
         Long idPanier = Long.parseLong(panierId);
@@ -80,7 +75,7 @@ public class PanierController {
         return "redirect:/produit";
     }
 
-    //
+
     @GetMapping("/panier")
     public String showPanier(Model model, Principal principal, HttpSession session) {
         Panier panier = getOrCreatePanier(principal, session);
@@ -93,6 +88,45 @@ public class PanierController {
         model.addAttribute("montantTotalPanier", montantTotal);
 
         return "panier/panier";
+    }
+
+    /**
+    @PostMapping("/deleteElemPanier")
+    public String deleteElementInPanier(@RequestParam("idPanier") String idPanier,
+                                        @RequestParam("idLigneDeCommande") String idLigneDeCommande){
+        panierService.deleteLigneDeCommandePanier(Long.parseLong(idPanier), Long.parseLong(idLigneDeCommande));
+        return "redirect:/panier";
+    }**/
+
+    @PostMapping("/deleteElemPanier")
+    public String deleteElementInPanier(@RequestParam("idPanier") String idPanier,
+                                        @RequestParam("idLigneDeCommande") String idLigneDeCommande) {
+
+        System.out.println("idPanier : "+idPanier+ " :: ligne co:"+ idLigneDeCommande);
+
+        if (NumberUtils.isDigits(idPanier) && NumberUtils.isDigits(idLigneDeCommande)) {
+            Long panierId = Long.parseLong(idPanier);
+            Long ligneDeCommandeId = Long.parseLong(idLigneDeCommande);
+
+            panierService.deleteLigneDeCommandePanier(panierId, ligneDeCommandeId);
+            return "redirect:/panier";
+        } else {
+            // Gérer les erreurs de paramètres invalides ici
+            return "redirect:/errorPage"; // Rediriger vers une page d'erreur spécifique
+        }
+    }
+
+    @PostMapping("/confirmerPanier")
+    public String confirmerPanier(@ModelAttribute("panier") Panier panier) {
+        for (LigneDeCommande ligne : panier.getLignesDeCommande()) {
+            BigDecimal total = ligne.getProduit().getPrix().multiply(new BigDecimal(ligne.getQuantite()));
+            // Enregistrez le total dans la base de données ou effectuez toute autre opération nécessaire
+            // ...
+            // Votre logique pour enregistrer le total pour chaque ligne de commande
+        }
+
+        // Rediriger vers une autre page après avoir enregistré les totaux pour chaque ligne de commande
+        return "redirect:/confirmation";
     }
 
     private Panier getOrCreatePanier(Principal principal, HttpSession session) {
@@ -133,9 +167,6 @@ public class PanierController {
         return panier;
     }
 
-    //
-
-
     @GetMapping("/panier/{id}")
     public String voirPanier(Model model, @PathVariable("id")long idPanier) {
         String errorMessage = "";
@@ -147,14 +178,6 @@ public class PanierController {
         }
         return "panier/panier";
     }
-
-    @GetMapping("/vider-panier")
-    public String viderPanier(SessionStatus status) {
-        status.setComplete();
-        return "redirect:/liste-produits";
-    }
-    //
-
 
 
     @GetMapping("panier/show")
@@ -182,19 +205,6 @@ public class PanierController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Produit non trouvé dans le panier");
         }
     }
-    /**
-    @PostMapping("/add")
-    public ResponseEntity<String> addLigneDeCommandeToPanier(@RequestBody LigneDeCommandeData request) {
-        try {
-            // Appelez le service pour ajouter la ligne de commande au panier
-            panierService.addLigneDeCommandeToPanier(request.getPanierId(), request.getProduitId(), request.getQuantite());
-
-            return ResponseEntity.ok("Ligne de commande ajoutée avec succès.");
-        } catch (PanierNotFoundException | ProduitNotFoundException | QuantiteInsuffisanteException e) {
-            // Gérez les exceptions ici, par exemple, en renvoyant une réponse d'erreur appropriée
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }**/
 
     @GetMapping("/api/{panierId}/lignesdecommande")
     public ResponseEntity<List<LigneDeCommandeDTO>> getLignesDeCommande(@PathVariable Long panierId) {
@@ -274,8 +284,6 @@ public class PanierController {
         }
     }
 
-
-
     @GetMapping("/panier/api/{id}")
     public ResponseEntity<Panier> getPanierById(@PathVariable Long id) {
         // Remplacez "panierRepository" par le nom de votre repository de panier
@@ -287,7 +295,6 @@ public class PanierController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Panier non trouvé");
         }
     }
-
 
     @PostMapping("/addToCart2")//modifier
     public String addToCart(@RequestParam("quantite")Integer qty, @RequestParam("produitId")Long productId ) {
@@ -311,14 +318,4 @@ public class PanierController {
         // Redirigez l'utilisateur vers la page du panier ou une autre page appropriée
         return "redirect:/panier/show";
     }
-
-    /**public BigDecimal getMontantTotalPanier(Long panierId) {
-        Panier panier = panierRepository.findById(panierId).orElse(null);
-        if (panier != null) {
-            return panier.getMontantTotalPanier();
-        }
-        return BigDecimal.ZERO; // Si le panier n'existe pas ou est vide, retourne BigDecimal.ZERO
-    }**/
-
-
 }

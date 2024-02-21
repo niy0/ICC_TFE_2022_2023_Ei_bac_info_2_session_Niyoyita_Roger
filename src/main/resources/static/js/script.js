@@ -344,6 +344,23 @@ function getProduitDetails(produitId) {
 
 
 $(document).ready(function () {
+
+    $('#cart-items').on('change', '.quantity-input', function() {
+          var quantity = parseInt($(this).val());
+          var price = parseFloat($(this).closest('tr').find('#prix-produit').text());
+          var total = quantity * price;
+          $(this).closest('tr').find('#total-produit').text(total.toFixed(2));
+          updateCartTotal();
+        });
+
+        function updateCartTotal() {
+          var total = 0;
+          $('.product-total').each(function() {
+            total += parseFloat($(this).text());
+          });
+          $('#panier-total').text(total.toFixed(2));
+        }
+
     // Gestionnaire d'événement pour le bouton "-"
     $('.button-minusJs').on('click', function () {
         var productId = $(this).data('product-id');

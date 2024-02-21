@@ -12,7 +12,6 @@ public class LigneDeCommandeData implements Serializable {
     private Long panierId;  // l'ID du panier en cours
     private int quantite;   // la quantité demandée pour le produit
 
-
     // Constructeurs
     public LigneDeCommandeData() {
     }

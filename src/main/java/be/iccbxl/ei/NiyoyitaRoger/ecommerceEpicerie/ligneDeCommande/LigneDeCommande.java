@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "lignedecommande")
 public class LigneDeCommande {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,8 +29,10 @@ public class LigneDeCommande {
 
     private BigDecimal montantTotal; // Montant total de la ligne de commande
 
-    protected LigneDeCommande() {
+    public LigneDeCommande() {
     }
+
+    // Constructeurs, getters, setters et autres méthodes d'accès
 
     public LigneDeCommande(Produit produit, Panier panier, int quantite, BigDecimal prixUnitaire) {
         this.produit = produit;
@@ -38,8 +41,6 @@ public class LigneDeCommande {
         setPrixUnitaire(prixUnitaire); // Utilisation de la méthode setter pour initialiser le prix unitaire
         calculerMontantTotal();
     }
-
-    // Constructeurs, getters, setters et autres méthodes d'accès
 
     public Long getId() {
         return id;
@@ -96,5 +97,17 @@ public class LigneDeCommande {
 
     public void calculerMontantTotal() {
         montantTotal = prixUnitaire.multiply(BigDecimal.valueOf(quantite));
+    }
+
+    @Override
+    public String toString() {
+        return "LigneDeCommande{" +
+                "id=" + id +
+                ", produit=" + produit.getId() +
+                ", panier=" + panier.getId() +
+                ", quantite=" + quantite +
+                ", prixUnitaire=" + prixUnitaire +
+                ", montantTotal=" + montantTotal +
+                '}';
     }
 }
