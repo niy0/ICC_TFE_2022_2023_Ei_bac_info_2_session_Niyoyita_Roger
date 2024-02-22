@@ -346,20 +346,27 @@ function getProduitDetails(produitId) {
 $(document).ready(function () {
 
     $('#cart-items').on('change', '.quantity-input', function() {
-          var quantity = parseInt($(this).val());
-          var price = parseFloat($(this).closest('tr').find('#prix-produit').text());
-          var total = quantity * price;
-          $(this).closest('tr').find('#total-produit').text(total.toFixed(2));
-          updateCartTotal();
-        });
+       var quantity = parseInt($(this).val());
+       var price = parseFloat($(this).closest('tr').find('#prix-produit').text());
+       var total = quantity * price;
+       $(this).closest('tr').find('#total-produit').text(total.toFixed(2));
+       updateCartTotal();
+    });
 
-        function updateCartTotal() {
-          var total = 0;
-          $('.product-total').each(function() {
-            total += parseFloat($(this).text());
-          });
-          $('#panier-total').text(total.toFixed(2));
-        }
+    function updateCartTotal() {
+       var total = 0;
+       $('.product-total').each(function() {
+          total += parseFloat($(this).text());
+       });
+       $('#panier-total').text(total.toFixed(2));
+    }
+
+    // Modal panier pour la confirmation de suppression d'une ligne de commande
+    const myModal = new bootstrap.Modal('#exampleModalCenter');
+    document.querySelector('.close').addEventListener('click', () =>{
+        alert("testModal");
+        myModal.hide();
+    });
 
     // Gestionnaire d'événement pour le bouton "-"
     $('.button-minusJs').on('click', function () {
