@@ -3,16 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <title>Panier</title>
-  <!-- Utilisez uniquement Bootstrap 5 CSS -->
+  <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-  <!-- Utilisez Bootstrap 5 JS avec Popper -->
-  <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-          integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <!-- Font Awesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
-  <script src="js/script.js"></script>
-  <!-- Inclusion de jQuery -->
+  <!-- jQuery (Nécessaire avant les scripts Bootstrap) -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <!-- Bootstrap Bundle JS (inclut Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+  <style></style>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <body>
 <div class="container mt-4">
@@ -28,6 +32,7 @@
           <table class="table">
             <thead>
             <tr>
+              <th>Id Produit</th>
               <th>Image Produit</th>
               <th>Nom</th>
               <th>Prix</th>
@@ -37,52 +42,71 @@
             </tr>
             </thead>
             <tbody id="cart-items">
-            <tr th:each="ligne : ${panier.lignesDeCommande}">
+            <tr th:each="ligne : ${panier.lignesDeCommande}" th:data-ligne-commande-id="${ligne.id}">
+
+              <td th:text="${ligne.produit.id}" name="id_produit"></td>
+
               <td scope="row">
                 <img th:src="@{/display(id=${ligne.produit.id})}" alt="Image du produit" height="100px" />
               </td>
               <td th:text="${ligne.produit.nom}">Nom du produit</td>
               <td th:text="${ligne.produit.prix}" id="prix-produit">Prix</td>
               <td>
-                <input type="number" th:value="${ligne.quantite}" min="1" class="form-control quantity-input" th:name="'quantite_' + ${ligne.produit.id}" style="width:85px;"/>
+                <input type="number" th:value="${ligne.quantite}" min="1" class="form-control quantity-input"
+                       th:data-product-id="${ligne.produit.id}" th:id="'quantite_' + ${ligne.produit.id}" style="width:85px;"/>
+                <!--élément pour afficher le message d'erreur -->
+                <div th:id="'error_' + ${ligne.produit.id}" class="text-danger" style="display: none;">Quantité demandée non disponible en stock.</div>
               </td>
+
+
               <td id="total-produit" class="product-total" th:text="${ligne.produit.prix * ligne.quantite}">Total</td>
-
               <td>
-                <form id="deleteElemPanier" th:action="@{/deleteElemPanier}" method="post">
-                  <input type="hidden"  th:value="${ligne.id}" name="idLigneDeCommande">
-                  <input type="hidden" th:value="${panier.id}" name="idPanier">
-                  <button type="submit" form="deleteElemPanier" class="btn btn-outline-danger">Supprimer du panier</button>
-                </form>
 
-                <form th:action="@{/lignedecommande/delete/{id}(id=${ligne.id})}" method="post">
-                  <button type="submit" class="btn btn-outline-danger">Supprimer la ligne de commande</button>
-                </form>
+                <!--
+                  <form id="deleteElemPanier" th:action="@{/deleteElemPanier}" method="post"  hidden>
+                    <input type="hidden"  th:value="${ligne.id}" name="idLigneDeCommande">
+                    <input type="hidden" th:value="${panier.id}" name="idPanier">
+                    <button type="submit" form="deleteElemPanier" class="btn btn-outline-danger">Supprimer du panier</button>
+                  </form>
 
-                <!-- Bouton pour déclencher le modal -->
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModalCenter">
-                  Lancer le modal de démo
+                  <form th:action="@{/lignedecommande/delete/{id}(id=${ligne.id})}" method="post" hidden>
+                    <button type="submit" class="btn btn-outline-danger">Supprimer la ligne de commande</button>
+                  </form>
+                -->
+
+                <!-- Bouton pour déclencher le modal avec un ID unique -->
+                <button type="button" class="btn btn-outline-danger launch-modal" data-bs-toggle="modal"
+                        th:attr="data-bs-target='#exampleModalCenter'+${ligne.id}"
+                        th:data-id="${ligne.produit.id}" th:data-nom="${ligne.produit.nom}"
+                        th:data-prix="${ligne.produit.prix}" th:data-quantite="${ligne.quantite}"
+                        th:data-image-url="@{'/display?id=' + ${ligne.produit.id}}">
+                  Supprimer du panier
                 </button>
 
-                <!-- Modal -->
-                <div class="modal fade" id="exampleModalCenter" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <!-- Modal avec un ID unique -->
+                <div class="modal fade" th:id="'exampleModalCenter'+${ligne.id}" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                   <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
                       <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLongTitle">Titre du modal</h5>
+                        <h5 class="modal-title" id="exampleModalLongTitle">Êtes-vous sûr ?</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                       </div>
-                      <div class="modal-body">
-                        Contenu du modal
+                      <div class="modal-body text-center">
+                        <img th:src="@{/display(id=${ligne.produit.id})}" alt="Image du produit" class="img-fluid mb-3" style="max-height: 200px;"/>
+                        <h6 th:text="${ligne.produit.nom}">Nom du produit</h6>
+                        <p class="mb-1" th:text="${ligne.produit.prix} + ' €'">Prix</p>
+                        <p class="mb-2 quantite-text" data-product-id="${ligne.produit.id}">Quantité : <span>1</span></p>
+                        <h5 class="mt-3">Total : <span class="product-total" th:text="${ligne.produit.prix * ligne.quantite} + ' €'">Total</span></h5>
                       </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                        <button type="button" class="btn btn-primary">Enregistrer les modifications</button>
+                      <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
+                        <form th:action="@{/lignedecommande/delete/{id}(id=${ligne.id})}" method="post">
+                          <button type="submit" class="btn btn-danger">Confirmer la suppression</button>
+                        </form>
                       </div>
                     </div>
                   </div>
                 </div>
-
                 <a class="btn btn-outline-warning" th:href="@{/produit/{id}(id=${ligne.produit.id})}">Voir produit</a>
               </td>
             </tr>

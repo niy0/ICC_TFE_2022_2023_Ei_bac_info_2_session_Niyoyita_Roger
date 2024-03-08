@@ -1,54 +1,39 @@
-//Avoir la quantite d'un produit
-function getQuantiteProduit(produitId) {
-    // Récupérez le jeton CSRF depuis les balises meta
-        var csrfParameterName = $("meta[name='_csrf.parameterName']").attr("content");
-        var csrfToken = $("meta[name='_csrf.token']").attr("content");
+//Panier : modifier une ligne de commande par quantite
+function updateLigneDeCommande(ligneDeCommandeId, nouvelleQuantite) {
+    // Récupérer le jeton CSRF pour la sécurité
+    var csrfToken = $("meta[name='_csrf']").attr("content");
+    var csrfHeader = $("meta[name='_csrf_header']").attr("content");
 
-        // Créez un objet d'en-tête avec le jeton CSRF
-        var headers = {};
-        headers[csrfParameterName] = csrfToken;
     $.ajax({
-        type: "GET",
-        url: "/quantite-produit/" + produitId,
-        dataType: "json",
-        headers: headers, // Ajoutez le jeton CSRF dans les en-têtes de la requête
-        success: function (quantite) {
-            // Faites quelque chose avec la quantité, par exemple, l'afficher
-            console.log("Quantité du produit #" + produitId + ": " + quantite);
-            return quantite;
+        url: '/api/ligne-de-commande/update', // L'URL de votre endpoint côté serveur
+        type: 'POST', // ou 'PUT' selon la configuration de votre serveur
+        contentType: 'application/json', // Type de contenu envoyé
+        data: JSON.stringify({
+            ligneDeCommandeId: ligneDeCommandeId,
+            quantite: nouvelleQuantite
+            // Pas besoin d'envoyer le total, il peut être recalculé côté serveur
+        }),
+        beforeSend: function(xhr) {
+            // Ajouter le jeton CSRF dans les en-têtes de la requête pour la sécurité
+            xhr.setRequestHeader(csrfHeader, csrfToken);
         },
-        error: function (error) {
-            console.error('Erreur lors de la récupération de la quantité du produit :', error);
+        success: function(response) {
+            console.log("Ligne de commande mise à jour avec succès:", response);
+            // Mettre à jour l'interface utilisateur en conséquence
+            // Par exemple, mettez à jour le total affiché pour cette ligne de commande
+            // et potentiellement le total global du panier si nécessaire
+            $("#total-ligne-" + ligneDeCommandeId).text(response.total + ' €');
+            updateCartTotal(); // Mettez à jour le total du panier si cette fonction est définie
+        },
+        error: function(xhr, status, error) {
+            console.error("Erreur lors de la mise à jour de la ligne de commande:", error);
+            // Gérez l'erreur, par exemple, en affichant un message à l'utilisateur
         }
     });
 }
 
-// Avoir la quantité d'un produit
-function getQuantiteProduit(produitId) {
-    return new Promise(function (resolve, reject) {
-        // Récupérez le jeton CSRF depuis les balises meta
-                var csrfParameterName = $("meta[name='_csrf.parameterName']").attr("content");
-                var csrfToken = $("meta[name='_csrf.token']").attr("content");
 
-                // Créez un objet d'en-tête avec le jeton CSRF
-                var headers = {};
-                headers[csrfParameterName] = csrfToken;
-        $.ajax({
-            type: "GET",
-            url: "/quantite-produit/" + produitId,
-            dataType: "json",
-            headers: headers, // Ajoutez le jeton CSRF dans les en-têtes de la requête
-            success: function (quantite) {
-                // Résoudre la promesse avec la quantité
-                resolve(quantite);
-            },
-            error: function (error) {
-                // Rejeter la promesse en cas d'erreur
-                reject(error);
-            }
-        });
-    });
-}
+
 
 //Affiche la liste des produits actif et quantite >= 1
 function getProduitActif() {
@@ -342,15 +327,77 @@ function getProduitDetails(produitId) {
     });
 }
 
-
 $(document).ready(function () {
-
+    /**
     $('#cart-items').on('change', '.quantity-input', function() {
        var quantity = parseInt($(this).val());
        var price = parseFloat($(this).closest('tr').find('#prix-produit').text());
        var total = quantity * price;
        $(this).closest('tr').find('#total-produit').text(total.toFixed(2));
        updateCartTotal();
+    });
+    **/
+
+    //Avoir la quantite d'un produit (version modifiée pour retourner une promesse)
+    // Fonction modifiée pour définir l'attribut 'max' de l'input
+    function getQuantiteProduit(produitId) {
+        var csrfParameterName = $("meta[name='_csrf.parameterName']").attr("content");
+        var csrfToken = $("meta[name='_csrf.token']").attr("content");
+        var headers = {};
+        headers[csrfParameterName] = csrfToken;
+
+        $.ajax({
+            type: "GET",
+            url: "/quantite-produit/" + produitId,
+            dataType: "json",
+            headers: headers,
+            success: function (quantite) {
+                // Définir l'attribut max avec la quantité du stock
+                $('#quantite_' + produitId).attr('max', quantite);
+            },
+            error: function (error) {
+                console.error('Erreur lors de la récupération de la quantité du produit :', error);
+            }
+        });
+    }
+
+    // Appel pour chaque produit à la page chargement
+        $('.quantity-input').each(function() {
+            var productId = $(this).data('product-id');
+            getQuantiteProduit(productId);
+        });
+
+        // Surveiller les changements sur les entrées de quantité
+        $('.quantity-input').on('change', function() {
+            var productId = $(this).data('product-id');
+            var maxQuantite = parseInt($(this).attr('max'));
+            var currentQuantite = parseInt($(this).val());
+
+            // Vérifier si la quantité dépasse le stock maximum
+            if(currentQuantite > maxQuantite) {
+                // Afficher un message d'erreur
+                $('#error_' + productId).show();
+                $(this).val(maxQuantite); // Réinitialiser à la quantité max
+            } else {
+                // Cacher le message d'erreur si la quantité est valide
+                $('#error_' + productId).hide();
+            }
+        });
+
+    $('#cart-items').on('change', '.quantity-input', function() {
+        var ligneDeCommandeId = $(this).closest('tr').data('ligne-commande-id'); // Récupère l'ID de la ligne de commande
+        var quantity = parseInt($(this).val());
+        var price = parseFloat($(this).closest('tr').find('#prix-produit').text());
+        var total = quantity * price;
+
+        // Met à jour l'affichage du total pour cette ligne de commande dans le tableau
+        $(this).closest('tr').find('#total-produit').text(total.toFixed(2));
+
+        // Appel AJAX pour mettre à jour la quantité et potentiellement le total côté serveur
+        updateLigneDeCommande(ligneDeCommandeId, quantity);
+
+        // Met à jour le total du panier
+        updateCartTotal();
     });
 
     function updateCartTotal() {
@@ -362,11 +409,21 @@ $(document).ready(function () {
     }
 
     // Modal panier pour la confirmation de suppression d'une ligne de commande
-    const myModal = new bootstrap.Modal('#exampleModalCenter');
-    document.querySelector('.close').addEventListener('click', () =>{
-        alert("testModal");
-        myModal.hide();
+    document.addEventListener("DOMContentLoaded", function() {
+        var myModalEl = document.getElementById('exampleModalCenter');
+        if (myModalEl) {
+            var myModal = new bootstrap.Modal(myModalEl);
+
+            // Utilisez querySelectorAll et un boucle si vous avez plusieurs boutons fermer
+            document.querySelectorAll('.btn-close').forEach(function(btnClose) {
+                btnClose.addEventListener('click', function() {
+                    alert("testModal");
+                    myModal.hide();
+                });
+            });
+        }
     });
+
 
     // Gestionnaire d'événement pour le bouton "-"
     $('.button-minusJs').on('click', function () {

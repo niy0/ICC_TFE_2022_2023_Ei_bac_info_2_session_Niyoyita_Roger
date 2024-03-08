@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+    <head>
+        <meta charset="UTF-8">
+        <title>Erreur</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+        <style>
+                /*CSS pour la page d'erreur */
+                .error-container {
+                    text-align: center;
+                    margin-top: 50px;
+                }
+        </style>
+    </head>
+    <body>
+        <div layout:fragment="content" class="content">
+            <div class="error-container">
+                <h1>Oups! Quelque chose s'est mal passé.</h1>
+                <p>Nous avons rencontré une erreur lors du traitement de votre demande.</p>
+                <div>
+                    <span th:text="${errorMessage}">Message d'erreur par défaut</span>
+                </div>
+                <div>
+                    <a th:href="@{/}" class="btn btn-primary">Retour à l'accueil</a>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
