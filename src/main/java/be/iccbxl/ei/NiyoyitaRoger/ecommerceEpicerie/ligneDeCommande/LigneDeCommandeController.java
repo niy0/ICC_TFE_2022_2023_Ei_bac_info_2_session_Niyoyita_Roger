@@ -183,25 +183,41 @@ public class LigneDeCommandeController {
         return "lignesdecommande/view";
     }
 
-    @PutMapping("/update")
-    public String updateLigneDeCommande(@ModelAttribute("ligneDeCommande") LigneDeCommande ligneDeCommande,
-                                        RedirectAttributes redirectAttributes) {
-        try {
-            ligneDeCommandeService.updateLigneDeCommande(ligneDeCommande);
-            redirectAttributes.addFlashAttribute("successMessage", "Ligne de commande mise à jour avec succès.");
-        } catch (EntityNotFoundException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Ligne de commande non trouvée.");
+
+    @PostMapping("/update")
+    public ResponseEntity<?> updateLigneDeCommande(@RequestBody LigneDeCommandeUpdatePayload payload) {
+        Optional<LigneDeCommande> ligneDeCommandeOptional = Optional.ofNullable(ligneDeCommandeService.getLigneDeCommandeById(payload.getId()));
+        if (!ligneDeCommandeOptional.isPresent()) {
+            return ResponseEntity.notFound().build();
         }
-        return "redirect:/lignedecommande/list";
+
+        LigneDeCommande ligneDeCommande = ligneDeCommandeOptional.get();
+        Optional<Produit> produitOptional = produitRepository.findById(ligneDeCommande.getProduit().getId());
+        if (!produitOptional.isPresent() || payload.getQuantite() > produitOptional.get().getQuantite()) {
+            return ResponseEntity.badRequest().body("Produit non trouvé ou quantité demandée non disponible en stock.");
+        }
+
+        ligneDeCommande.setQuantite(payload.getQuantite());
+        ligneDeCommandeService.save(ligneDeCommande); // Assurez-vous que cette méthode existe et qu'elle fait la mise à jour nécessaire
+
+        return ResponseEntity.ok().build(); // Vous pouvez retourner l'objet mis à jour si nécessaire
     }
+
+
+
 
     @PostMapping("/delete/{id}")
     public String deleteLigneDeCommande(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        LigneDeCommande ligneDeCommande = ligneDeCommandeService.getLigneDeCommandeById(id);
-        System.out.println(ligneDeCommande + "tessssssstttttttttssssssstttttttte ligne de com*****************"+ ":"+id);
+        Optional<LigneDeCommande> ligneDeCommandeOpt = Optional.ofNullable(ligneDeCommandeService.getLigneDeCommandeById(id));
 
-        ligneDeCommandeService.deleteLigneDeCommande(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Ligne de commande supprimée avec succès.");
+        if (ligneDeCommandeOpt.isPresent()) {
+            ligneDeCommandeService.deleteLigneDeCommande(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Ligne de commande supprimée avec succès.");
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Ligne de commande introuvable.");
+        }
+
         return "redirect:/panier";
     }
+
 }

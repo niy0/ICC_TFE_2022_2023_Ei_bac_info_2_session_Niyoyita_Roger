@@ -24,6 +24,7 @@ public class Panier implements Serializable {
     private List<LigneDeCommande> lignesDeCommande = new ArrayList<>();
 
     @OneToOne
+    @JsonIgnore
     @JoinColumn(name = "user_id")
     private User utilisateur;
 
@@ -45,27 +46,32 @@ public class Panier implements Serializable {
     }
 
     private BigDecimal calculerMontantTotal() {
+        if (lignesDeCommande == null || lignesDeCommande.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
         return lignesDeCommande.stream()
                 .map(LigneDeCommande::getMontantTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public void addLigneDeCommande(LigneDeCommande ligneDeCommande) {
-        lignesDeCommande.add(ligneDeCommande);
-        ligneDeCommande.setPanier(this);
+    public void addLigneDeCommande(LigneDeCommande ligne) {
+
+        if (ligne != null) {
+            //ligne.setPanier(ligne.getPanier());
+            lignesDeCommande.add(ligne);
+        }
+
         recalculerMontantTotalPanier();
     }
 
     public void removeLigneDeCommande(LigneDeCommande ligneDeCommande) {
-        lignesDeCommande.remove(ligneDeCommande);
-        ligneDeCommande.setPanier(null);
+        if (lignesDeCommande.remove(ligneDeCommande)) { // Vérifie si la ligne a bien été supprimée
+            ligneDeCommande.setPanier(null); // Retire le panier de la ligne de commande
+        }
         recalculerMontantTotalPanier();
     }
 
-
-
     // ... autres getters et setters ...
-
 
     public Long getId() {
         return id;
@@ -120,6 +126,7 @@ public class Panier implements Serializable {
     }
 
     public BigDecimal getMontantTotalPanier() {
+        recalculerMontantTotalPanier();
         return montantTotalPanier.setScale(2, RoundingMode.HALF_UP);
     }
 
@@ -151,12 +158,12 @@ public class Panier implements Serializable {
     public String toString() {
         return "Panier{" +
                 "id=" + id +
-                ", lignesDeCommande=" + lignesDeCommande +
                 ", actif=" + actif +
                 ", dateCreation=" + dateCreation +
                 ", dateModification=" + dateModification +
-                ", montantTotalPanier=" + montantTotalPanier +
-                ", utilisateur=" + utilisateur +
+                ", montantTotalPanier=" + calculerMontantTotal()+
+                ", utilisateur=" + utilisateur.getId() +
                 '}';
     }
+
 }

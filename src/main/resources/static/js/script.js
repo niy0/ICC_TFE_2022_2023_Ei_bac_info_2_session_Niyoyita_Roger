@@ -18,7 +18,7 @@ function updateLigneDeCommande(ligneDeCommandeId, nouvelleQuantite) {
             xhr.setRequestHeader(csrfHeader, csrfToken);
         },
         success: function(response) {
-            console.log("Ligne de commande mise à jour avec succès:", response);
+            console.log("Ligne de commande mise à jour avec succès 'Test totale':", response);
             // Mettre à jour l'interface utilisateur en conséquence
             // Par exemple, mettez à jour le total affiché pour cette ligne de commande
             // et potentiellement le total global du panier si nécessaire
@@ -337,6 +337,8 @@ $(document).ready(function () {
        updateCartTotal();
     });
     **/
+
+
 
     //Avoir la quantite d'un produit (version modifiée pour retourner une promesse)
     // Fonction modifiée pour définir l'attribut 'max' de l'input

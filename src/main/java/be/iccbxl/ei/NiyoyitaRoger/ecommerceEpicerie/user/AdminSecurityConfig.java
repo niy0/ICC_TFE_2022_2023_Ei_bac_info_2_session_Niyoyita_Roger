@@ -90,7 +90,7 @@ public class AdminSecurityConfig {
         httpSecurity.csrf( csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .ignoringRequestMatchers("/addToCart"))
                 .authorizeHttpRequests( auth -> {
-                    auth.requestMatchers("/images/**","/js/**","/webjars/**","/api/**","/favicon.ico/**").permitAll();
+                    auth.requestMatchers("/images/**","/js/**","/webjars/**","/api/**","/panier/api/**","/favicon.ico/**").permitAll();
                     auth.requestMatchers("/favicon.ico","/panier/**","/viderPanier/**","/deleteElemPanier").permitAll();
                     auth.requestMatchers("/","/signup","/display/**", "/produit","/produit/**","/user/signup","/produit/nouveau","/auth/debug").permitAll() //changer nouveau produit
                     .requestMatchers("/info-contact","/info-livraison","/info-retour","/info-utilisation","/info-confidentialite","/addToCart").permitAll()

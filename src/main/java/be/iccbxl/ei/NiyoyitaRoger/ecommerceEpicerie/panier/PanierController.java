@@ -89,6 +89,30 @@ public class PanierController {
 
         return "panier/panier";
     }
+/**
+    @GetMapping("/panier/{id}")
+    public String voirPanier(Model model, @PathVariable("id")long idPanier) {
+        String errorMessage = "";
+        Optional<Panier> panier = panierRepository.findById(idPanier);
+        if(panier.isPresent()) {
+            model.addAttribute("panier",panier.get());
+        }else {
+            errorMessage = "Panier introuvable";
+        }
+        return "panier/panier";
+    }**/
+
+    @GetMapping("/panier/api/{id}")
+    public ResponseEntity<Panier> getPanierById(Model model,@PathVariable("id") Long id) {
+        // Remplacez "panierRepository" par le nom de votre repository de panier
+        Optional<Panier> panier = panierRepository.findById(id);
+
+        if (panier.isPresent()) {
+            return ResponseEntity.ok(panier.get());
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Panier non trouvé");
+        }
+    }
 
     /**
     @PostMapping("/deleteElemPanier")
@@ -167,19 +191,9 @@ public class PanierController {
         return panier;
     }
 
-    @GetMapping("/panier/{id}")
-    public String voirPanier(Model model, @PathVariable("id")long idPanier) {
-        String errorMessage = "";
-        Optional<Panier> panier = panierRepository.findById(idPanier);
-        if(panier.isPresent()) {
-            model.addAttribute("panier",panier.get());
-        }else {
-            errorMessage = "Panier introuvable";
-        }
-        return "panier/panier";
-    }
 
 
+/**
     @GetMapping("panier/show")
     public String afficherPanier(Model model, HttpSession session) {
         // Obtenez le panier de la session
@@ -192,7 +206,7 @@ public class PanierController {
 
         model.addAttribute("panier", panier);
         return "panier/show";
-    }
+    }**/
 
     @GetMapping("/panier/lignedecommande/api/{id}")
     public ResponseEntity<LigneDeCommande> getProduitInPanierById(@PathVariable Long id) {
@@ -248,7 +262,6 @@ public class PanierController {
                     System.out.println("Aucun jeton CSRF trouvé dans les en-têtes de la requête.");
                 }
 
-
                 // Utilisez votre service pour ajouter la ligne de commande au panier
 
                 panierService.addLigneDeCommandeToPanier(
@@ -258,8 +271,6 @@ public class PanierController {
                 );
 
                 int testQ1 = produit.getQuantite();
-
-                System.out.println();
 
                 //Diminuer la quantite ajouter dans la bd pour le produit
                // a la création d'une commande produit.setQuantite(produit.getQuantite() - quantiteDemandee);
@@ -284,17 +295,7 @@ public class PanierController {
         }
     }
 
-    @GetMapping("/panier/api/{id}")
-    public ResponseEntity<Panier> getPanierById(@PathVariable Long id) {
-        // Remplacez "panierRepository" par le nom de votre repository de panier
-        Optional<Panier> panier = panierRepository.findById(id);
 
-        if (panier.isPresent()) {
-            return ResponseEntity.ok(panier.get());
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Panier non trouvé");
-        }
-    }
 
     @PostMapping("/addToCart2")//modifier
     public String addToCart(@RequestParam("quantite")Integer qty, @RequestParam("produitId")Long productId ) {

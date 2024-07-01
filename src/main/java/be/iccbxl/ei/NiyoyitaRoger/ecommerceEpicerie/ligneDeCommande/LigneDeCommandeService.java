@@ -34,7 +34,7 @@ public class LigneDeCommandeService {
 
         if (existingLigneDeCommande != null) {
             // Mettez à jour les champs de la ligne de commande existante avec les valeurs de la nouvelle ligne de commande
-            existingLigneDeCommande.setProduit(ligneDeCommande.getProduit());
+            //existingLigneDeCommande.setProduit(ligneDeCommande.getProduit());
             existingLigneDeCommande.setQuantite(ligneDeCommande.getQuantite());
 
             // Enregistrez la mise à jour dans la base de données
