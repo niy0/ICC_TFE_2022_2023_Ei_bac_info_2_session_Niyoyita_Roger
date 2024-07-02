@@ -8,20 +8,21 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 @Entity
 public class Panier implements Serializable {
+    private static final long serialVersionUID = 1333887242125065122L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToMany(mappedBy = "panier", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private List<LigneDeCommande> lignesDeCommande = new ArrayList<>();
+    private List<LigneDeCommande> lignesDeCommande = new LinkedList<>();
 
     @OneToOne
     @JsonIgnore
@@ -55,12 +56,9 @@ public class Panier implements Serializable {
     }
 
     public void addLigneDeCommande(LigneDeCommande ligne) {
-
         if (ligne != null) {
-            //ligne.setPanier(ligne.getPanier());
             lignesDeCommande.add(ligne);
         }
-
         recalculerMontantTotalPanier();
     }
 
@@ -71,7 +69,37 @@ public class Panier implements Serializable {
         recalculerMontantTotalPanier();
     }
 
-    // ... autres getters et setters ...
+    public void removeFirstLigneDeCommande() {
+        if (!lignesDeCommande.isEmpty()) {
+            LigneDeCommande firstLigne = (LigneDeCommande) ((LinkedList<LigneDeCommande>) lignesDeCommande).removeFirst();
+            if (firstLigne != null) {
+                firstLigne.setPanier(null);
+            }
+            recalculerMontantTotalPanier();
+        }
+    }
+
+    public void recalculerMontantTotalPanier() {
+        montantTotalPanier = calculerMontantTotal();
+    }
+
+    public void mergeWith(Panier panierTemporaire) {
+        for (LigneDeCommande ligneTemp : panierTemporaire.getLignesDeCommande()) {
+            boolean found = false;
+            for (LigneDeCommande ligneCourante : this.getLignesDeCommande()) {
+                if (ligneCourante.getId().equals(ligneTemp.getId())) {
+                    int nouvelleQuantite = ligneCourante.getQuantite() + ligneTemp.getQuantite();
+                    ligneCourante.setQuantite(nouvelleQuantite);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                this.addLigneDeCommande(ligneTemp);
+            }
+        }
+        recalculerMontantTotalPanier();
+    }
 
     public Long getId() {
         return id;
@@ -121,10 +149,6 @@ public class Panier implements Serializable {
         this.dateModification = dateModification;
     }
 
-    public void recalculerMontantTotalPanier() {
-        montantTotalPanier = calculerMontantTotal();
-    }
-
     public BigDecimal getMontantTotalPanier() {
         recalculerMontantTotalPanier();
         return montantTotalPanier.setScale(2, RoundingMode.HALF_UP);
@@ -134,26 +158,6 @@ public class Panier implements Serializable {
         this.montantTotalPanier = montantTotalPanier;
     }
 
-    // ... autres getters et setters ...
-
-    public void mergeWith(Panier panierTemporaire) {
-        for (LigneDeCommande ligneTemp : panierTemporaire.getLignesDeCommande()) {
-            boolean found = false;
-            for (LigneDeCommande ligneCourante : this.getLignesDeCommande()) {
-                if (ligneCourante.getId().equals(ligneTemp.getId())) {
-                    int nouvelleQuantite = ligneCourante.getQuantite() + ligneTemp.getQuantite();
-                    ligneCourante.setQuantite(nouvelleQuantite);
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                this.addLigneDeCommande(ligneTemp);
-            }
-        }
-        recalculerMontantTotalPanier();
-    }
-
     @Override
     public String toString() {
         return "Panier{" +
@@ -161,9 +165,8 @@ public class Panier implements Serializable {
                 ", actif=" + actif +
                 ", dateCreation=" + dateCreation +
                 ", dateModification=" + dateModification +
-                ", montantTotalPanier=" + calculerMontantTotal()+
-                ", utilisateur=" + utilisateur.getId() +
+                ", montantTotalPanier=" + calculerMontantTotal() +
+                ", utilisateur=" + (utilisateur != null ? utilisateur.getId() : "null") +
                 '}';
     }
-
 }

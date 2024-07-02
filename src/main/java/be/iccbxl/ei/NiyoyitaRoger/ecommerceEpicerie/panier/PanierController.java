@@ -140,6 +140,24 @@ public class PanierController {
         }
     }
 
+    @PostMapping("/deleteFirstElemPanier")
+    public String deleteFirstElementInPanier(@RequestParam("idPanier") String idPanier,
+                                        @RequestParam("idLigneDeCommande") String idLigneDeCommande) {
+
+        System.out.println("idPanier : "+idPanier+ " :: ligne co:"+ idLigneDeCommande);
+
+        if (NumberUtils.isDigits(idPanier) && NumberUtils.isDigits(idLigneDeCommande)) {
+            Long panierId = Long.parseLong(idPanier);
+            Long ligneDeCommandeId = Long.parseLong(idLigneDeCommande);
+
+            panierService.deleteFirstElemLigneDeCommandePanier(panierId, ligneDeCommandeId);
+            return "redirect:/panier";
+        } else {
+            // Gérer les erreurs de paramètres invalides ici
+            return "redirect:/errorPage"; // Rediriger vers une page d'erreur spécifique
+        }
+    }
+
     @PostMapping("/confirmerPanier")
     public String confirmerPanier(@ModelAttribute("panier") Panier panier) {
         for (LigneDeCommande ligne : panier.getLignesDeCommande()) {

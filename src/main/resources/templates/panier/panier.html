@@ -43,12 +43,10 @@
             </tr>
             </thead>
             <tbody id="cart-items">
-            <tr th:each="ligne : ${panier.lignesDeCommande}" th:data-ligne-commande-id="${ligne.id}">
+            <tr th:each="ligne, iterStat : ${panier.lignesDeCommande}" th:data-ligne-commande-id="${ligne.id}">
               <td th:text="${ligne.id}" name="id_ligneDeCommande"></td>
               <td th:text="${ligne.panier.id}" name="ligneDeCommandePanierId"></td>
-
               <td th:text="${ligne.produit.id}" name="id_produit"></td>
-
               <td scope="row">
                 <img th:src="@{/display(id=${ligne.produit.id})}" alt="Image du produit" height="100px" />
               </td>
@@ -57,28 +55,13 @@
               <td>
                 <input type="number" th:value="${ligne.quantite}" min="1" class="form-control quantity-input"
                        th:data-product-id="${ligne.produit.id}" th:id="'quantite_' + ${ligne.produit.id}" style="width:85px;"/>
-                  <!-- Élément pour afficher le message d'erreur avec la quantité maximale disponible -->
-                  <div th:id="'error_' + ${ligne.produit.id}" class="text-danger" style="display: none;">
-                    Quantité demandée non disponible en stock. Maximum : <span th:text="${ligne.produit.quantite}"></span>
-                  </div>
+                <!-- Élément pour afficher le message d'erreur avec la quantité maximale disponible -->
+                <div th:id="'error_' + ${ligne.produit.id}" class="text-danger" style="display: none;">
+                  Quantité demandée non disponible en stock. Maximum : <span th:text="${ligne.produit.quantite}"></span>
+                </div>
               </td>
-
-
               <td id="total-produit" class="product-total" th:text="${ligne.produit.prix * ligne.quantite}">Total</td>
               <td>
-
-                <!--
-                  <form id="deleteElemPanier" th:action="@{/deleteElemPanier}" method="post"  hidden>
-                    <input type="hidden"  th:value="${ligne.id}" name="idLigneDeCommande">
-                    <input type="hidden" th:value="${panier.id}" name="idPanier">
-                    <button type="submit" form="deleteElemPanier" class="btn btn-outline-danger">Supprimer du panier</button>
-                  </form>
-
-                  <form th:action="@{/lignedecommande/delete/{id}(id=${ligne.id})}" method="post" hidden>
-                    <button type="submit" class="btn btn-outline-danger">Supprimer la ligne de commande</button>
-                  </form>
-                -->
-
                 <!-- Bouton pour déclencher le modal avec un ID unique -->
                 <button type="button" class="btn btn-outline-danger launch-modal" data-bs-toggle="modal"
                         th:attr="data-bs-target='#exampleModalCenter'+${ligne.id}"
@@ -105,7 +88,12 @@
                       </div>
                       <div class="modal-footer justify-content-between">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
-                        <form th:action="@{/lignedecommande/delete/{id}(id=${ligne.id})}" method="post" th:id="'deleteForm'+${ligne.id}">
+                        <form th:if="${iterStat.first}" th:action="@{/deleteFirstElemPanier}" method="post" th:id="'deleteFirstForm'+${ligne.id}">
+                          <input type="hidden" th:value="${ligne.panier.id}" name="idPanier"/>
+                          <input type="hidden" th:value="${ligne.id}" name="idLigneDeCommande"/>
+                          <button type="submit" th:attr="form='deleteFirstForm'+${ligne.id}" class="btn btn-danger delete-first-line">Confirmer la suppression</button>
+                        </form>
+                        <form th:if="${!iterStat.first}" th:action="@{/lignedecommande/delete/{id}(id=${ligne.id})}" method="post" th:id="'deleteForm'+${ligne.id}">
                           <button type="submit" th:attr="form='deleteForm'+${ligne.id}" class="btn btn-danger">Confirmer la suppression</button>
                         </form>
                       </div>
@@ -127,7 +115,6 @@
           <button type="button" id="confirmerPanierBtn" class="btn btn-primary" data-id="{id_de_la_ligne_de_commande}">
             <i class="bi bi-cart4"></i> Confirmer Panier
           </button>
-
         </form>
       </div>
       <div th:unless="${not #lists.isEmpty(panier.lignesDeCommande)}">

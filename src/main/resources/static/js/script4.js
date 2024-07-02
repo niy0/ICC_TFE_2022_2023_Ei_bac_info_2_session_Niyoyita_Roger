@@ -1,30 +1,3 @@
-// Fonction pour récupérer le panier en spécifiant l'ID du panier
-function getPanier(idPanier, callback) {
-    var idPanierval = parseInt(idPanier);
-
-    // Récupérez le jeton CSRF depuis les balises meta
-    var csrfParameterName = $("meta[name='_csrf.parameterName']").attr("content");
-    var csrfToken = $("meta[name='_csrf.token']").attr("content");
-
-    // Créez un objet d'en-tête avec le jeton CSRF
-    var headers = {};
-    headers[csrfParameterName] = csrfToken;
-
-    $.ajax({
-        url: '/panier/api/' + idPanierval, // Utilisez l'ID du panier spécifié
-        type: 'GET',
-        dataType: 'json',
-        headers: headers, // Ajoutez le jeton CSRF dans les en-têtes de la requête
-        success: function (panierData) {
-            // La réponse a été reçue avec succès
-            console.log('Panier récupéré avec succès :', panierData);
-            if (callback) callback(panierData); // Exécutez la fonction de callback avec les données du panier
-        },
-        error: function (xhr, status, error) {
-            console.error('Erreur AJAX :', error);
-        }
-    });
-}
 
 function getListLigneDeCommandePanier(panierId) {
     var panierIdValue = parseInt(panierId);
@@ -147,6 +120,56 @@ $(document).ready(function () {
                 alert("Erreur lors de la suppression : " + error);
             }
         });
+    });
+
+    // Fonction pour récupérer le panier en spécifiant l'ID du panier
+    function getPanier(idPanier, callback) {
+        var idPanierval = parseInt(idPanier);
+
+        // Récupération du jeton CSRF depuis les balises meta
+        var csrfParameterName = $("meta[name='_csrf.parameterName']").attr("content");
+        var csrfToken = $("meta[name='_csrf.token']").attr("content");
+
+        // en-tête avec le jeton CSRF
+        var headers = {};
+        headers[csrfParameterName] = csrfToken;
+
+        $.ajax({
+            url: '/panier/api/' + idPanierval, // Utilisez l'ID du panier spécifié
+            type: 'GET',
+            dataType: 'json',
+            headers: headers, // Ajoutez le jeton CSRF dans les en-têtes de la requête
+            success: function (panierData) {
+                // La réponse a été reçue avec succès
+                console.log('Panier récupéré avec succès :', panierData);
+                if (callback) callback(panierData); // Exécutez la fonction de callback avec les données du panier
+            },
+            error: function (xhr, status, error) {
+                console.error('Erreur AJAX :', error);
+            }
+        });
+    }
+
+    // Suppression d'une ligne de commande
+    $(document).on('click', '.delete-line', function(event) {
+         event.preventDefault();
+         var form = $(this).closest('form');
+         var ligneDeCommandeId = form.closest('tr').data('ligne-commande-id');
+
+         $.ajax({
+              url: '/lignedecommande/delete/' + ligneDeCommandeId,
+              type: 'POST',
+              beforeSend: function(xhr) {
+                  xhr.setRequestHeader(csrfHeader, csrfToken);
+              },
+              success: function(response) {
+                  // Met à jour l'affichage du panier
+                  location.reload();
+              },
+              error: function(xhr, status, error) {
+                  alert("Erreur lors de la suppression de la ligne de commande : " + error);
+              }
+         });
     });
 
     // Fonction pour mettre à jour une ligne de commande

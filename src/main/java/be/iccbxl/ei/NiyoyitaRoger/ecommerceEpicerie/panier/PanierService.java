@@ -222,24 +222,6 @@ public class PanierService {
         }
     }
 
-    /**
-    public boolean deleteLigneDeCommandePanier(Long idPanier, Long idLigneDeCommande){
-        boolean ok = false;
-        Panier panier = panierRepository.findById(idPanier)
-                .orElseThrow(() -> new PanierNotFoundException("Panier non trouvé avec l'ID : " + idPanier));
-
-        LigneDeCommande ligneDeCommande = ligneDeCommandeRepository.findById(idLigneDeCommande)
-                .orElseThrow(() -> new LigneDeCommandeNotFoundException("Ligne de commande non trouvée avec l'ID : " + idLigneDeCommande));
-
-        if (!panier.getLignesDeCommande().isEmpty() && ligneDeCommande != null) {
-            ok = true;
-            panier.getLignesDeCommande().removeIf(l -> l.getId().equals(idLigneDeCommande));
-            panierRepository.save(panier);
-            return ok;
-        }
-        return ok;
-    }**/
-
     public boolean deleteLigneDeCommandePanier(Long idPanier, Long idLigneDeCommande) {
         Panier panier = panierRepository.findById(idPanier)
                 .orElseThrow(() -> new PanierNotFoundException("Panier non trouvé avec l'ID : " + idPanier));
@@ -262,5 +244,25 @@ public class PanierService {
         return false;
     }
 
+    public boolean deleteFirstElemLigneDeCommandePanier(Long idPanier, Long idLigneDeCommande) {
+        Panier panier = panierRepository.findById(idPanier)
+                .orElseThrow(() -> new PanierNotFoundException("Panier non trouvé avec l'ID : " + idPanier));
 
+        LigneDeCommande ligneDeCommande = ligneDeCommandeRepository.findById(idLigneDeCommande)
+                .orElseThrow(() -> new LigneDeCommandeNotFoundException("Ligne de commande non trouvée avec l'ID : " + idLigneDeCommande));
+
+        if (panier.getLignesDeCommande().contains(ligneDeCommande)) {
+            panier.getLignesDeCommande().remove(0);
+
+            ligneDeCommande.setPanier(null); // Dissociez la ligne de commande du panier si nécessaire
+            ligneDeCommandeRepository.save(ligneDeCommande);
+
+            //test suppression de ligne de commande
+            ligneDeCommandeService.deleteLigneDeCommande(idLigneDeCommande);
+
+            panierRepository.save(panier);
+            return true;
+        }
+        return false;
+    }
 }

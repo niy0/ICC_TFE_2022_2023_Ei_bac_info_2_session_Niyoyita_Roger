@@ -203,9 +203,6 @@ public class LigneDeCommandeController {
         return ResponseEntity.ok().build(); // Vous pouvez retourner l'objet mis à jour si nécessaire
     }
 
-
-
-
     @PostMapping("/delete/{id}")
     public String deleteLigneDeCommande(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         Optional<LigneDeCommande> ligneDeCommandeOpt = Optional.ofNullable(ligneDeCommandeService.getLigneDeCommandeById(id));
