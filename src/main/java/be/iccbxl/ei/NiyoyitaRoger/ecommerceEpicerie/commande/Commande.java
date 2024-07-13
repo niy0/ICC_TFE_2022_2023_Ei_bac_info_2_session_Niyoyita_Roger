@@ -48,20 +48,4 @@ public class Commande {
         this.statut = StatutCommande.EN_COURS;
     }
 
-    /**
-     * <dependency>
-     *     <groupId>org.springframework.boot</groupId>
-     *     <artifactId>spring-boot-starter-mail</artifactId>
-     * </dependency>
-     *
-     * spring.mail.host=your-smtp-server.com
-     * spring.mail.port=587
-     * spring.mail.username=your-username
-     * spring.mail.password=your-password
-     * spring.mail.properties.mail.smtp.auth=true
-     * spring.mail.properties.mail.smtp.starttls.enable=true
-     */
-
-
-
 }

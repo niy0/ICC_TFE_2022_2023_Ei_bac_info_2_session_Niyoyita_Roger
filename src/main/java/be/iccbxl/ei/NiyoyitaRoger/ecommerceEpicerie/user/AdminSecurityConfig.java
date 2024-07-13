@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -80,20 +81,19 @@ public class AdminSecurityConfig {
         return new UserInfoUserDetailsService();
     }**/
 
-
-
     @Bean
     public SecurityFilterChain filterChain1(HttpSecurity httpSecurity) throws Exception {
 
         // .requestMatchers("/user/**").access("hasAuthority('User') or hasAuthority('Admin')")
         //AbstractHttpConfigurer::disable
         httpSecurity.csrf( csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                .ignoringRequestMatchers("/addToCart"))
+                .ignoringRequestMatchers("/addToCart","/api/checkout/**",
+                        "https://bf9a-2a02-2788-2b8-3ad-61a6-2f05-76f9-f26f.ngrok-free.app/**"))
                 .authorizeHttpRequests( auth -> {
                     auth.requestMatchers("/images/**","/js/**","/webjars/**","/api/**","/panier/api/**","/favicon.ico/**").permitAll();
                     auth.requestMatchers("/favicon.ico","/panier/**","/viderPanier/**","/deleteElemPanier").permitAll();
                     auth.requestMatchers("/","/signup","/display/**", "/produit","/produit/**","/user/signup","/produit/nouveau","/auth/debug").permitAll() //changer nouveau produit
-                    .requestMatchers("/info-contact","/info-livraison","/info-retour","/info-utilisation","/info-confidentialite","/addToCart").permitAll()
+                    .requestMatchers("/info-contact","/info-livraison","/info-retour","/info-utilisation","/info-confidentialite","/addToCart","/checkout/success","/checkout/cancel").permitAll()
                         .requestMatchers("/admin/**").hasAuthority("Admin")
                             .requestMatchers("/user/**").hasAnyAuthority("User", "Employee", "Admin")
                                 .requestMatchers("/employee/**").hasAnyAuthority( "Employee", "Admin")

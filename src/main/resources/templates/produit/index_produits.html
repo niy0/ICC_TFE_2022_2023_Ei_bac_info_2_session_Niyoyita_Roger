@@ -10,6 +10,7 @@
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <link rel="icon" href="/favicon.ico" type="image/x-icon">
         <script src="js/script.js"></script>
+        <script src="https://js.stripe.com/v3/"></script>
         <!-- Balises meta pour le jeton CSRF -->
         <meta name="_csrf.parameterName" th:content="${_csrf.parameterName}" />
         <meta name="_csrf.token" th:content="${_csrf.token}" />
@@ -186,6 +187,20 @@
                     <a class="btn btn-outline-success mx-2" th:href="@{/produits/user}">User view produits</a>
                     <a class="btn btn-outline-success mx-2" th:href="@{/cat/allCat}">List catégorie</a>
                 </div>
+                <section>
+                    <div class="product">
+                        <img src="https://i.imgur.com/EHyR2nP.png" alt="The cover of Stubborn Attachments" />
+                        <div class="description">
+                            <h3>Stubborn Attachments</h3>
+                            <h5>$20.00</h5>
+                        </div>
+                    </div>
+                    <form action="/create-checkout-session2" method="POST">
+                        <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                        <button type="submit" id="checkout-button">Checkout</button>
+                    </form>
+
+                </section>
                 <div class="input-group">
                     <div id="search-autocomplete" class="form-outline">
                         <input type="search" id="form1" class="form-control" />

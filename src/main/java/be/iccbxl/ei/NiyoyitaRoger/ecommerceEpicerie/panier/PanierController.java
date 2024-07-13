@@ -89,18 +89,6 @@ public class PanierController {
 
         return "panier/panier";
     }
-/**
-    @GetMapping("/panier/{id}")
-    public String voirPanier(Model model, @PathVariable("id")long idPanier) {
-        String errorMessage = "";
-        Optional<Panier> panier = panierRepository.findById(idPanier);
-        if(panier.isPresent()) {
-            model.addAttribute("panier",panier.get());
-        }else {
-            errorMessage = "Panier introuvable";
-        }
-        return "panier/panier";
-    }**/
 
     @GetMapping("/panier/api/{id}")
     public ResponseEntity<Panier> getPanierById(Model model,@PathVariable("id") Long id) {
@@ -114,13 +102,6 @@ public class PanierController {
         }
     }
 
-    /**
-    @PostMapping("/deleteElemPanier")
-    public String deleteElementInPanier(@RequestParam("idPanier") String idPanier,
-                                        @RequestParam("idLigneDeCommande") String idLigneDeCommande){
-        panierService.deleteLigneDeCommandePanier(Long.parseLong(idPanier), Long.parseLong(idLigneDeCommande));
-        return "redirect:/panier";
-    }**/
 
     @PostMapping("/deleteElemPanier")
     public String deleteElementInPanier(@RequestParam("idPanier") String idPanier,
@@ -210,22 +191,6 @@ public class PanierController {
     }
 
 
-
-/**
-    @GetMapping("panier/show")
-    public String afficherPanier(Model model, HttpSession session) {
-        // Obtenez le panier de la session
-        Panier panier = (Panier) session.getAttribute("panier");
-
-        if (panier == null) {
-            panier = new Panier();
-            session.setAttribute("panier", panier);
-        }
-
-        model.addAttribute("panier", panier);
-        return "panier/show";
-    }**/
-
     @GetMapping("/panier/lignedecommande/api/{id}")
     public ResponseEntity<LigneDeCommande> getProduitInPanierById(@PathVariable Long id) {
         // Remplacez "ligneDeCommandeRepository" par le nom de votre repository de ligne de commande
@@ -312,8 +277,6 @@ public class PanierController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de l'ajout de la ligne de commande.");
         }
     }
-
-
 
     @PostMapping("/addToCart2")//modifier
     public String addToCart(@RequestParam("quantite")Integer qty, @RequestParam("produitId")Long productId ) {

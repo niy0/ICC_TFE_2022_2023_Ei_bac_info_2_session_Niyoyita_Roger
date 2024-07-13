@@ -1,73 +1,89 @@
 $(document).ready(function () {
-    var csrfToken = $("meta[name='_csrf']").attr("content");
-    var csrfHeader = $("meta[name='_csrf_header']").attr("content");
+    var checkoutButton = document.getElementById('checkout-button');
 
-    const stripe = Stripe('pk_test_51LUs5LDjQcavZkZrmoldBAz0GwZXQK4EYEHJDMs3NQiqYZAMdaKG8z1MF8kJmgOO1sKNFW2ZqG30JtRTG9BLoHU300IugCOShr');
+    if (checkoutButton) {
+        var csrfToken = $("meta[name='_csrf']").attr("content");
+        var csrfHeader = $("meta[name='_csrf_header']").attr("content");
 
-    const checkoutButton = document.getElementById('checkout-button');
+        const stripe = Stripe('pk_test_51LUs5LDjQcavZkZrmoldBAz0GwZXQK4EYEHJDMs3NQiqYZAMdaKG8z1MF8kJmgOO1sKNFW2ZqG30JtRTG9BLoHU300IugCOShr');
 
-    checkoutButton.addEventListener('click', function () {
-        fetch('/api/checkout/create-session', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').content
-            },
-            body: JSON.stringify({
-                items: [
-                    // Remplacez ceci par vos articles réels
-                    { name: 'Article 1', price: 1000, quantity: 2 },
-                    { name: 'Article 2', price: 2000, quantity: 1 }
-                ]
+        checkoutButton.addEventListener('click', function () {
+            console.log("Bouton Confirmer Panier cliqué.");
+
+            // Définir items ici
+            var items = [];
+            $('#cart-items tr').each(function () {
+                var item = {
+                    name: $(this).find('td[name="nom_produit"]').text(),
+                    price: parseFloat($(this).find('#prix-produit').text()) * 100, // Convertir en cents
+                    quantity: parseInt($(this).find('.quantity-input').val())
+                };
+                items.push(item);
+            });
+
+            console.log("Articles du panier:");
+            console.table(items); // Pour vérifier la structure des articles
+
+            fetch('/api/checkout/create-session', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify({ items: items })
             })
-        })
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (data) {
-            if (data.id) {
-                return stripe.redirectToCheckout({ sessionId: data.id });
-            } else {
-                throw new Error('Session ID non trouvé dans la réponse.');
-            }
-        })
-        .then(function (result) {
-            if (result.error) {
-                alert(result.error.message);
-            }
-        })
-        .catch(function (error) {
-            console.error('Error:', error);
-            alert('Une erreur est survenue lors de la création de la session de paiement. Veuillez réessayer.');
-        });
-    });
-
-
-    // Suppression du premier élément
-        $(document).on('click', '.delete-first-line', function(event) {
-            event.preventDefault();
-            var form = $(this).closest('form');
-            var panierId = form.find('input[name="idPanier"]').val();
-            var ligneDeCommandeId = form.find('input[name="idLigneDeCommande"]').val();
-
-            $.ajax({
-                url: '/deleteFirstElemPanier',
-                type: 'POST',
-                data: {
-                    idPanier: panierId,
-                    idLigneDeCommande: ligneDeCommandeId
-                },
-                beforeSend: function(xhr) {
-                    xhr.setRequestHeader(csrfHeader, csrfToken);
-                },
-                success: function(response) {
-                    location.reload();
-                },
-                error: function(xhr, status, error) {
-                    alert("Erreur lors de la suppression de la ligne de commande : " + error);
+            .then(function (response) {
+                if (!response.ok) {
+                    return response.json().then(err => {throw new Error('Network response was not ok: ' + err.message)});
                 }
+                return response.json();
+            })
+            .then(function (data) {
+                if (data.id) {
+                    return stripe.redirectToCheckout({ sessionId: data.id });
+                } else {
+                    throw new Error('Session ID non trouvé dans la réponse.');
+                }
+            })
+            .then(function (result) {
+                if (result.error) {
+                    alert(result.error.message);
+                }
+            })
+            .catch(function (error) {
+                console.error('Error:', error);
+                alert('Une erreur est survenue lors de la création de la session de paiement. Veuillez réessayer.');
             });
         });
+    } else {
+        console.log("Le bouton de paiement Stripe n'a pas été trouvé.");
+    }
+
+    // Suppression du premier élément
+    $(document).on('click', '.delete-first-line', function(event) {
+        event.preventDefault();
+        var form = $(this).closest('form');
+        var panierId = form.find('input[name="idPanier"]').val();
+        var ligneDeCommandeId = form.find('input[name="idLigneDeCommande"]').val();
+
+        $.ajax({
+            url: '/deleteFirstElemPanier',
+            type: 'POST',
+            data: {
+                idPanier: panierId,
+                idLigneDeCommande: ligneDeCommandeId
+            },
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(csrfHeader, csrfToken);
+            },
+            success: function(response) {
+                location.reload();
+            },
+            error: function(xhr, status, error) {
+                alert("Erreur lors de la suppression de la ligne de commande : " + error);
+            }
+        });
+    });
 
     // Fonction pour récupérer les lignes de commande du panier
     function getListLigneDeCommandePanier(panierId) {

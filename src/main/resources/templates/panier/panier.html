@@ -27,12 +27,12 @@
           <input type="hidden" th:value="${panier.id}" name="idPanier">
           <button type="submit" form="viderPanier" class="btn btn-primary">Vider Panier</button>
         </form>
-        <form id="confirmerPanier" th:action="@{/confirmerPanier}" method="post">
+        <form id="confirmerPanier" th:action="@{/api/checkout/create-session}" method="post" onsubmit="event.preventDefault(); createCheckoutSession();">
           <table class="table">
             <thead>
             <tr>
-              <th>Id Ligne de Commande</th>
-              <th>Id Panier</th>
+              <th hidden>Id Ligne de Commande</th>
+              <th hidden>Id Panier</th>
               <th>Numéro Article</th>
               <th>Image</th>
               <th>Nom Article</th>
@@ -44,25 +44,23 @@
             </thead>
             <tbody id="cart-items">
             <tr th:each="ligne, iterStat : ${panier.lignesDeCommande}" th:data-ligne-commande-id="${ligne.id}">
-              <td th:text="${ligne.id}" name="id_ligneDeCommande"></td>
-              <td th:text="${ligne.panier.id}" name="ligneDeCommandePanierId"></td>
+              <td th:text="${ligne.id}" name="id_ligneDeCommande" hidden></td>
+              <td th:text="${ligne.panier.id}" name="ligneDeCommandePanierId" hidden></td>
               <td th:text="${ligne.produit.id}" name="id_produit"></td>
               <td scope="row">
                 <img th:src="@{/display(id=${ligne.produit.id})}" alt="Image du produit" height="100px" />
               </td>
-              <td th:text="${ligne.produit.nom}">Nom du produit</td>
+              <td th:text="${ligne.produit.nom}" name="nom_produit">Nom du produit</td>
               <td th:text="${ligne.produit.prix}" id="prix-produit">Prix</td>
               <td>
                 <input type="number" th:value="${ligne.quantite}" min="1" class="form-control quantity-input"
                        th:data-product-id="${ligne.produit.id}" th:id="'quantite_' + ${ligne.produit.id}" style="width:85px;"/>
-                <!-- Élément pour afficher le message d'erreur avec la quantité maximale disponible -->
                 <div th:id="'error_' + ${ligne.produit.id}" class="text-danger" style="display: none;">
                   Quantité demandée non disponible en stock. Maximum : <span th:text="${ligne.produit.quantite}"></span>
                 </div>
               </td>
               <td id="total-produit" class="product-total" th:text="${ligne.produit.prix * ligne.quantite}">Total</td>
               <td>
-                <!-- Bouton pour déclencher le modal avec un ID unique -->
                 <button type="button" class="btn btn-outline-danger launch-modal" data-bs-toggle="modal"
                         th:attr="data-bs-target='#exampleModalCenter'+${ligne.id}"
                         th:data-id="${ligne.produit.id}" th:data-nom="${ligne.produit.nom}"
@@ -70,8 +68,6 @@
                         th:data-image-url="@{'/display?id=' + ${ligne.produit.id}}">
                   Supprimer du panier
                 </button>
-
-                <!-- Modal avec un ID unique -->
                 <div class="modal fade" th:id="'exampleModalCenter'+${ligne.id}" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                   <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
@@ -112,7 +108,7 @@
             </tr>
             </tfoot>
           </table>
-          <button type="button" id="confirmerPanierBtn" class="btn btn-primary" data-id="{id_de_la_ligne_de_commande}">
+          <button type="submit" id="checkout-button" class="btn btn-primary">
             <i class="bi bi-cart4"></i> Confirmer Panier
           </button>
         </form>
@@ -125,5 +121,11 @@
     </div>
   </div>
 </div>
+
+<!-- Inclure Stripe.js uniquement si nécessaire -->
+<script th:if="${not #lists.isEmpty(panier.lignesDeCommande)}" src="https://js.stripe.com/v3/"></script>
+<!-- Votre script -->
+<script src="js/script6.js"></script>
+
 </body>
 </html>
