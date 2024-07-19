@@ -20,49 +20,81 @@
 <div class="container mt-4">
     <div layout:fragment="content">
         <div class="mt-5">
-            <h2><i class="fas fa-info-circle"></i> Informations de Commande</h2>
+            <h2 class="custom-title"><i class="fas fa-info-circle"></i> Informations de Commande</h2>
             <form id="orderInfoForm" th:action="@{/api/checkout/confirm-order}" method="post">
                 <input type="hidden" th:value="${panier.id}" name="idPanierStripe">
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="firstName" class="form-label">Prénom</label>
                         <input type="text" class="form-control" id="firstName" name="firstName" th:value="${firstName}" required>
+                        <div class="invalid-feedback">Ce champ est requis.</div>
                     </div>
                     <div class="col-md-6">
                         <label for="lastName" class="form-label">Nom</label>
                         <input type="text" class="form-control" id="lastName" name="lastName" th:value="${lastName}" required>
+                        <div class="invalid-feedback">Ce champ est requis.</div>
                     </div>
                 </div>
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
                     <input type="email" class="form-control" id="email" name="email" th:value="${email}" required>
+                    <div class="invalid-feedback">Ce champ est requis.</div>
                 </div>
                 <div class="mb-3">
-                    <label for="address" class="form-label">Adresse</label>
-                    <input type="text" class="form-control" id="address" name="address" required>
+                    <label for="rue" class="form-label">Rue</label>
+                    <input type="text" class="form-control" id="rue" name="rue" required>
+                    <div class="invalid-feedback">Ce champ est requis.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="numero" class="form-label">Numéro</label>
+                    <input type="text" class="form-control" id="numero" name="numero" required>
+                    <div class="invalid-feedback">Ce champ est requis.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="localite" class="form-label">Localité</label>
+                    <input type="text" class="form-control" id="localite" name="localite">
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="city" class="form-label">Ville</label>
                         <input type="text" class="form-control" id="city" name="city" required>
+                        <div class="invalid-feedback">Ce champ est requis.</div>
                     </div>
                     <div class="col-md-6">
                         <label for="zip" class="form-label">Code Postal</label>
                         <input type="text" class="form-control" id="zip" name="zip" required>
+                        <div class="invalid-feedback">Ce champ est requis.</div>
                     </div>
+                </div>
+                <div class="mb-3">
+                    <label for="departement" class="form-label">Département</label>
+                    <input type="text" class="form-control" id="departement" name="departement">
                 </div>
                 <div class="mb-3">
                     <label for="country" class="form-label">Pays</label>
                     <input type="text" class="form-control" id="country" name="country" required>
+                    <div class="invalid-feedback">Ce champ est requis.</div>
                 </div>
+
+                <!-- Méthode de commande -->
+                <div class="mb-3">
+                    <h2 class="custom-title"><label for="orderMethod" class="form-label"><i class="fas fa-info-circle"></i> Méthode de commande</label></h2>
+                    <select class="form-select" id="orderMethod" name="orderMethod" required>
+                        <option value="" disabled selected>Sélectionnez une méthode</option>
+                        <option value="delivery">Livraison</option>
+                        <option value="pickup">Récupérer au magasin</option>
+                    </select>
+                    <div class="invalid-feedback">Ce champ est requis.</div>
+                </div>
+
                 <div class="d-flex justify-content-between">
-                    <button type="button" id="checkout-button" class="btn btn-primary">Confirmer la commande</button>
+                    <button type="submit" id="checkout-button" class="btn btn-primary" disabled>Confirmer la commande</button>
                     <a href="/panier" class="btn btn-secondary">Retour au panier</a>
                 </div>
             </form>
 
             <div th:if="${not #lists.isEmpty(panier.lignesDeCommande)}" class="mt-5">
-                <h3><i class="bi bi-cart-fill"></i>Résumer de la commande </h3>
+                <h3><i class="bi bi-cart-fill"></i>Résumé de la commande</h3>
                 <table class="table">
                     <thead>
                     <tr>
@@ -143,7 +175,6 @@
                     </tr>
                     </tfoot>
                 </table>
-
             </div>
             <div th:unless="${not #lists.isEmpty(panier.lignesDeCommande)}">
                 <p>Votre panier est vide.</p>
@@ -154,8 +185,5 @@
 
 <!-- Inclure Stripe.js uniquement si nécessaire -->
 <script src="https://js.stripe.com/v3/"></script>
-<!-- Votre script -->
+<!-- script -->
 <script src="/js/stripePayment.js"></script>
-
-</body>
-</html>

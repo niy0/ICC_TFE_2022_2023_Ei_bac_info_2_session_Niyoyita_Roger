@@ -2,9 +2,53 @@ $(document).ready(function () {
     var csrfToken = $("meta[name='_csrf']").attr("content");
     var csrfHeader = $("meta[name='_csrf_header']").attr("content");
 
+    // Fonction pour vérifier si tous les champs requis sont remplis
+    function validateForm() {
+        let isValid = true;
+        const requiredFields = document.querySelectorAll('#orderInfoForm [required]');
+
+        requiredFields.forEach(field => {
+            const errorDiv = field.nextElementSibling;
+            if (!field.value.trim()) {
+                errorDiv.style.display = 'block';
+                field.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                errorDiv.style.display = 'none';
+                field.classList.remove('is-invalid');
+            }
+        });
+
+        return isValid;
+    }
+
+    // Fonction pour activer/désactiver le bouton de soumission
+    function toggleSubmitButton() {
+        if (validateForm()) {
+            $('#checkout-button').prop('disabled', false);
+        } else {
+            $('#checkout-button').prop('disabled', true);
+        }
+    }
+
+    // Écouteurs d'événements pour valider le formulaire en temps réel
+    $('#orderInfoForm [required]').on('input', function () {
+        toggleSubmitButton();
+    });
+
+    // Initialiser le bouton de soumission à l'état désactivé
+    toggleSubmitButton();
+
     // Ajouter un écouteur d'événements au bouton de paiement Stripe
-    $('#checkout-button').on('click', function () {
+    $('#checkout-button').on('click', function (event) {
+        event.preventDefault(); // Empêcher la soumission par défaut du formulaire
+
         console.log("Bouton Confirmer Panier cliqué.");
+
+        // Valider le formulaire avant de continuer
+        if (!validateForm()) {
+            return; // Si le formulaire n'est pas valide, arrêter ici
+        }
 
         const stripe = Stripe('pk_test_51LUs5LDjQcavZkZrmoldBAz0GwZXQK4EYEHJDMs3NQiqYZAMdaKG8z1MF8kJmgOO1sKNFW2ZqG30JtRTG9BLoHU300IugCOShr');
 
@@ -53,7 +97,6 @@ $(document).ready(function () {
             alert('Une erreur est survenue lors de la création de la session de paiement. Veuillez réessayer.');
         });
     });
-
 
     // Suppression du premier élément
     $(document).on('click', '.delete-first-line', function(event) {
@@ -245,7 +288,7 @@ $(document).ready(function () {
         var idPanierval = parseInt(idPanier);
         getPanier(idPanierval, function(panier) {
             var total = panier.montantTotalPanier;
-            $('#panier-total').text(total.toFixed(2) ); //icicicicicicic
+            $('#panier-total').text(total.toFixed(2));
         });
     }
 
@@ -261,8 +304,6 @@ $(document).ready(function () {
         updateLigneDeCommande(ligneDeCommandeId, ligneDeCommandePanierId, quantity);
         updateLocalStorage();
     });
-
-
 
     // Fonction pour initialiser les quantités max des produits basées sur le stock
     function initialiserQuantitesMax() {
