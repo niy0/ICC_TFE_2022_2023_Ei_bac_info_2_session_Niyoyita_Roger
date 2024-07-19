@@ -65,6 +65,10 @@ public class Commande {
     @NotNull
     private StatutCommande statut;
 
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    private MethodCommande methodCommande;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateDerniereMajStatut;
 
@@ -74,14 +78,15 @@ public class Commande {
     protected Commande() {}
 
     // Constructors for different scenarios
-    public Commande(Panier panier) {
+    public Commande(Panier panier, MethodCommande methodCommande) {
         this.panier = panier;
         this.dateCommande = new Date();
         this.statut = StatutCommande.EN_COURS;
+        this.methodCommande = methodCommande;
     }
 
-    public Commande(User utilisateur, Panier panier) {
-        this(panier);
+    public Commande(User utilisateur, Panier panier, MethodCommande methodCommande) {
+        this(panier, methodCommande);
         this.utilisateur = utilisateur;
         this.prenom = utilisateur.getPrenom();
         this.nom = utilisateur.getNom();
@@ -95,8 +100,8 @@ public class Commande {
         this.pays = utilisateur.getAdresse().getPays();
     }
 
-    public Commande(String prenom, String nom, String email, String rue, String numero, String localite, String ville, String codePostal, String departement, String pays, Panier panier) {
-        this(panier);
+    public Commande(String prenom, String nom, String email, String rue, String numero, String localite, String ville, String codePostal, String departement, String pays, Panier panier, MethodCommande methodCommande) {
+        this(panier, methodCommande);
         this.prenom = prenom;
         this.nom = nom;
         this.email = email;
@@ -109,8 +114,8 @@ public class Commande {
         this.pays = pays;
     }
 
-    public Commande(Adresse adresse, String email, Panier panier) {
-        this(panier);
+    public Commande(Adresse adresse, String email, Panier panier, MethodCommande methodCommande) {
+        this(panier, methodCommande);
         this.prenom = adresse.getPrenom();
         this.nom = adresse.getNom();
         this.email = email;
@@ -238,6 +243,14 @@ public class Commande {
 
     public void setStatut(StatutCommande statut) {
         this.statut = statut;
+    }
+
+    public MethodCommande getMethodCommande() {
+        return methodCommande;
+    }
+
+    public void setMethodCommande(MethodCommande methodCommande) {
+        this.methodCommande = methodCommande;
     }
 
     public Date getDateDerniereMajStatut() {
