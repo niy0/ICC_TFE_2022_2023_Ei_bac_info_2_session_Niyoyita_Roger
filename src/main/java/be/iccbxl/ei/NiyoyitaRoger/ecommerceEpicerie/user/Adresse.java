@@ -2,6 +2,7 @@ package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -11,7 +12,6 @@ public class Adresse {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
     @Size(max = 50)
     private String localite;
 
@@ -27,11 +27,26 @@ public class Adresse {
     @Size(max = 10)
     private String codePostal;
 
-    @NotNull
     @Size(max = 50)
     private String departement;
 
-    // Autres propriétés de l'adresse
+    @NotNull
+    @Size(max = 50)
+    private String ville;
+
+    @NotNull
+    @Size(max = 50)
+    private String pays;
+
+    @NotNull
+    @NotBlank
+    @Size(max = 50)
+    private String nom;
+
+    @NotNull
+    @NotBlank
+    @Size(max = 50)
+    private String prenom;
 
     @JsonIgnore
     @ManyToOne
@@ -85,6 +100,38 @@ public class Adresse {
         this.departement = departement;
     }
 
+    public String getVille() {
+        return ville;
+    }
+
+    public void setVille(String ville) {
+        this.ville = ville;
+    }
+
+    public String getPays() {
+        return pays;
+    }
+
+    public void setPays(String pays) {
+        this.pays = pays;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public String getPrenom() {
+        return prenom;
+    }
+
+    public void setPrenom(String prenom) {
+        this.prenom = prenom;
+    }
+
     public User getUtilisateur() {
         return utilisateur;
     }
@@ -102,7 +149,10 @@ public class Adresse {
                 ", numero='" + numero + '\'' +
                 ", codePostal='" + codePostal + '\'' +
                 ", departement='" + departement + '\'' +
+                ", ville='" + ville + '\'' +
+                ", pays='" + pays + '\'' +
+                ", nom='" + nom + '\'' +
+                ", prenom='" + prenom + '\'' +
                 '}';
     }
 }
-

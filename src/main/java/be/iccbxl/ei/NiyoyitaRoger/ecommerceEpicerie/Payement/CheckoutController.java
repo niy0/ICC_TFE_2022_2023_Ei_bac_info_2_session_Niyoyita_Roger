@@ -19,7 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/checkout")
-@CrossOrigin(origins = "${cors.allowedOrigins}") 
+@CrossOrigin(origins = "${cors.allowedOrigins}")
 public class CheckoutController {
 
     @Autowired
@@ -35,8 +35,8 @@ public class CheckoutController {
         SessionCreateParams.Builder paramsBuilder = SessionCreateParams.builder()
                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl("https://bf9a-2a02-2788-2b8-3ad-61a6-2f05-76f9-f26f.ngrok-free.app/checkout/success")
-                .setCancelUrl("https://bf9a-2a02-2788-2b8-3ad-61a6-2f05-76f9-f26f.ngrok-free.app/checkout/cancel");
+                .setSuccessUrl("http://localhost:8080/checkout/success")
+                .setCancelUrl("http://localhost:8080/checkout/cancel");
 
         for (CheckoutItem item : checkoutRequest.getItems()) {
             paramsBuilder.addLineItem(

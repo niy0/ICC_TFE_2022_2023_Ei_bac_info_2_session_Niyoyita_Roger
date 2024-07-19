@@ -2,62 +2,76 @@ $(document).ready(function () {
     var checkoutButton = document.getElementById('checkout-button');
 
     if (checkoutButton) {
-        var csrfToken = $("meta[name='_csrf']").attr("content");
-        var csrfHeader = $("meta[name='_csrf_header']").attr("content");
+            var csrfToken = $("meta[name='_csrf']").attr("content");
+            var csrfHeader = $("meta[name='_csrf_header']").attr("content");
 
-        const stripe = Stripe('pk_test_51LUs5LDjQcavZkZrmoldBAz0GwZXQK4EYEHJDMs3NQiqYZAMdaKG8z1MF8kJmgOO1sKNFW2ZqG30JtRTG9BLoHU300IugCOShr');
+            const stripe = Stripe('pk_test_51LUs5LDjQcavZkZrmoldBAz0GwZXQK4EYEHJDMs3NQiqYZAMdaKG8z1MF8kJmgOO1sKNFW2ZqG30JtRTG9BLoHU300IugCOShr');
 
-        checkoutButton.addEventListener('click', function () {
-            console.log("Bouton Confirmer Panier cliqué.");
+            checkoutButton.addEventListener('click', function () {
+                console.log("Bouton Confirmer Panier cliqué.");
 
-            // Définir items ici
-            var items = [];
-            $('#cart-items tr').each(function () {
-                var item = {
-                    name: $(this).find('td[name="nom_produit"]').text(),
-                    price: parseFloat($(this).find('#prix-produit').text()) * 100, // Convertir en cents
-                    quantity: parseInt($(this).find('.quantity-input').val())
-                };
-                items.push(item);
+                // Définir items ici
+                var items = [];
+                $('#cart-items tr').each(function () {
+                    var item = {
+                        name: $(this).find('td[name="nom_produit"]').text(),
+                        price: parseFloat($(this).find('#prix-produit').text()) * 100, // Convertir en cents
+                        quantity: parseInt($(this).find('.quantity-input').val())
+                    };
+                    items.push(item);
+                });
+
+                console.log("Articles du panier:");
+                console.table(items); // Pour vérifier la structure des articles
+
+                fetch('/api/checkout/create-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        [csrfHeader]: csrfToken
+                    },
+                    body: JSON.stringify({ items: items })
+                })
+                .then(function (response) {
+                    if (!response.ok) {
+                        return response.json().then(err => {throw new Error('Network response was not ok: ' + err.message)});
+                    }
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (data.id) {
+                        return stripe.redirectToCheckout({ sessionId: data.id });
+                    } else {
+                        throw new Error('Session ID non trouvé dans la réponse.');
+                    }
+                })
+                .then(function (result) {
+                    if (result.error) {
+                        alert(result.error.message);
+                    }
+                })
+                .catch(function (error) {
+                    console.error('Error:', error);
+                    alert('Une erreur est survenue lors de la création de la session de paiement. Veuillez réessayer.');
+                });
             });
+        } else {
+            console.log("Le bouton de paiement Stripe n'a pas été trouvé.");
+        }
 
-            console.log("Articles du panier:");
-            console.table(items); // Pour vérifier la structure des articles
+    $('#cart-items tr').each(function () {
+        var name = $(this).find('td[name="id_produit"]').text();
+        var price = parseFloat($(this).find('#prix-produit').text()) * 100; // Convertir en cents
+        var quantity = parseInt($(this).find('.quantity-input').val());
+        console.log("Nom:", name, "Prix:", price, "Quantité:", quantity);
 
-            fetch('/api/checkout/create-session', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    [csrfHeader]: csrfToken
-                },
-                body: JSON.stringify({ items: items })
-            })
-            .then(function (response) {
-                if (!response.ok) {
-                    return response.json().then(err => {throw new Error('Network response was not ok: ' + err.message)});
-                }
-                return response.json();
-            })
-            .then(function (data) {
-                if (data.id) {
-                    return stripe.redirectToCheckout({ sessionId: data.id });
-                } else {
-                    throw new Error('Session ID non trouvé dans la réponse.');
-                }
-            })
-            .then(function (result) {
-                if (result.error) {
-                    alert(result.error.message);
-                }
-            })
-            .catch(function (error) {
-                console.error('Error:', error);
-                alert('Une erreur est survenue lors de la création de la session de paiement. Veuillez réessayer.');
-            });
-        });
-    } else {
-        console.log("Le bouton de paiement Stripe n'a pas été trouvé.");
-    }
+        var item = {
+            name: name,
+            price: price,
+            quantity: quantity
+        };
+        items.push(item);
+    });
 
     // Suppression du premier élément
     $(document).on('click', '.delete-first-line', function(event) {

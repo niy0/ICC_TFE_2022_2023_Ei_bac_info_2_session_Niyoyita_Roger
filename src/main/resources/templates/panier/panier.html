@@ -24,10 +24,11 @@
       <h2><i class="bi bi-cart-fill"></i> Mon panier</h2>
       <div th:if="${not #lists.isEmpty(panier.lignesDeCommande)}">
         <form id="viderPanier" th:action="@{/viderPanier}" method="post">
-          <input type="hidden" th:value="${panier.id}" name="idPanier">
+          <input type="hidden"  th:value="${panier.id}" name="idPanier">
           <button type="submit" form="viderPanier" class="btn btn-primary">Vider Panier</button>
         </form>
-        <form id="confirmerPanier" th:action="@{/api/checkout/create-session}" method="post" onsubmit="event.preventDefault(); createCheckoutSession();">
+        <form id="confirmerPanier" th:action="@{/checkout/infos_de_commande(idPanierStripe=${panier.id})}" method="get">
+          <input type="hidden" th:value="${panier.id}" name="idPanierStripe">
           <table class="table">
             <thead>
             <tr>
@@ -48,7 +49,7 @@
               <td th:text="${ligne.panier.id}" name="ligneDeCommandePanierId" hidden></td>
               <td th:text="${ligne.produit.id}" name="id_produit"></td>
               <td scope="row">
-                <img th:src="@{/display(id=${ligne.produit.id})}" alt="Image du produit" height="100px" />
+                <img th:src="@{/display(id=${ligne.produit.id})}" alt="Image du produit" height="100px"/>
               </td>
               <td th:text="${ligne.produit.nom}" name="nom_produit">Nom du produit</td>
               <td th:text="${ligne.produit.prix}" id="prix-produit">Prix</td>
@@ -108,7 +109,7 @@
             </tr>
             </tfoot>
           </table>
-          <button type="submit" id="checkout-button" class="btn btn-primary">
+          <button type="submit" class="btn btn-primary" id="confirmerPanier'">
             <i class="bi bi-cart4"></i> Confirmer Panier
           </button>
         </form>

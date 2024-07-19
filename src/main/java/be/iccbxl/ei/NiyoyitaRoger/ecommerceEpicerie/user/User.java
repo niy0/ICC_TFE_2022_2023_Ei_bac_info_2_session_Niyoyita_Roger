@@ -46,8 +46,8 @@ public class User implements Serializable {
     @Size(max = 15 , message = "La taille du numéro de téléphone doit être de 15 caractères maximum.")
     private String Telephone;
 
-    @OneToMany(mappedBy = "utilisateur", cascade = CascadeType.ALL)
-    private List<Adresse> adresses = new ArrayList<>();
+    @OneToOne(mappedBy = "utilisateur", cascade = CascadeType.ALL)
+    private Adresse adresse;
 
     @Column(name = "date_creation")
     private LocalDateTime dateCreation;
@@ -169,12 +169,12 @@ public class User implements Serializable {
         Telephone = telephone;
     }
 
-    public List<Adresse> getAdresses() {
-        return adresses;
+    public Adresse getAdresse() {
+        return adresse;
     }
 
-    public void setAdresses(List<Adresse> adresses) {
-        this.adresses = adresses;
+    public void setAdresse(Adresse adresses) {
+        this.adresse = adresses;
     }
 
     public Set<Role> getRoles() {
@@ -209,24 +209,6 @@ public class User implements Serializable {
         this.sexe = sexe;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "Id=" + Id +
-                ", Nom='" + Nom + '\'' +
-                ", Prenom='" + Prenom + '\'' +
-                ", Email='" + Email + '\'' +
-                ", Password='" + Password + '\'' +
-                ", isLoggedIn=" + isLoggedIn +
-                ", Telephone='" + Telephone + '\'' +
-                ", adresses=" + adresses +
-                ", roles=" + roles +
-                ", commandes=" + commandes +
-                ", produitsFavoris=" + produitsFavoris +
-                ", sexe=" + sexe +
-                '}';
-    }
-
     public LocalDateTime getDateCreation() {
         return dateCreation;
     }
@@ -241,6 +223,27 @@ public class User implements Serializable {
 
     public void setDateModification(LocalDateTime dateModification) {
         this.dateModification = dateModification;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "Id=" + Id +
+                ", Nom='" + Nom + '\'' +
+                ", Prenom='" + Prenom + '\'' +
+                ", Email='" + Email + '\'' +
+                ", Password='" + Password + '\'' +
+                ", isLoggedIn=" + isLoggedIn +
+                ", Telephone='" + Telephone + '\'' +
+                ", adresse=" + adresse +
+                ", dateCreation=" + dateCreation +
+                ", dateModification=" + dateModification +
+                ", roles=" + roles +
+                ", commandes=" + commandes +
+                ", produitsFavoris=" + produitsFavoris +
+                ", panier=" + panier.getId() +
+                ", sexe=" + sexe +
+                '}';
     }
 }
 
