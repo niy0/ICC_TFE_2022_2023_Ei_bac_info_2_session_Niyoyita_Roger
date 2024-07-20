@@ -78,7 +78,9 @@ public class PanierController {
 
     @GetMapping("/panier")
     public String showPanier(Model model, Principal principal, HttpSession session) {
-        Panier panier = getOrCreatePanier(principal, session);
+       // Panier panier = getOrCreatePanier(principal, session);
+        Panier panier = panierService.getOrCreatePanier(principal,session);
+
 
         BigDecimal montantTotal = panier.getLignesDeCommande().stream()
                 .map(ligne -> ligne.getProduit().getPrix().multiply(new BigDecimal(ligne.getQuantite())))
@@ -152,13 +154,15 @@ public class PanierController {
         return "redirect:/confirmation";
     }
 
+    /**
     private Panier getOrCreatePanier(Principal principal, HttpSession session) {
         if (principal != null) {
-            return getOrCreateAuthenticatedUserPanier(principal, session);
+            return panierService.getOrCreateAuthenticatedUserPanier(principal, session);
         } else {
-            return getOrCreateSessionPanier(session);
+            return panierService.getOrCreateSessionPanier(session);
         }
     }
+
 
     private Panier getOrCreateAuthenticatedUserPanier(Principal principal, HttpSession session) {
         CustomUserDetails customUserDetails = (CustomUserDetails) ((UsernamePasswordAuthenticationToken) principal).getPrincipal();
@@ -174,6 +178,7 @@ public class PanierController {
         return panier;
     }
 
+
     private Panier getOrCreateSessionPanier(HttpSession session) {
         Long panierId = (Long) session.getAttribute("panierTemporaireId");
         Panier panier;
@@ -188,7 +193,7 @@ public class PanierController {
         }
 
         return panier;
-    }
+    }**/
 
 
     @GetMapping("/panier/lignedecommande/api/{id}")

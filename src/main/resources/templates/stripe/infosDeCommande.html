@@ -25,13 +25,13 @@
                 <input type="hidden" th:value="${panier.id}" name="idPanierStripe">
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="firstName" class="form-label">Prénom</label>
-                        <input type="text" class="form-control" id="firstName" name="firstName" th:value="${firstName}" required>
+                        <label for="prenom" class="form-label">Prénom</label>
+                        <input type="text" class="form-control" id="prenom" name="prenom" th:value="${firstName}" required>
                         <div class="invalid-feedback">Ce champ est requis.</div>
                     </div>
                     <div class="col-md-6">
-                        <label for="lastName" class="form-label">Nom</label>
-                        <input type="text" class="form-control" id="lastName" name="lastName" th:value="${lastName}" required>
+                        <label for="nom" class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="nom" name="nom" th:value="${lastName}" required>
                         <div class="invalid-feedback">Ce champ est requis.</div>
                     </div>
                 </div>
@@ -56,13 +56,13 @@
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="city" class="form-label">Ville</label>
-                        <input type="text" class="form-control" id="city" name="city" required>
+                        <label for="ville" class="form-label">Ville</label>
+                        <input type="text" class="form-control" id="ville" name="ville" required>
                         <div class="invalid-feedback">Ce champ est requis.</div>
                     </div>
                     <div class="col-md-6">
-                        <label for="zip" class="form-label">Code Postal</label>
-                        <input type="text" class="form-control" id="zip" name="zip" required>
+                        <label for="codePostal" class="form-label">Code Postal</label>
+                        <input type="text" class="form-control" id="codePostal" name="codePostal" required>
                         <div class="invalid-feedback">Ce champ est requis.</div>
                     </div>
                 </div>
@@ -71,18 +71,18 @@
                     <input type="text" class="form-control" id="departement" name="departement">
                 </div>
                 <div class="mb-3">
-                    <label for="country" class="form-label">Pays</label>
-                    <input type="text" class="form-control" id="country" name="country" required>
+                    <label for="pays" class="form-label">Pays</label>
+                    <input type="text" class="form-control" id="pays" name="pays" required>
                     <div class="invalid-feedback">Ce champ est requis.</div>
                 </div>
 
                 <!-- Méthode de commande -->
                 <div class="mb-3">
-                    <h2 class="custom-title"><label for="orderMethod" class="form-label"><i class="fas fa-info-circle"></i> Méthode de commande</label></h2>
-                    <select class="form-select" id="orderMethod" name="orderMethod" required>
+                    <h2 class="custom-title"><label for="methodCommande" class="form-label"><i class="fas fa-info-circle"></i> Méthode de commande</label></h2>
+                    <select class="form-select" id="methodCommande" name="methodCommande" required>
                         <option value="" disabled selected>Sélectionnez une méthode</option>
-                        <option value="delivery">Livraison</option>
-                        <option value="pickup">Récupérer au magasin</option>
+                        <option value="DELIVERY">Livraison</option>
+                        <option value="PICKUP">Récupérer au magasin</option>
                     </select>
                     <div class="invalid-feedback">Ce champ est requis.</div>
                 </div>
@@ -182,8 +182,7 @@
         </div>
     </div>
 </div>
-
 <!-- Inclure Stripe.js uniquement si nécessaire -->
 <script src="https://js.stripe.com/v3/"></script>
-<!-- script -->
-<script src="/js/stripePayment.js"></script>
+</body>
+</html>

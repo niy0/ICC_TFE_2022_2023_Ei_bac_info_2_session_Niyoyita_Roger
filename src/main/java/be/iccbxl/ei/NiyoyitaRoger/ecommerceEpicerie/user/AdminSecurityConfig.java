@@ -91,7 +91,7 @@ public class AdminSecurityConfig {
                         "https://bf9a-2a02-2788-2b8-3ad-61a6-2f05-76f9-f26f.ngrok-free.app/**"))
                 .authorizeHttpRequests( auth -> {
                     auth.requestMatchers("/images/**","/js/**","/webjars/**","/api/**","/panier/api/**","/favicon.ico/**").permitAll();
-                    auth.requestMatchers("/favicon.ico","/panier/**","/viderPanier/**","/deleteElemPanier").permitAll();
+                    auth.requestMatchers("/favicon.ico","/panier/**","/viderPanier/**","/deleteElemPanier","/commandes","/commande/**").permitAll();
                     auth.requestMatchers("/","/display/**", "/produit","/produit/**","/user/signup","/produit/nouveau","/auth/debug").permitAll() //changer nouveau produit
                     .requestMatchers("/info-contact","/info-livraison","/info-retour","/info-utilisation","/info-confidentialite","/addToCart").permitAll()
                             .requestMatchers("/checkout/infos_de_commande/**","/checkout/success","/checkout/cancel").permitAll()

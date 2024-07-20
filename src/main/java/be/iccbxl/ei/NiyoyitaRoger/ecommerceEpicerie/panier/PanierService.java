@@ -15,7 +15,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import jakarta.servlet.http.HttpSession;
 import java.math.BigDecimal;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -162,33 +164,6 @@ public class PanierService {
         }
     }
 
-    // Implémentez la logique pour récupérer le panier actif de l'utilisateur
-    public Panier getPanierActifDeLUtilisateur() throws UserEmailNotFoundException {
-        // Obtenez l'utilisateur authentifié
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        if (principal instanceof UserDetails) {
-            String username = ((UserDetails) principal).getUsername();
-            User user = userRepository.findByEmail(username);
-
-            if (user == null) {
-                throw new UserEmailNotFoundException("Aucun utilisateur authentifié trouvé.");
-            }
-
-            // Récupérez le panier actif de l'utilisateur
-            Panier panier = panierRepository.getPanierUser(user.getId());
-
-            if (panier != null) {
-                // Effectuez des opérations avec le panier
-                return panier;
-            } else {
-                throw new PanierNotFoundException("Aucun panier actif trouvé pour l'utilisateur.");
-            }
-
-        } else {
-            throw new UserEmailNotFoundException("Aucun utilisateur authentifié trouvé.");
-        }
-    }
 
     // Ajoutez des méthodes pour gérer le panier, par exemple, ajouter, mettre à jour, supprimer, etc.
 
@@ -264,5 +239,37 @@ public class PanierService {
             return true;
         }
         return false;
+    }
+
+    public Panier getOrCreatePanier(Principal principal, HttpSession session) {
+        if (principal != null) {
+            return getOrCreateAuthenticatedUserPanier(principal, session);
+        } else {
+            return getOrCreateSessionPanier(session);
+        }
+    }
+
+    public Panier getOrCreateAuthenticatedUserPanier(Principal principal, HttpSession session) {
+        // Logique pour récupérer ou créer un panier pour un utilisateur authentifié
+        User user = userRepository.findByEmail(principal.getName());
+        if (user.getPanier() == null) {
+            Panier panier = new Panier();
+            panier.setUtilisateur(user);
+            this.createPanier(panier);//a été modifier
+            user.setPanier(panier);
+            userRepository.save(user);
+        }
+        return user.getPanier();
+    }
+
+    public Panier getOrCreateSessionPanier(HttpSession session) {
+        // Logique pour récupérer ou créer un panier pour un utilisateur non authentifié
+        Panier panier = (Panier) session.getAttribute("panier");
+        if (panier == null) {
+            panier = new Panier();
+            panierRepository.save(panier);
+            session.setAttribute("panier", panier);
+        }
+        return panier;
     }
 }

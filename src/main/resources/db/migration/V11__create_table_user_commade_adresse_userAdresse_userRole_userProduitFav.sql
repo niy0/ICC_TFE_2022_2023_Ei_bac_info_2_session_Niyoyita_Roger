@@ -71,7 +71,9 @@ CREATE TABLE `commande` (
     `date_commande` datetime NOT NULL,
     `panier_id` bigint(20) NOT NULL,
     `statut` varchar(20) NOT NULL,
+    `method_commande` ENUM('DELIVERY', 'PICKUP') NOT NULL,
     `date_derniere_maj_statut` datetime,
+    `montant_commande` DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     FOREIGN KEY (`user_id`) REFERENCES `user` (`id`),
     FOREIGN KEY (`panier_id`) REFERENCES `panier` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

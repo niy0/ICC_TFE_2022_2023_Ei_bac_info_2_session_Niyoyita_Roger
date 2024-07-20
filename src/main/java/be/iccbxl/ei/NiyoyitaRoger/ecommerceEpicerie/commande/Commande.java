@@ -1,6 +1,5 @@
 package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.commande;
 
-import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.ligneDeCommande.LigneDeCommande;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.Panier;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.Adresse;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.User;
@@ -10,6 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -75,6 +75,9 @@ public class Commande {
     @OneToMany(mappedBy = "commande", cascade = CascadeType.ALL)
     private List<ChangementStatutCommande> historiqueStatuts;
 
+    @NotNull
+    private BigDecimal montantCommande;
+
     protected Commande() {}
 
     // Constructors for different scenarios
@@ -83,6 +86,7 @@ public class Commande {
         this.dateCommande = new Date();
         this.statut = StatutCommande.EN_COURS;
         this.methodCommande = methodCommande;
+        this.montantCommande = panier.getMontantTotalPanier();
     }
 
     public Commande(User utilisateur, Panier panier, MethodCommande methodCommande) {
@@ -267,5 +271,38 @@ public class Commande {
 
     public void setHistoriqueStatuts(List<ChangementStatutCommande> historiqueStatuts) {
         this.historiqueStatuts = historiqueStatuts;
+    }
+
+    public BigDecimal getMontantCommande() {
+        return montantCommande;
+    }
+
+    public void setMontantCommande(BigDecimal montantCommande) {
+        this.montantCommande = montantCommande;
+    }
+
+    @Override
+    public String toString() {
+        return "Commande{" +
+                "id=" + id +
+                ", utilisateur=" + utilisateur +
+                ", prenom='" + prenom + '\'' +
+                ", nom='" + nom + '\'' +
+                ", email='" + email + '\'' +
+                ", rue='" + rue + '\'' +
+                ", numero='" + numero + '\'' +
+                ", localite='" + localite + '\'' +
+                ", ville='" + ville + '\'' +
+                ", codePostal='" + codePostal + '\'' +
+                ", departement='" + departement + '\'' +
+                ", pays='" + pays + '\'' +
+                ", dateCommande=" + dateCommande +
+                ", panier=" + panier.getId() +
+                ", statut=" + statut +
+                ", methodCommande=" + methodCommande.name() +
+                ", dateDerniereMajStatut=" + dateDerniereMajStatut +
+                ", historiqueStatuts=" + historiqueStatuts +
+                ", montantCommande=" + montantCommande +
+                '}';
     }
 }

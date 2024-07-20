@@ -2,7 +2,6 @@ $(document).ready(function () {
     var csrfToken = $("meta[name='_csrf']").attr("content");
     var csrfHeader = $("meta[name='_csrf_header']").attr("content");
 
-    // Fonction pour vérifier si tous les champs requis sont remplis
     function validateForm() {
         let isValid = true;
         const requiredFields = document.querySelectorAll('#orderInfoForm [required]');
@@ -22,7 +21,6 @@ $(document).ready(function () {
         return isValid;
     }
 
-    // Fonction pour activer/désactiver le bouton de soumission
     function toggleSubmitButton() {
         if (validateForm()) {
             $('#checkout-button').prop('disabled', false);
@@ -31,40 +29,49 @@ $(document).ready(function () {
         }
     }
 
-    // Écouteurs d'événements pour valider le formulaire en temps réel
     $('#orderInfoForm [required]').on('input', function () {
         toggleSubmitButton();
     });
 
-    // Initialiser le bouton de soumission à l'état désactivé
     toggleSubmitButton();
 
-    // Ajouter un écouteur d'événements au bouton de paiement Stripe
     $('#checkout-button').on('click', function (event) {
-        event.preventDefault(); // Empêcher la soumission par défaut du formulaire
+        event.preventDefault();
 
-        console.log("Bouton Confirmer Panier cliqué.");
-
-        // Valider le formulaire avant de continuer
         if (!validateForm()) {
-            return; // Si le formulaire n'est pas valide, arrêter ici
+            return;
         }
 
         const stripe = Stripe('pk_test_51LUs5LDjQcavZkZrmoldBAz0GwZXQK4EYEHJDMs3NQiqYZAMdaKG8z1MF8kJmgOO1sKNFW2ZqG30JtRTG9BLoHU300IugCOShr');
 
-        // Définir items ici
         var items = [];
         $('#cart-items tr').each(function () {
             var item = {
                 name: $(this).find('td[name="nom_produit"]').text(),
-                price: parseFloat($(this).find('#prix-produit').text()) * 100, // Convertir en cents
+                price: parseFloat($(this).find('#prix-produit').text()) * 100,
                 quantity: parseInt($(this).find('.quantity-input').val())
             };
             items.push(item);
         });
 
-        console.log("Articles du panier:");
-        console.table(items); // Pour vérifier la structure des articles
+        var orderInfo = {
+            firstName: $('#prenom').val(),
+            lastName: $('#nom').val(),
+            email: $('#email').val(),
+            rue: $('#rue').val(),
+            numero: $('#numero').val(),
+            localite: encodeURIComponent($('#localite').val()),
+            ville: encodeURIComponent($('#ville').val()),
+            codePostal: encodeURIComponent($('#codePostal').val()),
+            departement: encodeURIComponent($('#departement').val()),
+            pays: encodeURIComponent($('#pays').val()),
+            orderMethod: $('#methodCommande').val(),
+            idPanierStripe: $('#orderInfoForm input[name="idPanierStripe"]').val(),
+            montantCommande: $('#panier-total').text().replace(' €', '')
+        };
+
+        console.log("Order Info: ", orderInfo);
+        alert("Order Info:\n" + JSON.stringify(orderInfo, null, 2));
 
         fetch('/api/checkout/create-session', {
             method: 'POST',
@@ -72,7 +79,7 @@ $(document).ready(function () {
                 'Content-Type': 'application/json',
                 [csrfHeader]: csrfToken
             },
-            body: JSON.stringify({ items: items })
+            body: JSON.stringify({ items: items, orderInfo: orderInfo })
         })
         .then(function (response) {
             if (!response.ok) {
@@ -96,9 +103,11 @@ $(document).ready(function () {
             console.error('Error:', error);
             alert('Une erreur est survenue lors de la création de la session de paiement. Veuillez réessayer.');
         });
+
+        // Prevent form submission for testing
+        return false;
     });
 
-    // Suppression du premier élément
     $(document).on('click', '.delete-first-line', function(event) {
         event.preventDefault();
         var form = $(this).closest('form');
@@ -124,7 +133,6 @@ $(document).ready(function () {
         });
     });
 
-    // Fonction pour récupérer les lignes de commande du panier
     function getListLigneDeCommandePanier(panierId) {
         var panierIdValue = parseInt(panierId);
         var totalPanier = 0.0;
@@ -150,7 +158,6 @@ $(document).ready(function () {
                         $("#cart-items").append(newRow);
                     });
                 }
-                // Mettre à jour le total du panier
                 $("#panier-total").text(totalPanier.toFixed(2) + ' €');
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -160,7 +167,6 @@ $(document).ready(function () {
         });
     }
 
-    // Fonction pour ajouter un produit au panier
     function addToCart(produitId) {
         var produitIdValue = parseInt(produitId);
         if (isNaN(produitIdValue)) {
@@ -213,7 +219,6 @@ $(document).ready(function () {
         quantiteInput.val(1);
     }
 
-    // Fonction pour récupérer le panier en spécifiant l'ID du panier
     function getPanier(idPanier, callback) {
         var idPanierval = parseInt(idPanier);
 
@@ -238,7 +243,6 @@ $(document).ready(function () {
         });
     }
 
-    // Suppression d'une ligne de commande
     $(document).on('click', '.delete-line', function(event) {
         event.preventDefault();
         var form = $(this).closest('form');
@@ -259,7 +263,6 @@ $(document).ready(function () {
         });
     });
 
-    // Fonction pour mettre à jour une ligne de commande
     function updateLigneDeCommande(ligneDeCommandeId, ligneDeCommandePanierId, nouvelleQuantite) {
         $.ajax({
             url: '/lignedecommande/update',
@@ -283,7 +286,6 @@ $(document).ready(function () {
         });
     }
 
-    // Fonction pour mettre à jour le total du panier
     function updateCartTotal(idPanier) {
         var idPanierval = parseInt(idPanier);
         getPanier(idPanierval, function(panier) {
@@ -304,7 +306,6 @@ $(document).ready(function () {
         updateLigneDeCommande(ligneDeCommandeId, ligneDeCommandePanierId, quantity);
     });
 
-    // Fonction pour initialiser les quantités max des produits basées sur le stock
     function initialiserQuantitesMax() {
         $('.quantity-input').each(function() {
             var produitId = $(this).data('product-id');
@@ -312,7 +313,6 @@ $(document).ready(function () {
         });
     }
 
-    // Fonction pour obtenir la quantité maximale d'un produit
     function getQuantiteProduit(produitId, inputElement) {
         $.ajax({
             type: "GET",
@@ -331,7 +331,6 @@ $(document).ready(function () {
 
     initialiserQuantitesMax();
 
-    // Fonction pour obtenir les détails du produit, y compris la quantité mise à jour
     function getProduitDetails(produitId) {
         var produitIdValue = parseInt(produitId);
 
