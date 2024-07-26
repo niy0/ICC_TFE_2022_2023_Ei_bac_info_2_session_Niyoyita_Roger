@@ -66,7 +66,7 @@ $(document).ready(function () {
             departement: encodeURIComponent($('#departement').val()),
             pays: encodeURIComponent($('#pays').val()),
             orderMethod: $('#methodCommande').val(),
-            idPanierStripe: $('#orderInfoForm input[name="idPanierStripe"]').val(),
+            idPanierStripe: $('#idPanierStripe').val(),
             montantCommande: $('#panier-total').text().replace(' €', '')
         };
 

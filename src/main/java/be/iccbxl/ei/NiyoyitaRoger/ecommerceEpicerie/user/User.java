@@ -18,33 +18,33 @@ public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
 
-    @NotEmpty(message = "Le nom doit contenir minimum 2 lettre.")
+    @NotEmpty(message = "Le nom doit contenir minimum 2 lettres.")
     @NotBlank
     @Size(min = 2, max = 50, message = "La taille du nom doit être entre 2 et 50 caractères maximum.")
-    private String Nom;
+    private String nom;
 
-    @NotEmpty(message = "Le prenom doit contenir minimum 2 lettre.")
+    @NotEmpty(message = "Le prénom doit contenir minimum 2 lettres.")
     @NotBlank
     @Size(min = 2, max = 50)
-    private String Prenom;
+    private String prenom;
 
     @NotEmpty(message = "Email obligatoire.")
     @NotBlank
     @Email
     @Column(unique = true, length = 50)
-    private String Email;
+    private String email;
 
-    @NotEmpty(message = "Mot de passe obligatoire")
+    @NotEmpty(message = "Mot de passe obligatoire.")
     @NotBlank
-    @Size(min = 8, max = 200, message = "La taille du mot de passe doit être entre 8 et 50 caractères maximum.")
-    private String Password;
+    @Size(min = 8, max = 200, message = "La taille du mot de passe doit être entre 8 et 200 caractères maximum.")
+    private String password;
 
     private boolean isLoggedIn;
 
-    @Size(max = 15 , message = "La taille du numéro de téléphone doit être de 15 caractères maximum.")
-    private String Telephone;
+    @Size(max = 15, message = "La taille du numéro de téléphone doit être de 15 caractères maximum.")
+    private String telephone;
 
     @OneToOne(mappedBy = "utilisateur", cascade = CascadeType.ALL)
     private Adresse adresse;
@@ -63,12 +63,11 @@ public class User implements Serializable {
     )
     private Set<Role> roles = new HashSet<>();
 
-
     public boolean hasRole(String roleName) {
         Iterator<Role> it = roles.iterator();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             Role role = it.next();
-            if(role.getNom().equals(roleName)) {
+            if (role.getNom().equals(roleName)) {
                 return true;
             }
         }
@@ -98,59 +97,61 @@ public class User implements Serializable {
     }
 
     @NotNull
-    @Enumerated(EnumType.STRING) // Vous pouvez utiliser EnumType.ORDINAL si vous préférez stocker sous forme d'entier
+    @Enumerated(EnumType.STRING)
     private Sexe sexe;
 
-    protected User(){}
+    protected User() {}
 
     public User(String nom, String prenom, String email, String password, Sexe sexe) {
-        Nom = nom;
-        Prenom = prenom;
-        Email = email;
-        Password = password;
+        this.nom = nom;
+        this.prenom = prenom;
+        this.email = email;
+        this.password = password;
         this.sexe = sexe;
         this.dateCreation = LocalDateTime.now();
         this.dateModification = LocalDateTime.now();
     }
 
+
+
     public Long getId() {
-        return Id;
+        return id;
     }
 
     public void setId(Long id) {
-        Id = id;
+        this.id = id;
     }
 
     public String getNom() {
-        return Nom;
+        return nom;
     }
 
     public void setNom(String nom) {
-        Nom = nom;
+        this.nom = nom;
     }
 
     public String getPrenom() {
-        return Prenom;
+        return prenom;
     }
 
     public void setPrenom(String prenom) {
-        Prenom = prenom;
+        this.prenom = prenom;
     }
 
     public String getEmail() {
-        return Email;
+        return email;
     }
 
     public void setEmail(String email) {
-        Email = email;
+        this.email = email;
     }
 
     public String getPassword() {
-        return Password;
+        return password;
     }
 
     public void setPassword(String password) {
-        Password = password;
+        this.password = password;
     }
 
     public boolean isLoggedIn() {
@@ -162,19 +163,19 @@ public class User implements Serializable {
     }
 
     public String getTelephone() {
-        return Telephone;
+        return telephone;
     }
 
     public void setTelephone(String telephone) {
-        Telephone = telephone;
+        this.telephone = telephone;
     }
 
     public Adresse getAdresse() {
         return adresse;
     }
 
-    public void setAdresse(Adresse adresses) {
-        this.adresse = adresses;
+    public void setAdresse(Adresse adresse) {
+        this.adresse = adresse;
     }
 
     public Set<Role> getRoles() {
@@ -228,22 +229,21 @@ public class User implements Serializable {
     @Override
     public String toString() {
         return "User{" +
-                "Id=" + Id +
-                ", Nom='" + Nom + '\'' +
-                ", Prenom='" + Prenom + '\'' +
-                ", Email='" + Email + '\'' +
-                ", Password='" + Password + '\'' +
+                "id=" + id +
+                ", nom='" + nom + '\'' +
+                ", prenom='" + prenom + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
                 ", isLoggedIn=" + isLoggedIn +
-                ", Telephone='" + Telephone + '\'' +
+                ", telephone='" + telephone + '\'' +
                 ", adresse=" + adresse +
                 ", dateCreation=" + dateCreation +
                 ", dateModification=" + dateModification +
                 ", roles=" + roles +
                 ", commandes=" + commandes +
                 ", produitsFavoris=" + produitsFavoris +
-                ", panier=" + panier.getId() +
+                ", panier=" + (panier != null ? panier.getId() : null) +
                 ", sexe=" + sexe +
                 '}';
     }
 }
-

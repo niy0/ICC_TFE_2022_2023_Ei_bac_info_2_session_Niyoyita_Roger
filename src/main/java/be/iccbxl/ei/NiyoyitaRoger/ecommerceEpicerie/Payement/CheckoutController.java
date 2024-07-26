@@ -57,9 +57,10 @@ public class CheckoutController {
             System.out.println("Departement: " + checkoutRequest.getOrderInfo().getDepartement());
             System.out.println("Pays: " + checkoutRequest.getOrderInfo().getPays());
             System.out.println("Montant Commande: " + checkoutRequest.getOrderInfo().getMontantCommande());
+            System.out.println("Id panier : " + checkoutRequest.getOrderInfo().getIdPanierStripe());
 
             String successUrl = String.format(
-                    "http://localhost:8080/checkout/success?session_id={CHECKOUT_SESSION_ID}&methodCommande=%s&prenom=%s&nom=%s&email=%s&rue=%s&numero=%s&localite=%s&ville=%s&codePostal=%s&departement=%s&pays=%s&montantCommande=%s",
+                    "http://localhost:8080/checkout/success?session_id={CHECKOUT_SESSION_ID}&methodCommande=%s&prenom=%s&nom=%s&email=%s&rue=%s&numero=%s&localite=%s&ville=%s&codePostal=%s&departement=%s&pays=%s&montantCommande=%s&idPanierStripe=%s",
                     encode(checkoutRequest.getOrderInfo().getOrderMethod()),
                     encode(checkoutRequest.getOrderInfo().getFirstName()),
                     encode(checkoutRequest.getOrderInfo().getLastName()),
@@ -71,7 +72,8 @@ public class CheckoutController {
                     encode(checkoutRequest.getOrderInfo().getCodePostal()),
                     encode(checkoutRequest.getOrderInfo().getDepartement()),
                     encode(checkoutRequest.getOrderInfo().getPays()),
-                    encode(checkoutRequest.getOrderInfo().getMontantCommande().toString())
+                    encode(checkoutRequest.getOrderInfo().getMontantCommande().toString()),
+                    encode(String.valueOf(checkoutRequest.getOrderInfo().getIdPanierStripe())) // Ajout de ce paramètre
             );
 
             SessionCreateParams.Builder paramsBuilder = SessionCreateParams.builder()

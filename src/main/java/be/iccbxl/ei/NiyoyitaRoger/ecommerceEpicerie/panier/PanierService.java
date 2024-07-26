@@ -93,6 +93,7 @@ public class PanierService {
         }
 
         panierRepository.save(panier);
+        System.out.println(panier.getLignesDeCommande().size() + "lllllllllllllignne de commmmmmande size");
     }
 
     public List<LigneDeCommandeDTO> getLignesDeCommande(Long panierId) {

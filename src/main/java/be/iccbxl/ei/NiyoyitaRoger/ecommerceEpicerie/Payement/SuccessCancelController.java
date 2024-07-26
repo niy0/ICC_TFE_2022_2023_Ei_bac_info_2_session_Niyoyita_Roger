@@ -3,6 +3,7 @@ package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.Payement;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.commande.Commande;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.commande.CommandeService;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.commande.MethodCommande;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.ligneDeCommande.LigneDeCommande;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.Panier;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.PanierService;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.User;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import jakarta.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.util.List;
 
 @Controller
 public class SuccessCancelController {
@@ -45,15 +47,26 @@ public class SuccessCancelController {
             @RequestParam("departement") String departement,
             @RequestParam("pays") String pays,
             @RequestParam("montantCommande") BigDecimal montantCommande,  // Montant de la commande
+            @RequestParam("idPanierStripe") String idPanierStripe, // Ajout
             Principal principal,
             HttpSession session) throws StripeException {
 
-        Panier panier = panierService.getOrCreatePanier(principal, session);
+        Panier panier = panierService.getPanierById(Long.valueOf(idPanierStripe));
+        Long idUser = null;
+        List<LigneDeCommande> list =  panier.getLignesDeCommande();
         User utilisateur = null;
-        if (principal != null) {
-            utilisateur = userService.getUserByEmail(principal.getName());
+
+        //récupere l'id de l'utilisateur grace au panier
+        if(panier.getUtilisateur() != null) {
+            idUser = panier.getUtilisateur().getId();
         }
 
+        //recupère l'utilisateur
+        if (idUser != null) {
+            utilisateur = userService.getUserById(idUser);
+        }
+
+        System.out.println(utilisateur);
         MethodCommande methodCommande;
         try {
             methodCommande = MethodCommande.valueOf(methodCommandeStr.toUpperCase());
@@ -65,14 +78,24 @@ public class SuccessCancelController {
         Commande nouvelleCommande;
 
         if (utilisateur != null) {
-            nouvelleCommande = new Commande(utilisateur, panier, methodCommande);
+            nouvelleCommande = new Commande(utilisateur, methodCommande);
             nouvelleCommande.setMontantCommande(montantCommande); // ajout montantCommande
+            nouvelleCommande.getLignesDeCommande().addAll(list);
+            nouvelleCommande.setUserId(idUser);
         } else {
-            nouvelleCommande = new Commande(prenom, nom, email, rue, numero, localite, ville, codePostal, departement, pays, panier, methodCommande);
+            nouvelleCommande = new Commande(prenom, nom, email, rue, numero, localite, ville, codePostal, departement, pays, methodCommande);
             nouvelleCommande.setMontantCommande(montantCommande); // ajout montantCommande
+            nouvelleCommande.getLignesDeCommande().addAll(list);
         }
         commandeService.createCommande(nouvelleCommande);
+
+        //Ajouter id de commande dans les lignes de commande
+        nouvelleCommande.getLignesDeCommande().forEach( ligne -> ligne.setCommande(nouvelleCommande));
+        commandeService.createCommande(nouvelleCommande);
+
         System.out.println("Nouvelle commande créée : " + nouvelleCommande);
+
+        //vider le panier
 
         return "redirect:/commande/detail/" + nouvelleCommande.getId();
     }

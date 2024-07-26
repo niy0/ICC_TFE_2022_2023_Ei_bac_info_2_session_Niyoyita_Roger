@@ -162,7 +162,7 @@ public class Panier implements Serializable {
     public String toString() {
         return "Panier{" +
                 "id=" + id +
-                ", actif=" + actif +
+                ", actif=" + (actif != null ? actif : "null") +
                 ", dateCreation=" + dateCreation +
                 ", dateModification=" + dateModification +
                 ", montantTotalPanier=" + calculerMontantTotal() +

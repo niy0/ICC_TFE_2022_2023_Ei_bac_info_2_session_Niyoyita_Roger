@@ -22,7 +22,7 @@
         <div class="mt-5">
             <h2 class="custom-title"><i class="fas fa-info-circle"></i> Informations de Commande</h2>
             <form id="orderInfoForm" th:action="@{/api/checkout/confirm-order}" method="post">
-                <input type="hidden" th:value="${panier.id}" name="idPanierStripe">
+                <input type="hidden" th:value="${panier.id}" name="idPanierStripe" id="idPanierStripe">
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label for="prenom" class="form-label">Prénom</label>

@@ -21,7 +21,7 @@
 <div class="container mt-4">
   <div layout:fragment="content">
     <div class="mt-5">
-      <h2><i class="bi bi-cart-fill"></i> Mon panier</h2>
+      <h2><i class="bi bi-cart-fill"></i><input   th:value="${panier.id}" name="idPanier"> Mon panier</h2>
       <div th:if="${not #lists.isEmpty(panier.lignesDeCommande)}">
         <form id="viderPanier" th:action="@{/viderPanier}" method="post">
           <input type="hidden"  th:value="${panier.id}" name="idPanier">
@@ -125,8 +125,8 @@
 
 <!-- Inclure Stripe.js uniquement si nécessaire -->
 <script th:if="${not #lists.isEmpty(panier.lignesDeCommande)}" src="https://js.stripe.com/v3/"></script>
-<!-- Votre script -->
-<script src="js/script6.js"></script>
+<!-- Votre script <script src="js/script6.js"></script> -->
+
 
 </body>
 </html>

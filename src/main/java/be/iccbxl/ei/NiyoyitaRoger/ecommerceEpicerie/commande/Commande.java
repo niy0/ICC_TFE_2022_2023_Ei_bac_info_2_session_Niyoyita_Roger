@@ -1,16 +1,14 @@
 package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.commande;
 
-import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.Panier;
-import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.Adresse;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.ligneDeCommande.LigneDeCommande;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 @Entity
@@ -20,8 +18,11 @@ public class Commande {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = true)
+    @JoinColumn(name = "user_id", nullable = true, insertable = false, updatable = false)
     private User utilisateur;
+
+    @Column(name = "user_id", nullable = true)
+    private Long userId;
 
     @NotBlank
     private String prenom;
@@ -56,11 +57,6 @@ public class Commande {
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateCommande;
 
-    @ManyToOne
-    @JoinColumn(name = "panier_id", nullable = false)
-    @NotNull
-    private Panier panier;
-
     @Enumerated(EnumType.STRING)
     @NotNull
     private StatutCommande statut;
@@ -75,23 +71,20 @@ public class Commande {
     @OneToMany(mappedBy = "commande", cascade = CascadeType.ALL)
     private List<ChangementStatutCommande> historiqueStatuts;
 
+    @OneToMany(mappedBy = "commande", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<LigneDeCommande> lignesDeCommande = new LinkedList<>();
+
     @NotNull
     private BigDecimal montantCommande;
 
+    // Constructeur par défaut
     protected Commande() {}
 
-    // Constructors for different scenarios
-    public Commande(Panier panier, MethodCommande methodCommande) {
-        this.panier = panier;
-        this.dateCommande = new Date();
-        this.statut = StatutCommande.EN_COURS;
-        this.methodCommande = methodCommande;
-        this.montantCommande = panier.getMontantTotalPanier();
-    }
-
-    public Commande(User utilisateur, Panier panier, MethodCommande methodCommande) {
-        this(panier, methodCommande);
+    // Constructeur avec utilisateur connecté
+    public Commande(User utilisateur, MethodCommande methodCommande) {
         this.utilisateur = utilisateur;
+        this.userId = utilisateur.getId();
         this.prenom = utilisateur.getPrenom();
         this.nom = utilisateur.getNom();
         this.email = utilisateur.getEmail();
@@ -102,10 +95,12 @@ public class Commande {
         this.codePostal = utilisateur.getAdresse().getCodePostal();
         this.departement = utilisateur.getAdresse().getDepartement();
         this.pays = utilisateur.getAdresse().getPays();
+
+        this.iniNouvelleCommande(methodCommande);
     }
 
-    public Commande(String prenom, String nom, String email, String rue, String numero, String localite, String ville, String codePostal, String departement, String pays, Panier panier, MethodCommande methodCommande) {
-        this(panier, methodCommande);
+    //Constructeur sans utilisateur connecté
+    public Commande(String prenom, String nom, String email, String rue, String numero, String localite, String ville, String codePostal, String departement, String pays, MethodCommande methodCommande) {
         this.prenom = prenom;
         this.nom = nom;
         this.email = email;
@@ -116,20 +111,8 @@ public class Commande {
         this.codePostal = codePostal;
         this.departement = departement;
         this.pays = pays;
-    }
 
-    public Commande(Adresse adresse, String email, Panier panier, MethodCommande methodCommande) {
-        this(panier, methodCommande);
-        this.prenom = adresse.getPrenom();
-        this.nom = adresse.getNom();
-        this.email = email;
-        this.rue = adresse.getRue();
-        this.numero = adresse.getNumero();
-        this.localite = adresse.getLocalite();
-        this.ville = adresse.getVille();
-        this.codePostal = adresse.getCodePostal();
-        this.departement = adresse.getDepartement();
-        this.pays = adresse.getPays();
+        this.iniNouvelleCommande(methodCommande);
     }
 
     // Getters and setters
@@ -137,12 +120,12 @@ public class Commande {
         return id;
     }
 
-    public User getUtilisateur() {
-        return utilisateur;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUtilisateur(User utilisateur) {
-        this.utilisateur = utilisateur;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getPrenom() {
@@ -233,14 +216,6 @@ public class Commande {
         this.dateCommande = dateCommande;
     }
 
-    public Panier getPanier() {
-        return panier;
-    }
-
-    public void setPanier(Panier panier) {
-        this.panier = panier;
-    }
-
     public StatutCommande getStatut() {
         return statut;
     }
@@ -281,11 +256,32 @@ public class Commande {
         this.montantCommande = montantCommande;
     }
 
+    public List<LigneDeCommande> getLignesDeCommande() {
+        return lignesDeCommande;
+    }
+
+    public void setLignesDeCommande(List<LigneDeCommande> lignesDeCommande) {
+        this.lignesDeCommande = lignesDeCommande;
+    }
+
+    // Méthode de validation pour vérifier que la liste des lignes de commande n'est pas vide
+    @AssertTrue(message = "La commande doit avoir au moins une ligne de commande.")
+    public boolean isLignesDeCommandeNotEmpty() {
+        return lignesDeCommande != null && !lignesDeCommande.isEmpty();
+    }
+
+    // Méthode pour initialiser une nouvelle commande
+    private void iniNouvelleCommande(MethodCommande methodCommande){
+        this.dateCommande = new Date();
+        this.statut = StatutCommande.EN_COURS;
+        this.methodCommande = methodCommande;
+    }
+
     @Override
     public String toString() {
         return "Commande{" +
                 "id=" + id +
-                ", utilisateur=" + utilisateur +
+                ", userId=" + userId +
                 ", prenom='" + prenom + '\'' +
                 ", nom='" + nom + '\'' +
                 ", email='" + email + '\'' +
@@ -297,12 +293,12 @@ public class Commande {
                 ", departement='" + departement + '\'' +
                 ", pays='" + pays + '\'' +
                 ", dateCommande=" + dateCommande +
-                ", panier=" + panier.getId() +
                 ", statut=" + statut +
                 ", methodCommande=" + methodCommande.name() +
                 ", dateDerniereMajStatut=" + dateDerniereMajStatut +
                 ", historiqueStatuts=" + historiqueStatuts +
                 ", montantCommande=" + montantCommande +
+                ", lignesDeCommande=" + lignesDeCommande +
                 '}';
     }
 }

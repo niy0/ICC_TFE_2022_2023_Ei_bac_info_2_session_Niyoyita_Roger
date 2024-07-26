@@ -1,5 +1,6 @@
 package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.ligneDeCommande;
 
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.commande.Commande;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.Panier;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit.Produit;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,6 +23,11 @@ public class LigneDeCommande {
     @ManyToOne
     @JoinColumn(name = "panier_id")
     private Panier panier;
+
+    @ManyToOne
+    @JoinColumn(name = "commande_id")
+    @JsonIgnore
+    private Commande commande;
 
     private int quantite;
 
@@ -97,6 +103,14 @@ public class LigneDeCommande {
 
     public void calculerMontantTotal() {
         montantTotal = prixUnitaire.multiply(BigDecimal.valueOf(quantite));
+    }
+
+    public Commande getCommande() {
+        return commande;
+    }
+
+    public void setCommande(Commande commande) {
+        this.commande = commande;
     }
 
     @Override

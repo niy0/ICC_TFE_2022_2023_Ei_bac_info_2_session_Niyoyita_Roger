@@ -62,7 +62,7 @@ public class PanierController {
     @Autowired
     private UserRepository userRepository;
 
-    //
+
     @ModelAttribute("panier")
     public Panier getPanier() {
         return new Panier();
@@ -80,7 +80,9 @@ public class PanierController {
     public String showPanier(Model model, Principal principal, HttpSession session) {
        // Panier panier = getOrCreatePanier(principal, session);
         Panier panier = panierService.getOrCreatePanier(principal,session);
+        System.out.println(panier);
 
+        System.out.println(principal+" pppppprincipal");
 
         BigDecimal montantTotal = panier.getLignesDeCommande().stream()
                 .map(ligne -> ligne.getProduit().getPrix().multiply(new BigDecimal(ligne.getQuantite())))
@@ -141,60 +143,6 @@ public class PanierController {
         }
     }
 
-    @PostMapping("/confirmerPanier")
-    public String confirmerPanier(@ModelAttribute("panier") Panier panier) {
-        for (LigneDeCommande ligne : panier.getLignesDeCommande()) {
-            BigDecimal total = ligne.getProduit().getPrix().multiply(new BigDecimal(ligne.getQuantite()));
-            // Enregistrez le total dans la base de données ou effectuez toute autre opération nécessaire
-            // ...
-            // Votre logique pour enregistrer le total pour chaque ligne de commande
-        }
-
-        // Rediriger vers une autre page après avoir enregistré les totaux pour chaque ligne de commande
-        return "redirect:/confirmation";
-    }
-
-    /**
-    private Panier getOrCreatePanier(Principal principal, HttpSession session) {
-        if (principal != null) {
-            return panierService.getOrCreateAuthenticatedUserPanier(principal, session);
-        } else {
-            return panierService.getOrCreateSessionPanier(session);
-        }
-    }
-
-
-    private Panier getOrCreateAuthenticatedUserPanier(Principal principal, HttpSession session) {
-        CustomUserDetails customUserDetails = (CustomUserDetails) ((UsernamePasswordAuthenticationToken) principal).getPrincipal();
-        User user = userRepository.findByEmail(customUserDetails.getEmailUser());
-        Panier panier = user.getPanier();
-
-        Panier panierTemporaire = (Panier) session.getAttribute("panierTemporaire");
-        if (panierTemporaire != null) {
-            panier.mergeWith(panierTemporaire);
-            session.removeAttribute("panierTemporaire");
-        }
-
-        return panier;
-    }
-
-
-    private Panier getOrCreateSessionPanier(HttpSession session) {
-        Long panierId = (Long) session.getAttribute("panierTemporaireId");
-        Panier panier;
-
-        if (panierId == null) {
-            panier = new Panier();
-            panierRepository.save(panier); // Assurez-vous que le panier est persisté pour obtenir un ID
-            session.setAttribute("panierTemporaireId", panier.getId());
-        } else {
-            panier = panierRepository.findById(panierId)
-                    .orElseThrow(() -> new RuntimeException("Panier non trouvé"));
-        }
-
-        return panier;
-    }**/
-
 
     @GetMapping("/panier/lignedecommande/api/{id}")
     public ResponseEntity<LigneDeCommande> getProduitInPanierById(@PathVariable Long id) {
@@ -222,7 +170,6 @@ public class PanierController {
         }
     }
 
-
     @PostMapping("/addToCart")
     public ResponseEntity<String> addToCart(@RequestBody LigneDeCommandeData ligneDeCommandeDTO, HttpServletRequest request) {
         try {
@@ -232,6 +179,9 @@ public class PanierController {
             // Récupérez la quantité demandée
             int quantiteDemandee = ligneDeCommandeDTO.getQuantite();
 
+            Panier panier = panierService.getPanierById(ligneDeCommandeDTO.getPanierId());
+            System.out.println();
+
             // Vérifiez si la quantité demandée est inférieure à la quantité en stock du produit
             if (produit != null && quantiteDemandee <= produit.getQuantite() && quantiteDemandee > 0) {
 
@@ -239,6 +189,7 @@ public class PanierController {
                 if (auth != null) {
                     for (GrantedAuthority authority : auth.getAuthorities()) {
                         System.out.println("Authority: " + authority.getAuthority());
+                        System.out.println(panier.getLignesDeCommande().size());
                     }
                 }
 
@@ -258,13 +209,9 @@ public class PanierController {
                         quantiteDemandee
                 );
 
+                System.out.println(panier.getLignesDeCommande().size() + "siiiiiiiiizzzzzzzzzzzeee");
+
                 int testQ1 = produit.getQuantite();
-
-                //Diminuer la quantite ajouter dans la bd pour le produit
-               // a la création d'une commande produit.setQuantite(produit.getQuantite() - quantiteDemandee);
-
-                //Si la quantite du produit est à 0, l'enlever du site
-                //à faire!!
 
                 produitService.updateProduit(produit);
                 int testQ2 = produit.getQuantite();

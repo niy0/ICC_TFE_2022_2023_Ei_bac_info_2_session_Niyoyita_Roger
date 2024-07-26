@@ -13,6 +13,7 @@ import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.motCle.MotCleService;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.Panier;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.PanierNotFoundException;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.PanierRepository;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.PanierService;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.CustomUserDetails;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.User;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.UserRepository;
@@ -79,10 +80,17 @@ public class ProduitController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PanierService panierService;
+
+
+
     @GetMapping("/")//faire un autre pour les non admin gérent/manager
     public String showIndex(Model model) {
         List<Produit> productsList = produitService.getAllProduct();
         List<Categorie> categorieList = categorieService.getAllCategorie();
+
+        System.out.println(productsList+"----------**********");
 
         model.addAttribute("listProducts", productsList);
         model.addAttribute("catList", categorieList);
@@ -188,7 +196,8 @@ public class ProduitController {
         Page<Produit> productPage = produitRepository.findAll(pageable);
         List<Categorie> categorieList = categorieService.getAllCategorie();
 
-        Panier panier = getOrCreatePanier(principal, session);
+        Panier panier = panierService.getOrCreatePanier(principal, session);
+        System.out.println(panier);
 
         BigDecimal montantTotal = panier.getLignesDeCommande().stream()
                 .map(ligne -> ligne.getProduit().getPrix().multiply(new BigDecimal(ligne.getQuantite())))
@@ -202,44 +211,6 @@ public class ProduitController {
         model.addAttribute("montantTotalPanier", montantTotal);
 
         return "produit/index_produits";
-    }
-
-    private Panier getOrCreatePanier(Principal principal, HttpSession session) {
-        if (principal != null) {
-            return getOrCreateAuthenticatedUserPanier(principal, session);
-        } else {
-            return getOrCreateSessionPanier(session);
-        }
-    }
-
-    private Panier getOrCreateAuthenticatedUserPanier(Principal principal, HttpSession session) {
-        CustomUserDetails customUserDetails = (CustomUserDetails) ((UsernamePasswordAuthenticationToken) principal).getPrincipal();
-        User user = userRepository.findByEmail(customUserDetails.getEmailUser());
-        Panier panier = user.getPanier();
-
-        Panier panierTemporaire = (Panier) session.getAttribute("panierTemporaire");
-        if (panierTemporaire != null) {
-            panier.mergeWith(panierTemporaire);
-            session.removeAttribute("panierTemporaire");
-        }
-
-        return panier;
-    }
-
-    private Panier getOrCreateSessionPanier(HttpSession session) {
-        Long panierId = (Long) session.getAttribute("panierTemporaireId");
-        Panier panier;
-
-        if (panierId == null) {
-            panier = new Panier();
-            panierRepository.save(panier); // Assurez-vous que le panier est persisté pour obtenir un ID
-            session.setAttribute("panierTemporaireId", panier.getId());
-        } else {
-            panier = panierRepository.findById(panierId)
-                    .orElseThrow(() -> new RuntimeException("Panier non trouvé"));
-        }
-
-        return panier;
     }
 
     //*********************

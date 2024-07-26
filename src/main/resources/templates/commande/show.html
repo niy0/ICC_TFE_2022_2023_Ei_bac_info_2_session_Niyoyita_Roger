@@ -58,7 +58,7 @@
     .invoice-box table tr.details td {
       padding-bottom: 20px;
     }
-    .invoice-box table tr.item td{
+    .invoice-box table tr.item td {
       border-bottom: 1px solid #eee;
     }
     .invoice-box table tr.item.last td {
@@ -83,9 +83,12 @@
                   <h2>Facture</h2>
                 </td>
                 <td>
-                  Commande #: <span th:text="${commande.id}"></span><br>
+                  Facture #: <span th:text="${commande.id}"></span><br>
                   Date: <span th:text="${#dates.format(commande.dateCommande, 'dd/MM/yyyy')}"></span><br>
                   Heure: <span th:text="${#dates.format(commande.dateCommande, 'HH:mm')}"></span>
+                  <span th:if="${commande.dateDerniereMajStatut != null}">
+                    Dernière mise à jour: <span th:text="${#dates.format(commande.dateDerniereMajStatut, 'dd/MM/yyyy HH:mm')}"></span>
+                  </span>
                 </td>
               </tr>
             </table>
@@ -99,9 +102,9 @@
                   <h4>Adresse de Facturation</h4>
                   <strong th:text="${commande.prenom} + ' ' + ${commande.nom}"></strong><br>
                   <span th:text="${commande.rue}"></span>, <span th:text="${commande.numero}"></span><br>
-                  <span th:text="${commande.localite}" th:if="${commande.localite}"></span><br>
+                  <span th:text="${commande.localite}" th:if="${commande.localite != null && !commande.localite.isEmpty()}"></span><br>
                   <span th:text="${commande.codePostal}"></span> <span th:text="${commande.ville}"></span><br>
-                  <span th:text="${commande.departement}" th:if="${commande.departement}"></span><br>
+                  <span th:text="${commande.departement}" th:if="${commande.departement != null && !commande.departement.isEmpty()}"></span><br>
                   <span th:text="${commande.pays}"></span><br>
                   <span th:text="${commande.email}"></span>
                 </td>
@@ -109,9 +112,9 @@
                   <h4>Adresse de Livraison</h4>
                   <strong th:text="${commande.prenom} + ' ' + ${commande.nom}"></strong><br>
                   <span th:text="${commande.rue}"></span>, <span th:text="${commande.numero}"></span><br>
-                  <span th:text="${commande.localite}" th:if="${commande.localite}"></span><br>
+                  <span th:text="${commande.localite}" th:if="${commande.localite != null && !commande.localite.isEmpty()}"></span><br>
                   <span th:text="${commande.codePostal}"></span> <span th:text="${commande.ville}"></span><br>
-                  <span th:text="${commande.departement}" th:if="${commande.departement}"></span><br>
+                  <span th:text="${commande.departement}" th:if="${commande.departement != null && !commande.departement.isEmpty()}"></span><br>
                   <span th:text="${commande.pays}"></span><br>
                   <span th:text="${commande.email}"></span>
                 </td>
@@ -121,7 +124,7 @@
         </tr>
         <tr class="heading">
           <td>Méthode de Commande</td>
-          <td th:text="${commande.methodCommande}"></td>
+          <td th:text="${commande.methodCommande == 'PICKUP' ? 'Récupérer au magasin' : 'Livraison'}"></td>
         </tr>
         <tr class="heading">
           <td>Statut</td>
@@ -131,16 +134,33 @@
           <td>Article</td>
           <td>Prix</td>
         </tr>
-        <tr th:each="ligne : ${commande.panier.lignesDeCommande}" class="item">
-          <td th:text="${ligne.produit.nom} + ' (x' + ${ligne.quantite} + ')'"></td>
+        <tr th:each="ligne : ${commande.lignesDeCommande}" class="item">
+          <td>
+            <span th:text="${ligne.produit.nom}"></span> (x<span th:text="${ligne.quantite}"></span>)<br>
+            <small>Prix Unitaire: <span th:text="${ligne.prixUnitaire} + ' €'"></span></small>
+          </td>
           <td th:text="${ligne.montantTotal} + ' €'"></td>
         </tr>
         <tr class="total">
           <td></td>
-          <td>Total: <span th:text="${commande.montantCommande} + ' €'"></span></td>
+          <td>Sous-total: <span th:text="${commande.montantCommande} + ' €'"></span></td>
+        </tr>
+        <tr class="total">
+          <td></td>
+          <td>TVA (21%)</td>
+        </tr>
+        <tr class="total">
+          <td></td>
+          <td>Total TTC: <span th:text="${commande.montantCommande} + ' €'"></span></td>
         </tr>
       </table>
       <a href="/commandes" class="btn btn-primary mt-3">Retour à la liste des commandes</a>
+      <div class="mt-5">
+        <p><strong>Conditions générales de vente:</strong> Les articles retournés doivent être dans leur état d'origine. Consultez notre
+          <a href="/conditions-generales" target="_blank">politique de retour</a> pour plus de détails.
+        </p>
+      </div>
+
     </div>
   </div>
 </div>

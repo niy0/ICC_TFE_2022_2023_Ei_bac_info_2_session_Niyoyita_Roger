@@ -29,7 +29,8 @@ public class CommandeController {
     @GetMapping("/commandes")
     public String getUserCommandes(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         User user = userService.getUserByEmail(userDetails.getUsername());
-        List<Commande> commandes = commandeService.getCommandesByUser(user);
+        List<Commande> commandes = user.getCommandes() ;
+        List<Commande> commandes2 = commandeService.getCommandesByUser(user);
         model.addAttribute("commandes", commandes);
         return "commande/myList";
     }
