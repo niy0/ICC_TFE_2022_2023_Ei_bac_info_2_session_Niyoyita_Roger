@@ -103,8 +103,10 @@ public class UserController {
     @GetMapping("/user/{userId}/profile")
     public String getUserProfilById(Model model, @PathVariable("userId") long id) {
         User user = userService.getUserById(id);
+        Adresse adresse = user.getAdresse();
 
         model.addAttribute("user", user);
+        model.addAttribute("adresse", adresse);
         model.addAttribute("title", "Fiche d'un user");
 
         return "user/profile";

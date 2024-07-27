@@ -3,6 +3,9 @@ package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.commande;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.User;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,11 +29,12 @@ public class CommandeController {
         this.userService = userService;
     }
 
+
+
     @GetMapping("/commandes")
-    public String getUserCommandes(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+    public String getUserCommandes(@AuthenticationPrincipal UserDetails userDetails, @PageableDefault(size = 5) Pageable pageable, Model model) {
         User user = userService.getUserByEmail(userDetails.getUsername());
-        List<Commande> commandes = user.getCommandes() ;
-        List<Commande> commandes2 = commandeService.getCommandesByUser(user);
+        Page<Commande> commandes = commandeService.getCommandesByUser(user, pageable);
         model.addAttribute("commandes", commandes);
         return "commande/myList";
     }

@@ -1,83 +1,216 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
-      layout:decorate="~{layouts/main}" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<html lang="fr"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
 <head>
   <meta charset="UTF-8">
-  <title>Bienvenue dans le page Membre</title>
+  <title>Page Membre</title>
   <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
   <style>
-    /* Styles pour la barre de navigation latérale */
+        body {
+            background-color: #f0f2f5;
+            font-family: Arial, sans-serif;
+        }
 
-    .card {
-      margin-left: 250px;
-      background-color: #f8f9fa;
-    }
-    .sidenav {
-      margin: 0;
-      height: 100%;
-      width: 200px;
-      position: absolute;
-      padding-top: 20px;
-      overflow-y: auto;
-      background-color: #f8f9fa;
-      border: 1px solid #28a745;
-      border-radius: 5px;
-    }
+        .sidenav {
+            position: fixed;
+            left: 0;
+            top: 60px; /* Espacement pour le header */
+            height: calc(100vh - 60px); /* Ajuster pour éviter de déborder le footer */
+            width: 280px;
+            background-color: #343a40;
+            color: white;
+            overflow-y: auto; /* Ajouter un défilement si nécessaire */
+        }
 
-    .sidenav a {
-      padding: 8px 8px 8px 16px;
-      text-decoration: none;
-      font-size: 18px;
-      color: #333;
-      display: block;
-    }
+        .sidenav a {
+            padding: 15px 25px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+            transition: background 0.2s, color 0.2s;
+        }
 
-    .sidenav a:hover {
-      color: #007bff;
-    }
+        .sidenav a:hover {
+            background-color: #495057;
+            color: #f8f9fa;
+        }
 
-    .content {
-      margin-left: 250px;
-      padding: 20px;
-      position: relative;
-    }
+        .content {
+            margin-left: 300px; /* Alignement avec la largeur du sidenav */
+            padding: 20px;
+            transition: margin-left 0.3s;
+        }
+
+        .card {
+            background-color: white;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-title {
+            color: #007bff;
+        }
+
+        .card-subtitle {
+            color: #6c757d;
+        }
+
+        .btn-outline-warning {
+            color: #ffc107;
+            border-color: #ffc107;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .btn-outline-warning:hover {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: white;
+        }
+
+        .btn-outline-primary {
+            color: #007bff;
+            border-color: #007bff;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: white;
+        }
+
+        .address-section {
+            margin-top: 20px;
+        }
+
+        .address-section h6 {
+            margin-top: 10px;
+            color: #007bff;
+        }
+
+        .address-card {
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .address-card .card-body {
+            padding: 15px;
+        }
+
+        .address-detail p {
+            margin-bottom: 10px;
+        }
+
+        .address-detail strong {
+            color: #007bff;
+        }
   </style>
-
 </head>
-<body >
-    <div layout:fragment="content">
-      <div class="sidenav">
-        <a href="#">Profile</a>
-        <a href="#">Mes commandes</a>
-        <a href="#">Mes produits favoris</a>
+<body>
+<div class="container">
+  <div layout:fragment="content" class="content">
+    <div class="sidenav">
+      <a href="#"><i class="fas fa-user-circle"></i> Profile</a>
+      <a href="#"><i class="fas fa-shopping-cart"></i> Mes commandes</a>
+      <a href="#"><i class="fas fa-heart"></i> Mes produits favoris</a>
+
+      <a class="collapsed" data-bs-toggle="collapse" href="#commandesSubmenu" role="button" aria-expanded="false" aria-controls="commandesSubmenu">
+        <i class="fas fa-chart-line"></i> Gestion commandes
+      </a>
+      <div class="collapse" id="commandesSubmenu">
+        <a href="#"><i class="fas fa-chart-bar"></i> Commandes a traiter</a>
+        <a href="#"><i class="fas fa-chart-pie"></i> Liste des commandes</a>
       </div>
 
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Page profile</h5>
-          <h6 class="card-subtitle mb-2 text-muted" th:text="${user.nom} +' '+ ${user.prenom}"></h6>
-          <p class="card-text"><strong>Nom:</strong> <span th:text="${user.nom}"></span></p>
-          <p class="card-text"><strong>Prénom:</strong> <span th:text="${user.prenom}"></span></p>
-          <p class="card-text"><strong>Email:</strong> <span th:text="${user.email}"></span></p>
-          <p class="card-text"><strong>Sexe:</strong> <span th:text="${user.sexe}"></span></p>
-          <p class="card-text"><strong>Téléphone:</strong>
-            <span th:if="${user.telephone} != null" th:text="${user.telephone}"></span>
-            <span th:if="${user.telephone} == null">Pas de numéro enregistré</span>
-          </p>
-          <p class="card-text"><strong>Date de création:</strong> <span th:text="${user.dateCreation}"></span></p>
-          <p class="card-text"><strong>Rôles:</strong>
-            <span th:each="role : ${user.roles}" th:text="${role.nom} + ' '"></span>
-          </p>
-          <p class="card-text"><strong>Adresses:</strong>
-            <span th:if="${user.adresses.size() == 0}">Adresse vide</span>
-            <span th:each="adresse : ${user.adresses}">
-              <br/><span th:text="${adresse.rue}, ${adresse.codePostal}, ${adresse.ville}, ${adresse.pays}"></span>
-            </span>
-          </p>
+      <a class="collapsed" data-bs-toggle="collapse" href="#statSubmenu" role="button" aria-expanded="false" aria-controls="statSubmenu">
+        <i class="fas fa-chart-line"></i> Statistiques
+      </a>
+      <div class="collapse" id="statSubmenu">
+        <a href="#"><i class="fas fa-chart-bar"></i> Ventes</a>
+        <a href="#"><i class="fas fa-chart-pie"></i> Répartition des produits</a>
+        <a href="#"><i class="fas fa-chart-area"></i> Croissance des utilisateurs</a>
+      </div>
 
-          <a class="btn btn-outline-warning" th:href="@{'/user/'+ ${user.id}}+ '/profile/edit'">Modifier profile</a>
-        </div>
+      <a class="collapsed" data-bs-toggle="collapse" href="#adminSubmenu" role="button" aria-expanded="false" aria-controls="adminSubmenu">
+        <i class="fas fa-cog"></i> Admin
+      </a>
+      <div class="collapse" id="adminSubmenu">
+        <a href="#"><i class="fas fa-box"></i> Gestion stock</a>
+        <a href="#">Ajouter un produit</a>
+        <a href="#">Modifier un produit</a>
+        <a href="#">Supprimer un produit</a>
+      </div>
+
+      <a class="collapsed" data-bs-toggle="collapse" href="#userManagementSubmenu" role="button" aria-expanded="false" aria-controls="userManagementSubmenu">
+        <i class="fas fa-users"></i> Gestion des utilisateurs
+      </a>
+      <div class="collapse" id="userManagementSubmenu">
+        <a href="#"><i class="fas fa-user-plus"></i> Ajouter un utilisateur</a>
+        <a href="#"><i class="fas fa-list"></i> Liste des utilisateurs</a>
       </div>
     </div>
+
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Page profil</h5>
+        <h6 class="card-subtitle mb-2 text-muted" th:text="${user.nom} + ' ' + ${user.prenom}"></h6>
+        <p class="card-text"><strong>Nom:</strong> <span th:text="${user.nom}"></span></p>
+        <p class="card-text"><strong>Prénom:</strong> <span th:text="${user.prenom}"></span></p>
+        <p class="card-text"><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+        <p class="card-text"><strong>Sexe:</strong> <span th:text="${user.sexe}"></span></p>
+        <p class="card-text"><strong>Téléphone:</strong>
+          <span th:if="${user.telephone != null}" th:text="${user.telephone}"></span>
+          <span th:if="${user.telephone == null}">Pas de numéro enregistré</span>
+        </p>
+        <p class="card-text"><strong>Date de création:</strong> <span th:text="${user.dateCreation}"></span></p>
+        <p class="card-text"><strong>Rôles:</strong>
+          <span th:each="role : ${user.roles}" th:text="${role.nom} + ' '"></span>
+        </p>
+        <div class="address-section">
+          <h6><strong>Adresse:</strong></h6>
+          <span th:if="${adresse == null}">Aucune adresse enregistrée</span>
+          <div th:if="${adresse != null}">
+            <div class="card address-card">
+              <div class="card-body">
+                <div class="address-detail">
+                  <p><strong>Rue:</strong> <span th:text="${adresse.rue}" th:if="${adresse.rue != null}">Non renseignée</span></p>
+                  <p><strong>Numéro:</strong> <span th:text="${adresse.numero}" th:if="${adresse.numero != null}">Non renseigné</span></p>
+                  <p><strong>Localité:</strong> <span th:text="${adresse.localite}" th:if="${adresse.localite != null}">Non renseignée</span></p>
+                  <p><strong>Code Postal:</strong> <span th:text="${adresse.codePostal}" th:if="${adresse.codePostal != null}">Non renseigné</span></p>
+                  <p><strong>Ville:</strong> <span th:text="${adresse.ville}" th:if="${adresse.ville != null}">Non renseignée</span></p>
+                  <p><strong>Pays:</strong> <span th:text="${adresse.pays}" th:if="${adresse.pays != null}">Non renseigné</span></p>
+                  <p th:if="${adresse.departement != null}"><strong>Département:</strong> <span th:text="${adresse.departement}"></span></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <!-- Bouton Modifier profil -->
+          <a class="btn btn-outline-warning" th:href="@{'/user/' + ${user.id} + '/profile/edit'}">Modifier profil</a>
+          <!-- Bouton Modifier adresse -->
+          <a class="btn btn-outline-primary" th:href="@{'/user/' + ${user.id} + '/adresse/edit'}">Modifier adresse</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Footer -->
+<div class="page-footer">
+  <div th:replace="~{fragments/footer :: footer}"></div>
+</div>
 </body>
 </html>

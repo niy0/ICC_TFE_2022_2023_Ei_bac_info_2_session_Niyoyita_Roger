@@ -15,6 +15,70 @@
             integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <style>
+        .container {
+            max-width: 1200px;
+        }
+        .facture-card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .facture-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        .facture-header, .facture-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .facture-header {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+        .facture-id {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .facture-status {
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: #fff;
+        }
+        .status-en_attente { background-color: #f0ad4e; }
+        .status-en_cours { background-color: #5bc0de; }
+        .status-en_preparation { background-color: #0275d8; }
+        .status-commande_prete, .status-livree { background-color: #5cb85c; }
+        .status-annulee { background-color: #d9534f; }
+        .facture-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .facture-info div {
+            margin-bottom: 10px;
+        }
+        .facture-total {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        .facture-actions {
+            text-align: right;
+        }
+        .btn-outline-danger, .btn-outline-warning {
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+        }
+        .btn-outline-danger:hover, .btn-outline-warning:hover {
+            color: #fff;
+        }
+    </style>
 </head>
 <body>
 <div class="container mt-4">
@@ -95,7 +159,7 @@
 
             <div th:if="${not #lists.isEmpty(panier.lignesDeCommande)}" class="mt-5">
                 <h3><i class="bi bi-cart-fill"></i>Résumé de la commande</h3>
-                <table class="table">
+                <table class="table facture-card">
                     <thead>
                     <tr>
                         <th hidden>Id Ligne de Commande</th>

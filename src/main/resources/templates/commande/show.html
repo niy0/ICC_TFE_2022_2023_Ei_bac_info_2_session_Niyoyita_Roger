@@ -21,11 +21,16 @@
       margin: auto;
       padding: 30px;
       border: 1px solid #eee;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       font-size: 16px;
       line-height: 24px;
-      font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
+      font-family: 'Helvetica Neue', 'Helvetica', Arial, sans-serif;
       color: #555;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .invoice-box:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     }
     .invoice-box table {
       width: 100%;
@@ -33,7 +38,7 @@
       text-align: left;
     }
     .invoice-box table td {
-      padding: 5px;
+      padding: 8px;
       vertical-align: top;
     }
     .invoice-box table tr td:nth-child(2) {
@@ -68,6 +73,15 @@
       border-top: 2px solid #eee;
       font-weight: bold;
     }
+    .btn-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+    .btn-primary:hover {
+      background-color: #0056b3;
+      border-color: #004085;
+    }
   </style>
 </head>
 <body>
@@ -87,7 +101,7 @@
                   Date: <span th:text="${#dates.format(commande.dateCommande, 'dd/MM/yyyy')}"></span><br>
                   Heure: <span th:text="${#dates.format(commande.dateCommande, 'HH:mm')}"></span>
                   <span th:if="${commande.dateDerniereMajStatut != null}">
-                    Dernière mise à jour: <span th:text="${#dates.format(commande.dateDerniereMajStatut, 'dd/MM/yyyy HH:mm')}"></span>
+                    <br>Dernière mise à jour: <span th:text="${#dates.format(commande.dateDerniereMajStatut, 'dd/MM/yyyy HH:mm')}"></span>
                   </span>
                 </td>
               </tr>
@@ -160,7 +174,6 @@
           <a href="/conditions-generales" target="_blank">politique de retour</a> pour plus de détails.
         </p>
       </div>
-
     </div>
   </div>
 </div>
