@@ -1,164 +1,208 @@
 <!DOCTYPE html>
-<html lang="fr"
-      xmlns:th="http://www.thymeleaf.org"
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
       layout:decorate="~{layouts/main}">
 <head>
   <meta charset="UTF-8">
   <title>Page Membre</title>
-  <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" />
+  <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
   <style>
-        body {
-            background-color: #f0f2f5;
-            font-family: Arial, sans-serif;
-        }
+    body {
+        background-color: #f0f2f5;
+        font-family: Arial, sans-serif;
+    }
 
-        .sidenav {
-            position: fixed;
-            left: 0;
-            top: 60px; /* Espacement pour le header */
-            height: calc(100vh - 60px); /* Ajuster pour éviter de déborder le footer */
-            width: 280px;
-            background-color: #343a40;
-            color: white;
-            overflow-y: auto; /* Ajouter un défilement si nécessaire */
-        }
+    .sidenav {
+        position: fixed;
+        left: 0;
+        height: calc(100vh - 60px);
+        width: 300px;
+        background-color: #343a40;
+        color: white;
+        padding-top: 0px;
+        overflow-y: auto;
+        transition: width 0.3s ease-in-out;
+        border-radius: 0 0.5rem 0 0;
+    }
 
-        .sidenav a {
-            padding: 15px 25px;
-            text-decoration: none;
-            font-size: 18px;
-            color: white;
-            display: block;
-            transition: background 0.2s, color 0.2s;
-        }
+    .sidenav a {
+        padding: 15px 25px;
+        text-decoration: none;
+        font-size: 18px;
+        color: white;
+        display: block;
+        transition: background 0.2s, color 0.2s, padding-left 0.2s;
+    }
 
-        .sidenav a:hover {
-            background-color: #495057;
-            color: #f8f9fa;
-        }
+    .sidenav a:hover {
+        background-color: #495057;
+        color: rgb(255 193 7);
+        padding-left: 35px;
+    }
 
-        .content {
-            margin-left: 300px; /* Alignement avec la largeur du sidenav */
-            padding: 20px;
-            transition: margin-left 0.3s;
-        }
+    .sidenav .active, .sidenav .active:hover {
+        background-color: #007bff;
+        color: white;
+        padding-left: 35px;
+    }
 
-        .card {
-            background-color: white;
-            border: 1px solid #dee2e6;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-        }
+    .content {
+        margin-left: 300px;
+        padding: 20px;
+        transition: margin-left 0.3s;
+    }
 
-        .card:hover {
-            transform: translateY(-5px);
-        }
+    .card {
+        background-color: white;
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s;
+    }
 
-        .card-title {
-            color: #007bff;
-        }
+    .card:hover {
+        transform: translateY(-5px);
+    }
 
-        .card-subtitle {
-            color: #6c757d;
-        }
+    .card-title {
+        color: #007bff;
+    }
 
-        .btn-outline-warning {
-            color: #ffc107;
-            border-color: #ffc107;
-            transition: background-color 0.3s, border-color 0.3s;
-        }
+    .card-subtitle {
+        color: #6c757d;
+    }
 
-        .btn-outline-warning:hover {
-            background-color: #ffc107;
-            border-color: #ffc107;
-            color: white;
-        }
+    .btn-outline-warning {
+        color: #ffc107;
+        border-color: #ffc107;
+        transition: background-color 0.3s, border-color 0.3s;
+    }
 
-        .btn-outline-primary {
-            color: #007bff;
-            border-color: #007bff;
-            transition: background-color 0.3s, border-color 0.3s;
-        }
+    .btn-outline-warning:hover {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: white;
+    }
 
-        .btn-outline-primary:hover {
-            background-color: #007bff;
-            border-color: #007bff;
-            color: white;
-        }
+    .address-section {
+        margin-top: 20px;
+    }
 
-        .address-section {
-            margin-top: 20px;
-        }
+    .address-section h6 {
+        margin-top: 10px;
+        color: #007bff;
+    }
 
-        .address-section h6 {
-            margin-top: 10px;
-            color: #007bff;
-        }
+    .marginR{
+        margin-left: 30px;
+    }
 
-        .address-card {
-            border: 1px solid #dee2e6;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
+    .marginL{
+        margin-right: 20px;
+    }
 
-        .address-card .card-body {
-            padding: 15px;
-        }
+    .address-card {
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
 
-        .address-detail p {
-            margin-bottom: 10px;
-        }
+    .address-card .card-body {
+        padding: 15px;
+    }
 
-        .address-detail strong {
-            color: #007bff;
-        }
+    .address-detail p {
+        margin-bottom: 10px;
+    }
+
+    .address-detail strong {
+        color: #007bff;
+    }
+
+    .submenu-icon {
+        float: right;
+        transition: transform 0.3s;
+    }
+
+    .submenu-icon.collapsed::before {
+        content: "\f0da"; /* FontAwesome icon for down arrow */
+    }
+
+    .submenu-icon:not(.collapsed)::before {
+        content: "\f0d7"; /* FontAwesome icon for up arrow */
+    }
+
+
+    .btn-refresh {
+        color: rgb(255, 193, 7);
+        font-size: 20px;
+        transition: color 0.2s;
+        text-decoration: none;
+    }
+
+    .btn-refresh:hover {
+        color: rgb(255, 193, 7);
+    }
+
   </style>
 </head>
 <body>
 <div class="container">
   <div layout:fragment="content" class="content">
     <div class="sidenav">
-      <a href="#"><i class="fas fa-user-circle"></i> Profile</a>
-      <a href="#"><i class="fas fa-shopping-cart"></i> Mes commandes</a>
-      <a href="#"><i class="fas fa-heart"></i> Mes produits favoris</a>
-
-      <a class="collapsed" data-bs-toggle="collapse" href="#commandesSubmenu" role="button" aria-expanded="false" aria-controls="commandesSubmenu">
-        <i class="fas fa-chart-line"></i> Gestion commandes
+      <a href="javascript:location.reload()" class="btn-refresh">
+        <span class="refresh-text marginL">Replier les sous-menus</span> <i class="fas fa-sync-alt" style="color: rgb(255, 193, 7);"></i>
       </a>
-      <div class="collapse" id="commandesSubmenu">
-        <a href="#"><i class="fas fa-chart-bar"></i> Commandes a traiter</a>
-        <a href="#"><i class="fas fa-chart-pie"></i> Liste des commandes</a>
+      <a class="collapsed" data-bs-toggle="collapse" href="#profileSubmenu" role="button" aria-expanded="false" aria-controls="profileSubmenu">
+        <i class="fas fa-user-circle"></i> Profile : <span th:text="${user.nom} + ' ' + ${user.prenom}"></span>
+        <span class="submenu-icon fas fa-caret-right"></span>
+      </a>
+      <div class="collapse marginR" id="profileSubmenu">
+        <a th:href="@{'/user/' + ${user.id} + '/profile/edit'}" style="font-size: 16px;"><i class="fas fa-user-edit"></i> Modifier profil</a>
+        <a th:href="@{'/user/' + ${user.id} + '/adresse/edit'}" style="font-size: 16px;"><i class="fas fa-address-card"></i> Modifier adresse</a>
       </div>
 
-      <a class="collapsed" data-bs-toggle="collapse" href="#statSubmenu" role="button" aria-expanded="false" aria-controls="statSubmenu">
-        <i class="fas fa-chart-line"></i> Statistiques
+      <a th:href="@{/commandes}"><i class="fas fa-shopping-cart"></i> Mes commandes</a>
+      <a th:href="@{/user/favoris}"><i class="fas fa-heart"></i> Mes produits favoris</a>
+
+      <a class="collapsed" data-bs-toggle="collapse" href="#employeeSubmenu" role="button" aria-expanded="false" aria-controls="employeeSubmenu">
+        <i class="fas fa-briefcase"></i> Employé <span class="submenu-icon fas fa-caret-right"></span>
       </a>
-      <div class="collapse" id="statSubmenu">
-        <a href="#"><i class="fas fa-chart-bar"></i> Ventes</a>
-        <a href="#"><i class="fas fa-chart-pie"></i> Répartition des produits</a>
-        <a href="#"><i class="fas fa-chart-area"></i> Croissance des utilisateurs</a>
+      <div class="collapse marginR" id="employeeSubmenu">
+        <a href="#" style="font-size: 16px;"><i class="fas fa-list"></i> Liste des commandes</a>
+        <a href="#" style="font-size: 16px;"><i class="fas fa-chart-bar"></i> Commandes à traiter</a>
+        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#statSubmenu" role="button" aria-expanded="false" aria-controls="statSubmenu">
+          <i class="fas fa-chart-line"></i> Statistiques <span class="submenu-icon fas fa-caret-right"></span>
+        </a>
+        <div class="collapse marginR" id="statSubmenu">
+          <a href="#" style="font-size: 14px;"><i class="fas fa-chart-bar"></i> Ventes</a>
+          <a href="#" style="font-size: 14px;"><i class="fas fa-chart-pie"></i> Répartition des produits</a>
+        </div>
       </div>
 
       <a class="collapsed" data-bs-toggle="collapse" href="#adminSubmenu" role="button" aria-expanded="false" aria-controls="adminSubmenu">
-        <i class="fas fa-cog"></i> Admin
+        <i class="fas fa-cog"></i> Admin <span class="submenu-icon fas fa-caret-right"></span>
       </a>
-      <div class="collapse" id="adminSubmenu">
-        <a href="#"><i class="fas fa-box"></i> Gestion stock</a>
-        <a href="#">Ajouter un produit</a>
-        <a href="#">Modifier un produit</a>
-        <a href="#">Supprimer un produit</a>
-      </div>
-
-      <a class="collapsed" data-bs-toggle="collapse" href="#userManagementSubmenu" role="button" aria-expanded="false" aria-controls="userManagementSubmenu">
-        <i class="fas fa-users"></i> Gestion des utilisateurs
-      </a>
-      <div class="collapse" id="userManagementSubmenu">
-        <a href="#"><i class="fas fa-user-plus"></i> Ajouter un utilisateur</a>
-        <a href="#"><i class="fas fa-list"></i> Liste des utilisateurs</a>
+      <div class="collapse marginR" id="adminSubmenu">
+        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#stockSubmenu" role="button" aria-expanded="false" aria-controls="stockSubmenu">
+          <i class="fas fa-box"></i> Gestion stock <span class="submenu-icon fas fa-caret-right"></span>
+        </a>
+        <div class="collapse marginR" id="stockSubmenu">
+          <a th:href="@{/produits/admin}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des produits</a>
+          <a th:href="@{/produit/create}" style="font-size: 14px;"><i class="fas fa-plus-square"></i> Ajouter un produit</a>
+          <a th:href="@{/cat/allCat}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des catégories</a>
+          <a href="#" style="font-size: 14px;"><i class="fas fa-edit"></i> Modifier un produit</a>
+          <a href="#" style="font-size: 14px;"><i class="fas fa-trash-alt"></i> Supprimer un produit</a>
+        </div>
+        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#userManagementSubmenu" role="button" aria-expanded="false" aria-controls="userManagementSubmenu">
+          <i class="fas fa-users"></i> Gestion utilisateurs <span class="submenu-icon fas fa-caret-right"></span>
+        </a>
+        <div class="collapse marginR" id="userManagementSubmenu">
+          <a href="#" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des utilisateurs</a>
+          <a href="#" style="font-size: 14px;"><i class="fas fa-user-plus"></i> Ajouter un utilisateur</a>
+        </div>
       </div>
     </div>
 
@@ -185,12 +229,12 @@
             <div class="card address-card">
               <div class="card-body">
                 <div class="address-detail">
-                  <p><strong>Rue:</strong> <span th:text="${adresse.rue}" th:if="${adresse.rue != null}">Non renseignée</span></p>
-                  <p><strong>Numéro:</strong> <span th:text="${adresse.numero}" th:if="${adresse.numero != null}">Non renseigné</span></p>
-                  <p><strong>Localité:</strong> <span th:text="${adresse.localite}" th:if="${adresse.localite != null}">Non renseignée</span></p>
-                  <p><strong>Code Postal:</strong> <span th:text="${adresse.codePostal}" th:if="${adresse.codePostal != null}">Non renseigné</span></p>
-                  <p><strong>Ville:</strong> <span th:text="${adresse.ville}" th:if="${adresse.ville != null}">Non renseignée</span></p>
-                  <p><strong>Pays:</strong> <span th:text="${adresse.pays}" th:if="${adresse.pays != null}">Non renseigné</span></p>
+                  <p><strong>Rue:</strong> <span th:text="${adresse.rue}" th:if="${adresse.rue != null}"></span></p>
+                  <p><strong>Numéro:</strong> <span th:text="${adresse.numero}" th:if="${adresse.numero != null}"></span></p>
+                  <p><strong>Localité:</strong> <span th:text="${adresse.localite}" th:if="${adresse.localite != null}"></span></p>
+                  <p><strong>Code Postal:</strong> <span th:text="${adresse.codePostal}" th:if="${adresse.codePostal != null}"></span></p>
+                  <p><strong>Ville:</strong> <span th:text="${adresse.ville}" th:if="${adresse.ville != null}"></span></p>
+                  <p><strong>Pays:</strong> <span th:text="${adresse.pays}" th:if="${adresse.pays != null}"></span></p>
                   <p th:if="${adresse.departement != null}"><strong>Département:</strong> <span th:text="${adresse.departement}"></span></p>
                 </div>
               </div>
@@ -198,19 +242,22 @@
           </div>
         </div>
         <div>
-          <!-- Bouton Modifier profil -->
           <a class="btn btn-outline-warning" th:href="@{'/user/' + ${user.id} + '/profile/edit'}">Modifier profil</a>
-          <!-- Bouton Modifier adresse -->
           <a class="btn btn-outline-primary" th:href="@{'/user/' + ${user.id} + '/adresse/edit'}">Modifier adresse</a>
         </div>
-
       </div>
     </div>
   </div>
 </div>
+
 <!-- Footer -->
 <div class="page-footer">
   <div th:replace="~{fragments/footer :: footer}"></div>
 </div>
+<!-- jQuery (Nécessaire avant les scripts Bootstrap) -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<!-- Bootstrap 5 Bundle JS (inclut Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

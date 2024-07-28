@@ -421,7 +421,6 @@ public class ProduitController {
                 Marque marque1 = marqueRes.get();
                 produit.setMarque(marque1);
             }
-            System.out.println(marqueRes+"***************************debug");
         }
 
         produit.setDateCreation(LocalDateTime.now());
