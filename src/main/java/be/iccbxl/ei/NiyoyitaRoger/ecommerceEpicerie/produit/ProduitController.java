@@ -17,6 +17,7 @@ import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.PanierService;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.CustomUserDetails;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.User;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.UserRepository;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
@@ -27,9 +28,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -44,8 +48,10 @@ import java.sql.Blob;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import javax.imageio.ImageIO;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 public class ProduitController {
@@ -79,6 +85,9 @@ public class ProduitController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private PanierService panierService;
@@ -258,7 +267,7 @@ public class ProduitController {
     }
 
 
-
+/**
     @GetMapping("/produits/admin")//faire un autre pour les non admin gérent/manager
     public String showAllProducts(Model model) {
 
@@ -267,6 +276,29 @@ public class ProduitController {
 
         model.addAttribute("listProducts", productsList);
         model.addAttribute("catList", categorieList);
+
+        return "produit/admin_produit";
+    }**/
+
+    @GetMapping("/produits/admin")
+    @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")
+    public String showAllProducts(Model model, Authentication authentication) {
+        String title = "Liste des produits";
+        List<Produit> productsList = produitService.getAllProduct();
+        List<Categorie> categorieList = categorieService.getAllCategorie();
+
+        model.addAttribute("listProducts", productsList);
+        model.addAttribute("catList", categorieList);
+        model.addAttribute("title",title);
+
+        // Récupération de l'utilisateur connecté
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            String username = userDetails.getUsername();
+            User user = userService.getUserByEmail(username);
+            model.addAttribute("user", user);
+        }
 
         return "produit/admin_produit";
     }
@@ -302,14 +334,30 @@ public class ProduitController {
     }
 
     @GetMapping("/produit/create")
-    public String afficherFormulaireNouveauProduit(Model model, HttpServletRequest request) {
+    @PreAuthorize("isAuthenticated() and hasRole('Admin')")
+    public String afficherFormulaireNouveauProduit(Model model,
+                                                   HttpServletRequest request,
+                                                   Authentication authentication) {
         String message = "";
-        String title = "Nouveau produit";
+        String title = "Ajouter un produit";
 
         //Trié les listes par ordre !!
         List<Categorie> categorieList = categorieService.getAllCategorie();
         List<MotCle> motCleList = motCleService.getAllMotCle();
         List<Marque> marqueList = marqueService.getAllMarque();
+
+        // Récupération de l'utilisateur connecté
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            String username = userDetails.getUsername();
+            User user = userService.getUserByEmail(username);
+            model.addAttribute("user", user);
+        } else {
+            // Optionally log or handle the case where principal is not a UserDetails instance
+            throw new IllegalStateException("L'utilisateur connecté n'est pas une instance de UserDetails");
+        }
+
 
         //Générer le lien retour pour l'annulation
         String referrer = request.getHeader("Referer");
@@ -344,76 +392,67 @@ public class ProduitController {
             @RequestParam("maxStock") String maxStock,
             @RequestParam(name = "actif", required = false) Boolean actif,
             Model model) throws CategorieNotFoundException {
-
-        if (image.isEmpty()) {
-            return "redirect:/produits";
-        }
+        
 
         Produit produit = new Produit();
+        System.out.println(produit+ "lalalalalalalalala");
 
         try {
             // Lire l'image à l'aide de ImageIO
             BufferedImage bufferedImage = ImageIO.read(image.getInputStream());
-            // Convertir l'image en format JPEG
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(bufferedImage, "jpeg", baos);
-            byte[] imageBytes = baos.toByteArray();
+            if (bufferedImage != null) {
+                // Convertir l'image en format JPEG
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(bufferedImage, "jpeg", baos);
+                byte[] imageBytes = baos.toByteArray();
 
-            // Enregistrez l'image dans l'objet Produit
-            Blob blob = new javax.sql.rowset.serial.SerialBlob(imageBytes);
-            produit.setImagePrincipale(blob);
+                // Enregistrez l'image dans l'objet Produit
+                Blob blob = new javax.sql.rowset.serial.SerialBlob(imageBytes);
+                produit.setImagePrincipale(blob);
+            }
         } catch (IOException | SQLException e) {
             e.printStackTrace();
+            // Gérer l'erreur de téléchargement d'image
+            model.addAttribute("error", "Erreur lors de l'upload de l'image.");
+            return "produit/create";
         }
 
-        if(catId != null && !catId.trim().isEmpty()) {
+        if (catId != null && !catId.trim().isEmpty()) {
             Optional<Categorie> cat = categorieRepository.findById(Long.parseLong(catId));
-            if(cat.isPresent()){
-                Categorie catRes = categorieService.getCategorieById(cat.get().getId());
-                produit.setCategorie(catRes);
+            if (cat.isPresent()) {
+                produit.setCategorie(cat.get());
             } else {
                 throw new CategorieNotFoundException("Catégorie non trouvée");
             }
         }
 
-        System.out.println(produit);
-        // Faire de même pour la gestion des mots-clés
-        String errorCat = "";
-        if(catId != null && !catId.trim().isEmpty()) {
-            Optional<Categorie> cat = categorieRepository.findById(Long.parseLong(catId));
-            if(cat.isPresent()){
-                Categorie catRes = cat.orElseThrow(() -> new CategorieNotFoundException("Catégorie non trouvée"));
-                produit.setCategorie(catRes);
-            } else {
-                throw new CategorieNotFoundException("Catégorie non trouvée");
-            }
-        }
-
-        //Ajout des mots clés
-        for(Long motCleId : motCleIds) {
+        // Ajout des mots clés
+        for (Long motCleId : motCleIds) {
             MotCle motCle = motCleService.getMotCle(motCleId);
             produit.getMotsCles().add(motCle);
         }
+        if(description == null || description.trim().isEmpty()){
+            description = "";
+        }else {
+            description = description.trim();
+        }
+
         produit.setNom(nom);
         produit.setDescription(description);
         produit.setPrix(new BigDecimal(prix));
-        produit.setDisponibilite(true);
         produit.setTypePrix(typePrix);
-        quantite.trim();
-        minStock.trim();
-        maxStock.trim();
-        produit.setQuantite(Integer.parseInt(quantite));
 
-        if(!minStock.isEmpty() && minStock != "") {
-            produit.setMinStock(Integer.parseInt(minStock));
-        }
-        if(!maxStock.isEmpty() && maxStock != ""){
-            produit.setMaxStock(Integer.parseInt(maxStock));
+        produit.setQuantite(Integer.parseInt(quantite.trim()));
+
+        if (!minStock.isEmpty()) {
+            produit.setMinStock(Integer.parseInt(minStock.trim()));
         }
 
-        if (actif == null) {
-            produit.setActif(false);
+        if (!maxStock.isEmpty()) {
+            produit.setMaxStock(Integer.parseInt(maxStock.trim()));
         }
+
+        produit.setActif(actif != null && actif);
 
         if(marque != null && !marque.trim().isEmpty()) {
             Optional<Marque> marqueRes = Optional.ofNullable(marqueRepository.findById(Long.parseLong(marque)));
@@ -425,9 +464,11 @@ public class ProduitController {
 
         produit.setDateCreation(LocalDateTime.now());
         produitService.updateProduit(produit);
+
         model.addAttribute("produit", produit);
         return "redirect:/produits/admin";
     }
+
 
     @DeleteMapping("/produit/{id}")
     public String deleteProduit(@PathVariable("id") long id)  {

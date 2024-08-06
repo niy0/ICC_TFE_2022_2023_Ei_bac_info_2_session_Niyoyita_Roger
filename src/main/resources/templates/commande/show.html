@@ -16,6 +16,46 @@
   <meta name="_csrf" th:content="${_csrf.token}"/>
   <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
   <style>
+    body {
+      background-color: #f0f2f5;
+      font-family: Arial, sans-serif;
+    }
+    .sidenav {
+      position: fixed;
+      left: 0;
+      height: 100%;
+      width: 300px;
+      background-color: #343a40;
+      color: white;
+      padding-top: 0;
+      overflow-y: auto;
+      transition: width 0.3s ease-in-out;
+      border-radius: 0 0.5rem 0 0;
+    }
+    .sidenav a {
+      padding: 15px 25px;
+      text-decoration: none;
+      font-size: 18px;
+      color: white;
+      display: block;
+      transition: background 0.2s, color 0.2s, padding-left 0.2s;
+    }
+    .sidenav a:hover {
+      background-color: #495057;
+      color: rgb(255, 193, 7);
+      padding-left: 35px;
+    }
+    .sidenav .active, .sidenav .active:hover {
+      background-color: #007bff;
+      color: white;
+      padding-left: 35px;
+    }
+    .container {
+      max-width: 1200px;
+      margin-left: 320px; /* Ajuster cette marge en fonction de la largeur de la sidenav */
+      padding-top: 20px; /* Ajuster la marge supérieure pour éviter un chevauchement avec la barre de navigation, si présente */
+      transition: margin-left 0.3s ease-in-out;
+    }
     .invoice-box {
       max-width: 800px;
       margin: auto;
@@ -27,6 +67,13 @@
       font-family: 'Helvetica Neue', 'Helvetica', Arial, sans-serif;
       color: #555;
       transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .marginR {
+      margin-left: 30px;
+    }
+
+    .marginL {
+      margin-right: 20px;
     }
     .invoice-box:hover {
       transform: translateY(-5px);
@@ -82,11 +129,103 @@
       background-color: #0056b3;
       border-color: #004085;
     }
+    .submenu-icon {
+      float: right;
+      transition: transform 0.3s;
+    }
+
+    .submenu-icon.collapsed::before {
+      content: "\f0da"; /* FontAwesome icon for down arrow */
+    }
+
+    .submenu-icon:not(.collapsed)::before {
+      content: "\f0d7"; /* FontAwesome icon for up arrow */
+    }
+
+    @media (max-width: 768px) {
+      .sidenav {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+      .sidenav a {
+        float: left;
+        padding: 15px;
+      }
+      .sidenav a:hover {
+        padding-left: 15px;
+      }
+      .container {
+        margin-left: 0;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .sidenav a, .sidenav a:hover {
+        padding-left: 15px;
+      }
+      .invoice-box {
+        width: 100%;
+        margin: 20px 0;
+      }
+    }
   </style>
 </head>
 <body>
 <div class="container mt-4">
   <div layout:fragment="content">
+    <div class="sidenav">
+      <a href="javascript:location.reload()" class="btn-refresh">
+        <span class="refresh-text marginL">Replier les sous-menus</span> <i class="fas fa-sync-alt" style="color: rgb(255, 193, 7);"></i>
+      </a>
+      <a class="collapsed" data-bs-toggle="collapse" href="#profileSubmenu" role="button" aria-expanded="false" aria-controls="profileSubmenu">
+        <i class="fas fa-user-circle"></i> Profile : <span th:text="${user.nom} + ' ' + ${user.prenom}"></span>
+        <span class="submenu-icon fas fa-caret-right"></span>
+      </a>
+      <div class="collapse marginR" id="profileSubmenu">
+        <a th:href="@{'/user/' + ${user.id} + '/profile'}" style="font-size: 16px;"><i class="fas fa-user-circle"></i>Voir profil</a>
+        <a th:href="@{'/user/' + ${user.id} + '/profile/edit'}" style="font-size: 16px;"><i class="fas fa-user-edit"></i> Modifier profil</a>
+        <a th:href="@{'/user/' + ${user.id} + '/adresse/edit'}" style="font-size: 16px;"><i class="fas fa-address-card"></i> Modifier adresse</a>
+      </div>
+
+      <a th:href="@{/commandes}"><i class="fas fa-shopping-cart"></i> Mes commandes</a>
+      <a th:href="@{/user/favoris}"><i class="fas fa-heart"></i> Mes produits favoris</a>
+
+      <a class="collapsed" data-bs-toggle="collapse" href="#employeeSubmenu" role="button" aria-expanded="false" aria-controls="employeeSubmenu">
+        <i class="fas fa-briefcase"></i> Employé <span class="submenu-icon fas fa-caret-right"></span>
+      </a>
+      <div class="collapse marginR" id="employeeSubmenu">
+        <a href="#" style="font-size: 16px;"><i class="fas fa-list"></i> Liste des commandes</a>
+        <a href="#" style="font-size: 16px;"><i class="fas fa-chart-bar"></i> Commandes à traiter</a>
+        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#statSubmenu" role="button" aria-expanded="false" aria-controls="statSubmenu">
+          <i class="fas fa-chart-line"></i> Statistiques <span class="submenu-icon fas fa-caret-right"></span>
+        </a>
+        <div class="collapse marginR" id="statSubmenu">
+          <a href="#" style="font-size: 14px;"><i class="fas fa-chart-bar"></i> Ventes</a>
+          <a href="#" style="font-size: 14px;"><i class="fas fa-chart-pie"></i> Répartition des produits</a>
+        </div>
+      </div>
+
+      <a class="collapsed" data-bs-toggle="collapse" href="#adminSubmenu" role="button" aria-expanded="false" aria-controls="adminSubmenu">
+        <i class="fas fa-cog"></i> Admin <span class="submenu-icon fas fa-caret-right"></span>
+      </a>
+      <div class="collapse marginR" id="adminSubmenu">
+        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#stockSubmenu" role="button" aria-expanded="false" aria-controls="stockSubmenu">
+          <i class="fas fa-box"></i> Gestion stock <span class="submenu-icon fas fa-caret-right"></span>
+        </a>
+        <div class="collapse marginR" id="stockSubmenu">
+          <a th:href="@{/produits/admin}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des produits</a>
+          <a th:href="@{/produit/create}" style="font-size: 14px;"><i class="fas fa-plus-square"></i> Ajouter un produit</a>
+        </div>
+        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#userManagementSubmenu" role="button" aria-expanded="false" aria-controls="userManagementSubmenu">
+          <i class="fas fa-users"></i> Gestion utilisateurs <span class="submenu-icon fas fa-caret-right"></span>
+        </a>
+        <div class="collapse marginR" id="userManagementSubmenu">
+          <a th:href="@{/admin/user_list}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des utilisateurs</a>
+          <a th:href="@{/admin/add_new_user}"   style="font-size: 14px;"><i class="fas fa-user-plus"></i> Ajouter un utilisateur</a>
+        </div>
+      </div>
+    </div>
     <div class="invoice-box">
       <table cellpadding="0" cellspacing="0">
         <tr class="top">
@@ -145,7 +284,7 @@
           <td th:text="${commande.statut}"></td>
         </tr>
         <tr class="heading">
-          <td>Article</td>
+          <td>Article(s)</td>
           <td>Prix</td>
         </tr>
         <tr th:each="ligne : ${commande.lignesDeCommande}" class="item">

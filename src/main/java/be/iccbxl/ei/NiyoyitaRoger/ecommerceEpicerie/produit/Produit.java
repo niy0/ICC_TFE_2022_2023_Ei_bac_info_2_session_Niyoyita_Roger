@@ -3,6 +3,7 @@ package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.SQLException;
@@ -21,7 +22,7 @@ import org.springframework.util.StreamUtils;
 
 @Entity
 @Table(name = "produit")
-public class Produit {
+public class Produit implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

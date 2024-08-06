@@ -7,8 +7,10 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,7 +18,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 
 @Controller
@@ -50,31 +55,106 @@ public class UserController {
         }
     }
 
+    @GetMapping("/admin/add_new_user")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String adminNewUserForm(Model model,Authentication authentication) {
+
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            String username = userDetails.getUsername();
+            User user = userService.getUserByEmail(username);
+            model.addAttribute("user", user);
+        } else {
+            throw new IllegalStateException("L'utilisateur connecté n'est pas une instance de UserDetails");
+        }
+        
+        model.addAttribute("newUser", new User()); // changer le nom user par newUser
+        model.addAttribute("roles", roleRepository.findAll());
+        return "user/admin_create_user";
+    }
+
     //permet pour un admin de changer de role a un user
-    @PostMapping("/updateUserRole")
-    public ResponseEntity<String> updateUserRole(@RequestParam Long userID, @RequestParam String newRole) {
-        User userToChangeRole = userService.getUserById(userID);
-        if (userToChangeRole == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Utilisateur non trouvé");
+    @PostMapping("/admin/add_new_user")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String adminNewUser(@ModelAttribute("newUser") User user, @RequestParam List<Long> roleIds, Model model) {
+        User userTest = userService.getUserByEmail(user.getEmail());
+
+        if (userTest != null) {
+            model.addAttribute("roles", roleRepository.findAll());
+            return "admin/add_new_user";
         }
 
-        Role userNewRole = roleRepository.findByNom(newRole);
-        if (userNewRole == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Rôle non trouvé");
+        Set<Role> roles = new HashSet<>(roleRepository.findAllById(roleIds));
+        user.setRoles(roles);
+        userService.save(user);
+
+        System.out.println(user + "Nouvel utilisateur a été rajouté.");
+        return "redirect:/admin/user_list";
+    }
+
+    @GetMapping("/admin/user_list")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String listUsers(Model model,Authentication authentication) {
+
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            String username = userDetails.getUsername();
+            User user = userService.getUserByEmail(username);
+            model.addAttribute("user", user);
+        } else {
+            throw new IllegalStateException("L'utilisateur connecté n'est pas une instance de UserDetails");
         }
 
-        // Vérifier si l'utilisateur a déjà ce rôle pour éviter les doublons
-        if (userToChangeRole.getRoles().contains(userNewRole)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("L'utilisateur a déjà ce rôle");
+        List<User> listUsers = userService.getAllUsers();
+        model.addAttribute("listUsers", listUsers);
+        model.addAttribute("title", "Liste des utilisateurs");
+        return "user/admin_user_list";
+    }
+
+    @GetMapping("/admin/user/{id}/edit")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String editUserRoles(@PathVariable("id") Long id,
+                                Model model,
+                                Authentication authentication) {
+
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            String username = userDetails.getUsername();
+            User user = userService.getUserByEmail(username);
+            model.addAttribute("user", user);
+        } else {
+            throw new IllegalStateException("L'utilisateur connecté n'est pas une instance de UserDetails");
         }
 
-        userToChangeRole.getRoles().add(userNewRole);
-        userService.save(userToChangeRole);
+        User editUser = userService.getUserById(id);
+        List<Role> roles = roleRepository.findAll();
+        model.addAttribute("editUser", editUser);
+        model.addAttribute("roles", roles);
+        return "user/admin_update_user";
+    }
 
-        // Ensuite, après avoir mis à jour les autorisations dans la base de données
-        userSessionService.clearUserCache(userToChangeRole.getEmail());
+    @PostMapping("/admin/user/{id}/edit")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String updateUserRoles(@RequestParam("editUserId") Long editUserId,
+                                  @RequestParam("roleIds") List<Long> roleIds,
+                                  Authentication authentication,
+                                  Model model) {
 
-        return ResponseEntity.ok("Rôle de l'utilisateur mis à jour avec succès.");
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            String username = userDetails.getUsername();
+            User user = userService.getUserByEmail(username);
+            model.addAttribute("user", user);
+        } else {
+            throw new IllegalStateException("L'utilisateur connecté n'est pas une instance de UserDetails");
+        }
+
+        userService.updateUserRoles(editUserId, roleIds);
+        return "redirect:/admin/user_list";
     }
 
 
@@ -88,8 +168,6 @@ public class UserController {
     public String processRegistration(User user, RedirectAttributes redirectAttributes, Model model) {
         User userTest = userService.getUserByEmail(user.getEmail());
         if (userTest != null) {
-            System.out.println(userTest+"ttttttttttttttt");
-            //model.addAttribute("currentUser", user);
             redirectAttributes.addFlashAttribute("message", "Login existe déjà !");
             return "redirect:/signup";
         } else {
@@ -113,15 +191,52 @@ public class UserController {
     }
 
     @GetMapping("/user/{userId}/profile/edit")
-    public String getUpdateUser(@PathVariable("userId") long userId,Model model) {
-        User user = userService.getUserById(userId);
-        model.addAttribute("user", user);
+    public String getUpdateUser(@PathVariable("userId") long userId,
+                                Model model,
+                                Authentication authentication) {
+        //User user = userService.getUserById(userId);
+        //model.addAttribute("user", user);
+        // Récupération de l'utilisateur connecté
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            String username = userDetails.getUsername();
+            User user = userService.getUserByEmail(username);
+            model.addAttribute("user", user);
+        } else {
+            // Optionally log or handle the case where principal is not a UserDetails instance
+            throw new IllegalStateException("L'utilisateur connecté n'est pas une instance de UserDetails");
+        }
+
         return "/user/edit";
     }
 
-    @PostMapping("/user/{userId}/profile/edit")
-    public String updateUser(@RequestParam("id") long id,
-                             @RequestParam("nom") String nom,
+
+    @GetMapping("/user/{userId}/adresse/edit")
+    public String getUpdateAdresseUser(@PathVariable("userId") long userId,
+                                Model model,
+                                Authentication authentication) {
+
+        // Récupération de l'utilisateur connecté
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            String username = userDetails.getUsername();
+            User user = userService.getUserByEmail(username);
+            Adresse adresse = user.getAdresse();
+            model.addAttribute("user", user);
+            model.addAttribute("adresse", adresse);
+        } else {
+            // Optionally log or handle the case where principal is not a UserDetails instance
+            throw new IllegalStateException("L'utilisateur connecté n'est pas une instance de UserDetails");
+        }
+
+        return "/user/edit_adresse";
+    }
+
+    @PostMapping("/user/{userId}/adresse/edit")
+    public String updateAdresseUser(@RequestParam("id") long id,
+                             @RequestParam("rue") String nom,
                              @RequestParam("prenom") String prenom,
                              @RequestParam("email") String email,
                              @RequestParam("sexe") String sexe,
@@ -134,6 +249,31 @@ public class UserController {
             user.setNom(nom);
             user.setPrenom(prenom);
             user.setEmail(email);
+            user.setSexe(Sexe.valueOf(sexe));
+            user.setTelephone(telepone);
+            user.setDateModification(LocalDateTime.now());
+            userService.save(user);
+            return "redirect:/user/" + user.getId()+ "/profile";
+        }else {
+            erroMessage = "Utilisateur vide";
+        }
+
+        return erroMessage;
+    }
+
+    @PostMapping("/user/{userId}/profile/edit")
+    public String updateUser(@RequestParam("id") long id,
+                             @RequestParam("nom") String nom,
+                             @RequestParam("prenom") String prenom,
+                             @RequestParam("sexe") String sexe,
+                             @RequestParam("telephone") String telepone) {
+
+        String erroMessage ="";
+        User user = userService.getUserById(id);
+
+        if(user != null) {
+            user.setNom(nom);
+            user.setPrenom(prenom);
             user.setSexe(Sexe.valueOf(sexe));
             user.setTelephone(telepone);
             user.setDateModification(LocalDateTime.now());

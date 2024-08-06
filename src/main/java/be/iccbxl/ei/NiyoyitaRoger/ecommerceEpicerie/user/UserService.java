@@ -10,8 +10,10 @@ import org.springframework.stereotype.Service;
 
 import java.sql.SQLOutput;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserService {
@@ -68,6 +70,16 @@ public class UserService {
         existingUser.setDateModification(LocalDateTime.now());
         userRepository.save(updatedUser);
         return errorMessage;
+    }
+
+    public void updateUserRoles(Long userId, List<Long> roleIds) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            Set<Role> roles = new HashSet<>(roleRepository.findAllById(roleIds));
+            user.setRoles(roles);
+            userRepository.save(user);
+        }
     }
 
     public void deleteUser(Long userId) {

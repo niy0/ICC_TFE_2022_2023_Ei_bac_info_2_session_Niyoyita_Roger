@@ -97,7 +97,7 @@ public class SuccessCancelController {
 
         //vider le panier
 
-        return "redirect:/commande/detail/" + nouvelleCommande.getId();
+        return "redirect:/commande/detail/" + nouvelleCommande.getId(); // la transformer en user/commande/detail
     }
 
 

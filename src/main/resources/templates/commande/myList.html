@@ -6,7 +6,45 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
   <style>
-    .container { max-width: 1200px; }
+    body {
+      background-color: #f0f2f5;
+      font-family: Arial, sans-serif;
+    }
+    .sidenav {
+      position: fixed;
+      left: 0;
+      height: 100%;
+      width: 300px;
+      background-color: #343a40;
+      color: white;
+      padding-top: 0px;
+      overflow-y: auto;
+      transition: width 0.3s ease-in-out;
+      border-radius: 0 0.5rem 0 0;
+    }
+    .sidenav a {
+      padding: 15px 25px;
+      text-decoration: none;
+      font-size: 18px;
+      color: white;
+      display: block;
+      transition: background 0.2s, color 0.2s, padding-left 0.2s;
+    }
+    .sidenav a:hover {
+      background-color: #495057;
+      color: rgb(255, 193, 7);
+      padding-left: 35px;
+    }
+    .sidenav .active, .sidenav .active:hover {
+      background-color: #007bff;
+      color: white;
+      padding-left: 35px;
+    }
+    .container {
+      max-width: 1200px;
+      margin-left: 320px;
+      padding-top: 20px;
+    }
     .order-card {
       background: #fff;
       border-radius: 10px;
@@ -15,7 +53,9 @@
       padding: 20px;
       transition: transform 0.2s;
     }
-    .order-card:hover { transform: translateY(-5px); }
+    .order-card:hover {
+      transform: translateY(-5px);
+    }
     .order-header {
       display: flex;
       justify-content: space-between;
@@ -24,34 +64,152 @@
       padding-bottom: 10px;
       margin-bottom: 10px;
     }
-    .order-id { font-size: 1.5rem; font-weight: bold; color: #007bff; }
+    .order-id {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #007bff;
+    }
     .order-status {
       padding: 5px 10px;
       border-radius: 5px;
       color: #fff;
     }
-    .status-en_attente { background-color: #f0ad4e; }
-    .status-en_cours { background-color: #5bc0de; }
-    .status-en_preparation { background-color: #0275d8; }
-    .status-commande_prete, .status-livree { background-color: #5cb85c; }
-    .status-annulee { background-color: #d9534f; }
+    .status-en_attente {
+      background-color: #f0ad4e;
+    }
+    .status-en_cours {
+      background-color: #5bc0de;
+    }
+    .status-en_preparation {
+      background-color: #0275d8;
+    }
+    .status-commande_prete, .status-livree {
+      background-color: #5cb85c;
+    }
+    .status-annulee {
+      background-color: #d9534f;
+    }
+    .marginR{
+      margin-left: 30px;
+    }
+
+    .marginL{
+      margin-right: 20px;
+    }
     .order-info {
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
     }
-    .order-info div { margin-bottom: 10px; }
-    .order-total { font-size: 1.2rem; font-weight: bold; }
-    .order-actions { text-align: right; }
-    .pagination { justify-content: center; }
+    .order-info div {
+      margin-bottom: 10px;
+    }
+    .order-total {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    .order-actions {
+      text-align: right;
+    }
+    .pagination {
+      justify-content: center;
+    }
+    .submenu-icon {
+      float: right;
+      transition: transform 0.3s;
+    }
+
+    .submenu-icon.collapsed::before {
+      content: "\f0da"; /* FontAwesome icon for down arrow */
+    }
+
+    .submenu-icon:not(.collapsed)::before {
+      content: "\f0d7"; /* FontAwesome icon for up arrow */
+    }
+
+    @media (max-width: 768px) {
+      .sidenav {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+      .sidenav a {
+        float: left;
+        padding: 15px;
+      }
+      .sidenav a:hover {
+        padding-left: 15px;
+      }
+      .container {
+        margin-left: 0;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .sidenav a, .sidenav a:hover {
+        padding-left: 15px;
+      }
+    }
   </style>
 </head>
 <body>
 <div class="container mt-4">
   <div layout:fragment="content">
+    <div class="sidenav">
+      <a href="javascript:location.reload()" class="btn-refresh">
+        <span class="refresh-text marginL">Replier les sous-menus</span> <i class="fas fa-sync-alt" style="color: rgb(255, 193, 7);"></i>
+      </a>
+      <a class="collapsed" data-bs-toggle="collapse" href="#profileSubmenu" role="button" aria-expanded="false" aria-controls="profileSubmenu">
+        <i class="fas fa-user-circle"></i> Profile : <span th:text="${user.nom} + ' ' + ${user.prenom}"></span>
+        <span class="submenu-icon fas fa-caret-right"></span>
+      </a>
+      <div class="collapse marginR" id="profileSubmenu">
+        <a th:href="@{'/user/' + ${user.id} + '/profile'}" style="font-size: 16px;"><i class="fas fa-user-circle"></i>Voir profil</a>
+        <a th:href="@{'/user/' + ${user.id} + '/profile/edit'}" style="font-size: 16px;"><i class="fas fa-user-edit"></i> Modifier profil</a>
+        <a th:href="@{'/user/' + ${user.id} + '/adresse/edit'}" style="font-size: 16px;"><i class="fas fa-address-card"></i> Modifier adresse</a>
+      </div>
+
+      <a th:href="@{/commandes}"><i class="fas fa-shopping-cart"></i> Mes commandes</a>
+      <a th:href="@{/user/favoris}"><i class="fas fa-heart"></i> Mes produits favoris</a>
+
+      <a class="collapsed" data-bs-toggle="collapse" href="#employeeSubmenu" role="button" aria-expanded="false" aria-controls="employeeSubmenu">
+        <i class="fas fa-briefcase"></i> Employé <span class="submenu-icon fas fa-caret-right"></span>
+      </a>
+      <div class="collapse marginR" id="employeeSubmenu">
+        <a href="#" style="font-size: 16px;"><i class="fas fa-list"></i> Liste des commandes</a>
+        <a href="#" style="font-size: 16px;"><i class="fas fa-chart-bar"></i> Commandes à traiter</a>
+        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#statSubmenu" role="button" aria-expanded="false" aria-controls="statSubmenu">
+          <i class="fas fa-chart-line"></i> Statistiques <span class="submenu-icon fas fa-caret-right"></span>
+        </a>
+        <div class="collapse marginR" id="statSubmenu">
+          <a href="#" style="font-size: 14px;"><i class="fas fa-chart-bar"></i> Ventes</a>
+          <a href="#" style="font-size: 14px;"><i class="fas fa-chart-pie"></i> Répartition des produits</a>
+        </div>
+      </div>
+
+      <a class="collapsed" data-bs-toggle="collapse" href="#adminSubmenu" role="button" aria-expanded="false" aria-controls="adminSubmenu">
+        <i class="fas fa-cog"></i> Admin <span class="submenu-icon fas fa-caret-right"></span>
+      </a>
+      <div class="collapse marginR" id="adminSubmenu">
+        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#stockSubmenu" role="button" aria-expanded="false" aria-controls="stockSubmenu">
+          <i class="fas fa-box"></i> Gestion stock <span class="submenu-icon fas fa-caret-right"></span>
+        </a>
+        <div class="collapse marginR" id="stockSubmenu">
+          <a th:href="@{/produits/admin}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des produits</a>
+          <a th:href="@{/produit/create}" style="font-size: 14px;"><i class="fas fa-plus-square"></i> Ajouter un produit</a>
+        </div>
+        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#userManagementSubmenu" role="button" aria-expanded="false" aria-controls="userManagementSubmenu">
+          <i class="fas fa-users"></i> Gestion utilisateurs <span class="submenu-icon fas fa-caret-right"></span>
+        </a>
+        <div class="collapse marginR" id="userManagementSubmenu">
+          <a th:href="@{/admin/user_list}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des utilisateurs</a>
+          <a th:href="@{/admin/add_new_user}"   style="font-size: 14px;"><i class="fas fa-user-plus"></i> Ajouter un utilisateur</a>
+        </div>
+      </div>
+    </div>
     <div class="mt-5">
-      <h2><i class="fas fa-info-circle"></i> Mes Commandes</h2>
+      <h2> Mes Commandes</h2>
       <div th:if="${#lists.isEmpty(commandes.content)}">
         <p>Vous n'avez pas encore passé de commande.</p>
       </div>

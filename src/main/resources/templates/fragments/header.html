@@ -65,8 +65,8 @@
 
                 <!-- Affichez ces boutons si l'utilisateur est un utilisateur anonyme -->
                 <div th:if="${isAnonymousUser}">
-                    <a class="btn btn-success" th:href="@{/user/signup}" href="#">S'inscrire</a>
-                    <a class="btn btn-success" th:href="@{/login}" href="#">Se connecter</a>
+                    <a class="btn btn-success" th:href="@{/user/signup}" >S'inscrire</a>
+                    <a class="btn btn-success" th:href="@{/login}" >Se connecter</a>
                 </div>
 
                 <!-- Affichez ce bouton si l'utilisateur n'est PAS un utilisateur anonyme -->
