@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout" layout:decorate="~{layouts/main}">
+    <head>
+        <meta charset="UTF-8">
+        <title>Liste des commandes</title>
+        <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+        <style>
+            body {
+                background-color: #f0f2f5;
+                font-family: Arial, sans-serif;
+            }
+
+            .sidenav {
+                position: fixed;
+                left: 0;
+                height: calc(100vh - 60px);
+                width: 300px;
+                background-color: #343a40;
+                color: white;
+                padding-top: 0px;
+                overflow-y: auto;
+                transition: width 0.3s ease-in-out;
+                border-radius: 0 0.5rem 0 0;
+            }
+
+            .sidenav a {
+                padding: 15px 25px;
+                text-decoration: none;
+                font-size: 18px;
+                color: white;
+                display: block;
+                transition: background 0.2s, color 0.2s, padding-left 0.2s;
+            }
+
+            .sidenav a:hover {
+                background-color: #495057;
+                color: rgb(255, 193, 7);
+                padding-left: 35px;
+            }
+
+            .sidenav .active, .sidenav .active:hover {
+                background-color: #007bff;
+                color: white;
+                padding-left: 35px;
+            }
+
+            .content {
+                margin-top: 0;
+                margin-left: 300px;
+                padding: 20px;
+                transition: margin-left 0.3s;
+            }
+
+            .centered-content {
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                min-height: 90%;
+                margin-top: 5%;
+                margin-bottom: 10px;
+                width: 100%;
+            }
+
+            .title {
+                font-family: Arial, sans-serif;
+                font-weight: bold;
+                color: #007bff;
+            }
+
+            .fieldError {
+                color: red;
+            }
+
+            .table {
+                width: 100%;
+                margin: 20px 0;
+            }
+
+            .table-info {
+                background-color: #d1ecf1; /* Couleur de fond bleu clair */
+                color: #0c5460; /* Couleur du texte */
+            }
+
+
+            .btn-refresh {
+                color: white;
+                font-size: 20px;
+                transition: color 0.2s;
+                text-decoration: none;
+            }
+
+            .btn-refresh:hover {
+                color: rgb(255, 193, 7);
+            }
+
+            .card {
+                background-color: white;
+                border: 1px solid #dee2e6;
+                border-radius: 0.5rem;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                transition: transform 0.3s;
+                margin-top: 20px;
+                width: 100%;
+            }
+
+            .card:hover {
+                transform: translateY(-5px);
+            }
+
+            .card-title {
+                color: #007bff;
+            }
+
+            .card-subtitle {
+                color: #6c757d;
+            }
+
+            .btn-outline-warning, .btn-outline-danger, .btn-outline-success {
+                margin: 5px;
+            }
+
+            .marginR{
+                margin-left: 30px;
+            }
+
+            .marginL{
+                margin-right: 20px;
+            }
+
+            .submenu-icon {
+                float: right;
+                transition: transform 0.3s;
+            }
+
+            .submenu-icon.collapsed::before {
+                content: "\f0da"; /* FontAwesome icon for down arrow */
+            }
+
+            .submenu-icon:not(.collapsed)::before {
+                content: "\f0d7"; /* FontAwesome icon for up arrow */
+            }
+
+            .btn-refresh {
+                color: rgb(255, 193, 7);
+                font-size: 20px;
+                transition: color 0.2s;
+                text-decoration: none;
+            }
+
+            .btn-refresh:hover {
+                color: rgb(255, 193, 7);
+            }
+
+            @media (max-width: 768px) {
+                .sidenav {
+                    width: 100%;
+                    height: auto;
+                    position: relative;
+                }
+                .sidenav a {
+                    float: left;
+                    padding: 15px;
+                }
+                .sidenav a:hover {
+                    padding-left: 15px;
+                }
+                .content {
+                    margin-left: 0;
+                    padding: 20px;
+                }
+                .centered-content {
+                    margin-top: 20px;
+                    width: 100%;
+                }
+                .card {
+                    margin-top: 20px;
+                    width: 100%;
+                }
+                .table-responsive {
+                    display: block;
+                    width: 100%;
+                    overflow-x: auto;
+                }
+            }
+
+            @media (max-width: 600px) {
+                .sidenav a, .sidenav a:hover {
+                    padding-left: 15px;
+                }
+                .content {
+                    margin-left: 0;
+                    padding: 10px;
+                }
+                .centered-content {
+                    margin-top: 10px;
+                    width: 100%;
+                }
+                .card {
+                    margin-top: 10px;
+                    width: 100%;
+                }
+                .table-responsive {
+                    display: block;
+                    width: 100%;
+                    overflow-x: auto;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div layout:fragment="content" class="content">
+                <div class="sidenav">
+                    <a href="javascript:location.reload()" class="btn-refresh">
+                        <span class="refresh-text marginL">Replier les sous-menus</span> <i class="fas fa-sync-alt" style="color: rgb(255, 193, 7);"></i>
+                    </a>
+                    <a class="collapsed" data-bs-toggle="collapse" href="#profileSubmenu" role="button" aria-expanded="false" aria-controls="profileSubmenu">
+                        <i class="fas fa-user-circle"></i> Profile : <span th:text="${user.nom} + ' ' + ${user.prenom}"></span>
+                        <span class="submenu-icon fas fa-caret-right"></span>
+                    </a>
+                    <div class="collapse marginR" id="profileSubmenu">
+                        <a th:href="@{'/user/' + ${user.id} + '/profile'}" style="font-size: 16px;"><i class="fas fa-user-circle"></i>Voir profil</a>
+                        <a th:href="@{'/user/' + ${user.id} + '/profile/edit'}" style="font-size: 16px;"><i class="fas fa-user-edit"></i> Modifier profil</a>
+                        <a th:href="@{'/user/' + ${user.id} + '/adresse/edit'}" style="font-size: 16px;"><i class="fas fa-address-card"></i> Modifier adresse</a>
+                    </div>
+
+                    <a th:href="@{/commandes}"><i class="fas fa-shopping-cart"></i> Mes commandes</a>
+                    <a th:href="@{/user/favoris}"><i class="fas fa-heart"></i> Mes produits favoris</a>
+
+                    <a class="collapsed" data-bs-toggle="collapse" href="#employeeSubmenu" role="button" aria-expanded="false" aria-controls="employeeSubmenu">
+                        <i class="fas fa-briefcase"></i> Employé <span class="submenu-icon fas fa-caret-right"></span>
+                    </a>
+                    <div class="collapse marginR" id="employeeSubmenu">
+                        <a th:href="@{/employe/commandes}"style="font-size: 16px;"><i class="fas fa-list"></i> Liste des commandes</a>
+                        <a href="#" style="font-size: 16px;"><i class="fas fa-chart-bar"></i> Commandes à traiter</a>
+                        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#statSubmenu" role="button" aria-expanded="false" aria-controls="statSubmenu">
+                            <i class="fas fa-chart-line"></i> Statistiques <span class="submenu-icon fas fa-caret-right"></span>
+                        </a>
+                        <div class="collapse marginR" id="statSubmenu">
+                            <a href="#" style="font-size: 14px;"><i class="fas fa-chart-bar"></i> Ventes</a>
+                            <a href="#" style="font-size: 14px;"><i class="fas fa-chart-pie"></i> Répartition des produits</a>
+                        </div>
+                    </div>
+                    <a class="collapsed" data-bs-toggle="collapse" href="#adminSubmenu" role="button" aria-expanded="false" aria-controls="adminSubmenu">
+                        <i class="fas fa-cog"></i> Admin <span class="submenu-icon fas fa-caret-right"></span>
+                    </a>
+                    <div class="collapse marginR" id="adminSubmenu">
+                        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#stockSubmenu" role="button" aria-expanded="false" aria-controls="stockSubmenu">
+                            <i class="fas fa-box"></i> Gestion stock <span class="submenu-icon fas fa-caret-right"></span>
+                        </a>
+                        <div class="collapse marginR" id="stockSubmenu">
+                            <a th:href="@{/produits/admin}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des produits</a>
+                            <a th:href="@{/produit/create}" style="font-size: 14px;"><i class="fas fa-plus-square"></i> Ajouter un produit</a>
+                        </div>
+                        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#userManagementSubmenu" role="button" aria-expanded="false" aria-controls="userManagementSubmenu">
+                            <i class="fas fa-users"></i> Gestion utilisateurs <span class="submenu-icon fas fa-caret-right"></span>
+                        </a>
+                        <div class="collapse marginR" id="userManagementSubmenu">
+                            <a th:href="@{/admin/user_list}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des utilisateurs</a>
+                            <a th:href="@{/admin/add_new_user}"   style="font-size: 14px;"><i class="fas fa-user-plus"></i> Ajouter un utilisateur</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="container centered-content">
+                    <h1 class="title" style="color: #343a40; font-family: 'Montserrat', sans-serif;">Liste des commandes</h1>
+                    <div class="filters mb-3">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <input type="text" id="searchId" class="form-control" placeholder="Rechercher par ID">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" id="searchVille"  class="form-control" placeholder="Rechercher par ville">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" id="searchCodePostal" style="width: auto; min-width: 250px;" class="form-control" placeholder="Rechercher par code postal">
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <select id="filterStatut" class="form-control">
+                                    <option value="">Filtrer par statut</option>
+                                    <option value="EN_ATTENTE">EN_ATTENTE</option>
+                                    <option value="EN_COURS">EN_COURS</option>
+                                    <option value="EN_PREPARATION">EN_PREPARATION</option>
+                                    <option value="COMMANDE_PRETE">COMMANDE_PRETE</option>
+                                    <option value="LIVREE">LIVREE</option>
+                                    <option value="ANNULEE">ANNULEE</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <select id="filterMethodCommande" class="form-control" style="width: auto; min-width: 250px;">
+                                    <option value="">Filtrer par méthode de commande</option>
+                                    <option value="DELIVERY">DELIVERY</option>
+                                    <option value="PICKUP">PICKUP</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-info">
+                                    <tr>
+                                        <th scope="col" class="sortable" data-sort="id">Id</th>
+                                        <th scope="col">Nom</th>
+                                        <th scope="col" class="sortable" data-sort="dateCommande">Date de commande</th>
+                                        <th scope="col" class="sortable" data-sort="statut">Statut</th>
+                                        <th scope="col" class="sortable" data-sort="ville">Ville</th>
+                                        <th scope="col" class="sortable" data-sort="codePostal">Code Postal</th>
+                                        <th scope="col" class="sortable" data-sort="methodCommande">Méthode de commande</th>
+                                        <th scope="col">Actions</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="commandesTableBody">
+                                    <!-- Les commandes seront injectées ici via Ajax -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <nav aria-label="Page navigation">
+                                <ul class="pagination">
+                                    <!-- La pagination sera injectée ici via Ajax -->
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                <!-- jQuery (Nécessaire avant les scripts Bootstrap) -->
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+                <!-- Bootstrap 5 Bundle JS (inclut Popper) -->
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+                <script>
+                    $(document).ready(function() {
+                        function loadCommandes(page, sortBy) {
+                            $.ajax({
+                                url: '/api/employe/commandes',
+                                data: {
+                                    page: page,
+                                    sortBy: sortBy,
+                                    searchId: $('#searchId').val(),
+                                    searchVille: $('#searchVille').val(),
+                                    searchCodePostal: $('#searchCodePostal').val(),
+                                    filterStatut: $('#filterStatut').val(),
+                                    filterMethodCommande: $('#filterMethodCommande').val()
+                                },
+                                success: function(data) {
+                                    var commandesTableBody = $('#commandesTableBody');
+                                    commandesTableBody.empty();
+                                    $.each(data.content, function(index, commande) {
+                                        commandesTableBody.append(`
+                                            <tr>
+                                                <td>${commande.id}</td>
+                                                <td>${commande.nom}</td>
+                                                <td>${new Date(commande.dateCommande).toLocaleDateString()}</td>
+                                                <td>${commande.statut}</td>
+                                                <td>${commande.ville}</td>
+                                                <td>${commande.codePostal}</td>
+                                                <td>${commande.methodCommande}</td>
+                                                <td>
+                                                    <a class="btn btn-outline-warning" href="/employe/commande/detail/${commande.id}">
+                                                        <i class="fas fa-edit"></i> Edit
+                                                    </a>
+                                                    <form action="/commande/${commande.id}" method="post" style="display:inline;">
+                                                        <input type="hidden" name="_method" value="delete">
+                                                        <button type="submit" class="btn btn-outline-danger">
+                                                            <i class="fas fa-trash-alt"></i> Supprimer
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        `);
+                                    });
+                                    // Mise à jour de la pagination
+                                    var pagination = $('.pagination');
+                                    pagination.empty();
+                                    for (var i = 0; i < data.totalPages; i++) {
+                                        pagination.append(`
+                                            <li class="page-item ${data.number === i ? 'active' : ''}">
+                                                <a class="page-link" href="#" onclick="loadCommandes(${i}, '${sortBy}')">${i + 1}</a>
+                                            </li>
+                                        `);
+                                    }
+                                }
+                            });
+                        }
+
+                        // Événements pour les filtres et le tri
+                        $('#searchId, #searchVille, #searchCodePostal').on('input', function() {
+                            loadCommandes(0, 'dateCommande');
+                        });
+                        $('#filterStatut, #filterMethodCommande').on('change', function() {
+                            loadCommandes(0, 'dateCommande');
+                        });
+                        $('.sortable').on('click', function() {
+                            var sortBy = $(this).data('sort');
+                            loadCommandes(0, sortBy);
+                        });
+
+                        // Chargement initial des commandes
+                        loadCommandes(0, 'dateCommande');
+                    });
+                </script>
+            </div>
+        </div>
+        </div>
+        <!-- Footer -->
+        <div class="page-footer">
+            <div th:replace="~{fragments/footer :: footer}"></div>
+        </div>
+    </body>
+</html>

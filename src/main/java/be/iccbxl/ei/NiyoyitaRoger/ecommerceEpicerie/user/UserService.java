@@ -61,6 +61,21 @@ public class UserService {
         panierRepository.save(panier);
     }
 
+    //ajout d'un nouvel utilisateur par un admin
+    public void adminNewUser(User user){
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String encodedPassword = encoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
+
+        user.setDateCreation(LocalDateTime.now());
+        this.save(user);
+
+        //Création d'un panier pour un nouveau utilisateur
+        Panier panier = new Panier();
+        panier.setUtilisateur(user);
+        panierRepository.save(panier);
+    }
+
     public String updateUser(Long userId, User updatedUser) {
         String errorMessage = "";
         User existingUser = userRepository.findById(userId).orElse(null);

@@ -79,17 +79,16 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public String adminNewUser(@ModelAttribute("newUser") User user, @RequestParam List<Long> roleIds, Model model) {
         User userTest = userService.getUserByEmail(user.getEmail());
-
         if (userTest != null) {
+            //Ajouter message err utilisateur existe déjà avec cette e-mail
             model.addAttribute("roles", roleRepository.findAll());
             return "admin/add_new_user";
         }
 
         Set<Role> roles = new HashSet<>(roleRepository.findAllById(roleIds));
         user.setRoles(roles);
-        userService.save(user);
+        userService.adminNewUser(user);
 
-        System.out.println(user + "Nouvel utilisateur a été rajouté.");
         return "redirect:/admin/user_list";
     }
 
