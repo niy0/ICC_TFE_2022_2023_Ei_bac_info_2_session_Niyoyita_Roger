@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="fr"
+      xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+    <head>
+        <meta charset="UTF-8">
+        <title>Modifier un produit</title>
+        <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+        <style>
+            body {
+                background-color: #f0f2f5;
+                font-family: Arial, sans-serif;
+            }
+
+            .sidenav {
+                position: fixed;
+                left: 0;
+                height: calc(100vh - 60px);
+                width: 300px;
+                background-color: #343a40;
+                color: white;
+                padding-top: 0px;
+                overflow-y: auto;
+                transition: width 0.3s ease-in-out;
+                border-radius: 0 0.5rem 0 0;
+            }
+
+            .sidenav a {
+                padding: 15px 25px;
+                text-decoration: none;
+                font-size: 18px;
+                color: white;
+                display: block;
+                transition: background 0.2s, color 0.2s, padding-left 0.2s;
+            }
+
+            .sidenav a:hover {
+                background-color: #495057;
+                color: rgb(255, 193, 7);
+                padding-left: 35px;
+            }
+
+            .sidenav .active, .sidenav .active:hover {
+                background-color: #007bff;
+                color: white;
+                padding-left: 35px;
+            }
+
+            .content {
+                margin-top: 0;
+                margin-left: 300px;
+                padding: 20px;
+                transition: margin-left 0.3s;
+            }
+
+            .centered-content {
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                min-height: 90%;
+                margin-top: 5%;
+                margin-bottom: 10px;
+                width: 100%;
+            }
+
+            .title {
+                font-family: Arial, sans-serif;
+                font-weight: bold;
+                color: #007bff;
+            }
+
+            .fieldError {
+                color: red;
+            }
+
+            .btn-refresh {
+                color: white;
+                font-size: 20px;
+                transition: color 0.2s;
+                text-decoration: none;
+            }
+
+            .btn-refresh:hover {
+                color: rgb(255, 193, 7);
+            }
+
+            .card {
+                background-color: white;
+                border: 1px solid #dee2e6;
+                border-radius: 0.5rem;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                transition: transform 0.3s;
+                margin-top: 20px;
+                width: 100%;
+            }
+
+            .card:hover {
+                transform: translateY(-5px);
+            }
+
+            .card-title {
+                color: #007bff;
+            }
+
+            .card-subtitle {
+                color: #6c757d;
+            }
+
+            .btn-outline-warning, .btn-outline-danger, .btn-outline-success {
+                margin: 5px;
+            }
+
+            .marginR {
+                margin-left: 30px;
+            }
+
+            .marginL {
+                margin-right: 20px;
+            }
+
+            .submenu-icon {
+                float: right;
+                transition: transform 0.3s;
+            }
+
+            .submenu-icon.collapsed::before {
+                content: "\f0da";
+            }
+
+            .submenu-icon:not(.collapsed)::before {
+                content: "\f0d7";
+            }
+
+            .btn-refresh {
+                color: rgb(255, 193, 7);
+                font-size: 20px;
+                transition: color 0.2s;
+                text-decoration: none;
+            }
+
+            .btn-refresh:hover {
+                color: rgb(255, 193, 7);
+            }
+
+            .form-container {
+                display: flex;
+                justify-content: center;
+                align-items: flex-start;
+                margin-top: 20px;
+            }
+
+            .form-container .card {
+                display: flex;
+                flex-direction: row;
+                max-width: 900px;
+                width: 100%;
+            }
+
+            .card-img-left {
+                width: 40%;
+                height: auto;
+                object-fit: contain; /* Assure que l'image conserve son aspect ratio */
+                border-right: 1px solid #dee2e6;
+            }
+
+            .card-body {
+                width: 60%;
+                padding: 20px;
+            }
+
+            @media (max-width: 768px) {
+                .sidenav {
+                    width: 100%;
+                    height: auto;
+                    position: relative;
+                }
+                .sidenav a {
+                    float: left;
+                    padding: 15px;
+                }
+                .sidenav a:hover {
+                    padding-left: 15px;
+                }
+                .content {
+                    margin-left: 0;
+                    padding: 20px;
+                }
+                .centered-content {
+                    margin-top: 20px;
+                    width: 100%;
+                }
+                .card {
+                    margin-top: 20px;
+                    width: 100%;
+                }
+                .table-responsive {
+                    display: block;
+                    width: 100%;
+                    overflow-x: auto;
+                }
+                .form-container .card {
+                    flex-direction: column;
+                }
+                .card-img-left {
+                    width: 100%;
+                    height: auto;
+                    object-fit: contain; /* Assure que l'image conserve son aspect ratio */
+                    border-right: none;
+                    border-bottom: 1px solid #dee2e6;
+                }
+                .card-body {
+                    width: 100%;
+                }
+            }
+
+            @media (max-width: 600px) {
+                .sidenav a, .sidenav a:hover {
+                    padding-left: 15px;
+                }
+                .content {
+                    margin-left: 0;
+                    padding: 10px;
+                }
+                .centered-content {
+                    margin-top: 10px;
+                    width: 100%;
+                }
+                .card {
+                    margin-top: 10px;
+                    width: 100%;
+                }
+                .table-responsive {
+                    display: block;
+                    width: 100%;
+                    overflow-x: auto;
+                }
+                .form-container .card {
+                    flex-direction: column;
+                }
+                .card-img-left {
+                    width: 100%;
+                    height: auto;
+                    border-right: none;
+                    border-bottom: 1px solid #dee2e6;
+                }
+                .card-body {
+                    width: 100%;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div layout:fragment="content" class="content">
+                <div class="sidenav">
+                    <a href="javascript:location.reload()" class="btn-refresh">
+                        <span class="refresh-text marginL">Replier les sous-menus</span> <i class="fas fa-sync-alt" style="color: rgb(255, 193, 7);"></i>
+                    </a>
+                    <a class="collapsed" data-bs-toggle="collapse" href="#profileSubmenu" role="button" aria-expanded="false" aria-controls="profileSubmenu">
+                        <i class="fas fa-user-circle"></i> Profile : <span th:text="${user.nom} + ' ' + ${user.prenom}"></span>
+                        <span class="submenu-icon fas fa-caret-right"></span>
+                    </a>
+                    <div class="collapse marginR" id="profileSubmenu">
+                        <a th:href="@{'/user/' + ${user.id} + '/profile'}" style="font-size: 16px;"><i class="fas fa-user-circle"></i>Voir profil</a>
+                        <a th:href="@{'/user/' + ${user.id} + '/profile/edit'}" style="font-size: 16px;"><i class="fas fa-user-edit"></i> Modifier profil</a>
+                        <a th:href="@{'/user/' + ${user.id} + '/adresse/edit'}" style="font-size: 16px;"><i class="fas fa-address-card"></i> Modifier adresse</a>
+                    </div>
+
+                    <a th:href="@{/commandes}"><i class="fas fa-shopping-cart"></i> Mes commandes</a>
+                    <a th:href="@{/user/favoris}"><i class="fas fa-heart"></i> Mes produits favoris</a>
+
+                    <a class="collapsed" data-bs-toggle="collapse" href="#employeeSubmenu" role="button" aria-expanded="false" aria-controls="employeeSubmenu">
+                        <i class="fas fa-briefcase"></i> Employé <span class="submenu-icon fas fa-caret-right"></span>
+                    </a>
+                    <div class="collapse marginR" id="employeeSubmenu">
+                        <a th:href="@{/employe/commandes}"style="font-size: 16px;"><i class="fas fa-list"></i> Liste des commandes</a>
+                        <a href="#" style="font-size: 16px;"><i class="fas fa-chart-bar"></i> Commandes à traiter</a>
+                        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#statSubmenu" role="button" aria-expanded="false" aria-controls="statSubmenu">
+                            <i class="fas fa-chart-line"></i> Statistiques <span class="submenu-icon fas fa-caret-right"></span>
+                        </a>
+                        <div class="collapse marginR" id="statSubmenu">
+                            <a href="#" style="font-size: 14px;"><i class="fas fa-chart-bar"></i> Ventes</a>
+                            <a href="#" style="font-size: 14px;"><i class="fas fa-chart-pie"></i> Répartition des produits</a>
+                        </div>
+                    </div>
+                    <a class="collapsed" data-bs-toggle="collapse" href="#adminSubmenu" role="button" aria-expanded="false" aria-controls="adminSubmenu">
+                        <i class="fas fa-cog"></i> Admin <span class="submenu-icon fas fa-caret-right"></span>
+                    </a>
+                    <div class="collapse marginR" id="adminSubmenu">
+                        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#stockSubmenu" role="button" aria-expanded="false" aria-controls="stockSubmenu">
+                            <i class="fas fa-box"></i> Gestion stock <span class="submenu-icon fas fa-caret-right"></span>
+                        </a>
+                        <div class="collapse marginR" id="stockSubmenu">
+                            <a th:href="@{/produits/admin}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des produits</a>
+                            <a th:href="@{/produit/create}" style="font-size: 14px;"><i class="fas fa-plus-square"></i> Ajouter un produit</a>
+                        </div>
+                        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#userManagementSubmenu" role="button" aria-expanded="false" aria-controls="userManagementSubmenu">
+                            <i class="fas fa-users"></i> Gestion utilisateurs <span class="submenu-icon fas fa-caret-right"></span>
+                        </a>
+                        <div class="collapse marginR" id="userManagementSubmenu">
+                            <a th:href="@{/admin/user_list}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des utilisateurs</a>
+                            <a th:href="@{/admin/add_new_user}"   style="font-size: 14px;"><i class="fas fa-user-plus"></i> Ajouter un utilisateur</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="container centered-content">
+                    <div class="form-container">
+                    <div class="card mb-4">
+                        <img class="card-img-left" th:src="@{'/display?id=' + ${produit.id}}" alt="Image du produit">
+                        <div class="card-body">
+                            <form th:action="@{'/produit/' + ${produit.id} + '/edit'}" th:object="${produit}" method="post" enctype="multipart/form-data">
+                                <input type="hidden" name="_method" value="put" />
+
+                                <input type="hidden" name="id" th:value="${produit.id}" />
+
+                                <div class="form-group">
+                                    <label for="nom">Nom</label>
+                                    <input type="text" class="form-control" name="nom" id="nom" th:field="*{nom}" required />
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="description">Description</label>
+                                    <textarea id="description" class="form-control" name="description" th:field="*{description}" required></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="cat">Catégorie</label>
+                                    <select class="form-control" id="cat" name="catId" required
+                                            onchange="var selectElement = document.getElementById('cat');
+                                                  var selectedOption = selectElement.options[selectElement.selectedIndex];
+                                                  if (selectedOption.value === '') {
+                                                      document.getElementById('catId').value = '${catList[0].id}'; // Prend le premier ID
+                                                  } else {
+                                                      document.getElementById('catId').value = selectedOption.value;
+                                                  }">
+                                        <option value="" th:value="${produit.categorie.nom}" th:text="${produit.categorie.nom}"></option>
+                                        <option th:each="cat: ${catList}" th:value="${cat.id}" th:data-id="${cat.id}" th:text="${cat.nom}"></option>
+                                    </select>
+                                    <input class="form-group" hidden name="catId" id="catId"/>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="typePrix">Type de Prix</label>
+                                    <select class="form-control" id="typePrix" name="typePrix" th:field="*{typePrix}" required>
+                                        <option value="piece" selected>Prix à la pièce</option>
+                                        <option value="kilo">Prix au kilo</option>
+                                        <option value="litre">Prix au litre</option>
+                                        <option value="promotion">Prix promotionnel</option>
+                                        <option value="gros">Prix en gros</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="prix">Prix</label>
+                                    <input type="number" class="form-control" name="prix" min="0.01" id="prix" step="0.01" th:field="*{prix}" required />
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="quantite">Quantité stock</label>
+                                    <div style="display:flex;justify-content: space-between;">
+                                        <input type="number" class="form-control" min="1" name="quantite" id="quantite" th:field="*{quantite}" readonly/>
+                                        <input type="number" placeholder="Rajouter dans le stock" class="form-control" min="0" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="minStock">Min stock</label>
+                                    <input type="number" placeholder="min : stock" class="form-control" id="minStock" min="1" th:field="*{minStock}" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="maxStock">Max stock</label>
+                                    <input type="number" placeholder="max : stock" class="form-control" id="maxStock" th:field="*{maxStock}"
+                                           onchange="var maxStockValue = this.value;
+                                                  var quantiteValue = document.getElementById('quantite').value;
+                                                  var maxStockError = document.getElementById('maxStockError');
+
+                                                  if (quantiteValue !== '' && maxStockValue !== '' && parseFloat(maxStockValue) < parseFloat(quantiteValue)) {
+                                                      maxStockError.style.display = 'block';
+                                                      maxStockError.innerHTML = '<i class=\'fas fa-exclamation-circle\' style=\'color: #ea4848;\'></i> MaxStock doit être plus grand ou égal à quantité : ' + quantiteValue;
+                                                  } else {
+                                                      maxStockError.style.display = 'none';
+                                                  }" />
+                                    <p style="color: red; display: none;" id="maxStockError">
+                                        <i class="fas fa-exclamation-circle" style="color: #ea4848;"></i>
+                                        MaxStock doit être plus grand ou égal à quantité qui est à : <span id="quantiteValue"></span>
+                                    </p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="image">Image Principale</label>
+                                    <input type="file" class="form-control" id="image" name="image" accept="image/*" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="marque">Marque</label>
+                                    <select class="form-control selectpicker" id="marque" onchange="var selectElement = document.getElementById('marque'); var selectedOption = selectElement.options[selectElement.selectedIndex]; document.getElementById('marqueId').value = selectedOption.value;">
+                                        <option th:each="marque: ${marqueList}" th:value="${marque.id}" th:data-id="${marque.id}" th:text="${marque.nom}" th:field="*{marque}"></option>
+                                    </select>
+                                    <input class="form-group" hidden name="marqueId" id="marqueId" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="actif">Actif (dans le site)</label>
+                                    <input type="checkbox" class="form-check-input custom-checkbox ml-2" id="actif" name="actif" th:checked="${produit.actif}" />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Mots clés</label>
+                                    <div>
+                                        <div th:each="motcle: ${motCleList}" style="display: inline-block; margin-right: 10px;">
+                                            <input type="checkbox" th:value="${motcle.id}" name="motCleIds" th:id="${'motCle' + motcle.id}" th:checked="${produit.motsCles.contains(motcle)}" />
+                                            <label th:for="${'motCle' + motcle.id}" th:text="${motcle.nom}"></label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <button class="btn btn-outline-success" type="submit">Modifier</button>
+                                    <a th:href="@{/admin/produits}" class="btn btn-outline-warning">Annuler</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

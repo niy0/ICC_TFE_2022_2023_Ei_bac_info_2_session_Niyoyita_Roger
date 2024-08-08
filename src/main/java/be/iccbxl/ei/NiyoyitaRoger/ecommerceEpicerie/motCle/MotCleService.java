@@ -23,6 +23,10 @@ public class MotCleService {
         return motCleList;
     }
 
+    public List<MotCle> getAllMotsCles() {
+        return motCleRepository.findAll();
+    }
+
     public MotCle getMotCle(long id) {
         return motCleRepository.findById(id);
     }

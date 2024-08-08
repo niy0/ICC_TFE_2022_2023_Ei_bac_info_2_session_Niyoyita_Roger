@@ -25,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -92,57 +94,17 @@ public class ProduitController {
     @Autowired
     private PanierService panierService;
 
-
-
+    
     @GetMapping("/")//faire un autre pour les non admin gérent/manager
     public String showIndex(Model model) {
         List<Produit> productsList = produitService.getAllProduct();
         List<Categorie> categorieList = categorieService.getAllCategorie();
 
-        System.out.println(productsList+"----------**********");
-
         model.addAttribute("listProducts", productsList);
         model.addAttribute("catList", categorieList);
         return "index";
     }
-    /**
-    @GetMapping("/produit")
-    public String allProduit(Model model) {
-        List<Produit> productsList = produitService.getAllProduct();
-        List<Categorie> categorieList = categorieService.getAllCategorie();
 
-        model.addAttribute("listProducts", productsList);
-        model.addAttribute("catList", categorieList);
-        return "produit/index_produits";
-    }**/
-
-
-    //revoir l'erreur de la pagination !!
-    /**
-    @GetMapping("/produit")
-    public String allProduit(Model model, @RequestParam(defaultValue = "0") int page) {
-        Pageable pageable = PageRequest.of(page, 24); // 20 produits par page
-        Page<Produit> productPage = produitRepository.findAll(pageable); // Vous devriez avoir une méthode 'findAll' qui accepte un objet 'Pageable'
-        List<Categorie> categorieList = categorieService.getAllCategorie();
-
-        //panier
-       String s = "1";
-       Long idTest = Long.parseLong(s);
-        Optional<Panier> panier = panierRepository.findById(idTest);
-        //Panier panier = new Panier();
-        panierRepository.save(panier.get());
-
-        System.out.println(panier.get().getId()+"******************************************************");
-
-        model.addAttribute("panier",panier.get());
-
-
-        model.addAttribute("listProducts", productPage.getContent());
-        model.addAttribute("catList", categorieList);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", productPage.getTotalPages());
-        return "produit/index_produits";
-    }**/
 
     /**
     @GetMapping("/produit")
@@ -198,7 +160,7 @@ public class ProduitController {
         return "produit/index_produits";
     }**/
 
-    //*******************
+
     @GetMapping("/produit")
     public String allProduit(Model model, @RequestParam(defaultValue = "0") int page, Principal principal, HttpSession session) {
         Pageable pageable = PageRequest.of(page, 24);
@@ -222,63 +184,75 @@ public class ProduitController {
         return "produit/index_produits";
     }
 
-    //*********************
 
+    @GetMapping("/admin/produits")
+    public String getAllProduits(@RequestParam(defaultValue = "nom") String sortBy,
+                                 @RequestParam(defaultValue = "0") int page,
+                                 @RequestParam(defaultValue = "10") int size,
+                                 Model model,
+                                 Authentication authentication) {
+        String title = "Liste des produits";
 
-    @GetMapping("/produit2")
-    public String allProduit2(Model model, @RequestParam(defaultValue = "0") int page, Principal principal, HttpSession session) {
-        Pageable pageable = PageRequest.of(page, 24); // 20 produits par page
-        Page<Produit> productPage = produitRepository.findAll(pageable);
-        List<Categorie> categorieList = categorieService.getAllCategorie();
+        // Récupération des données pour les filtres
+        List<Categorie> categorieList = categorieService.getAllCategories();
+        List<Marque> marqueList = marqueService.getAllMarques();
+        List<MotCle> motCleList = motCleService.getAllMotsCles();
 
-        Panier panier = null;
-
-        if (principal != null) {
-            System.out.println("laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa*****************************");
-            // L'utilisateur est connecté, utilisez Spring Security pour obtenir l'utilisateur connecté
-            // Vous devrez peut-être ajuster votre configuration Spring Security
-           // User user = (User) ((Authentication) principal).getPrincipal();
-            // L'utilisateur est connecté, utilisez Spring Security pour obtenir l'utilisateur connecté
-            CustomUserDetails userDetails = (CustomUserDetails) ((Authentication) principal).getPrincipal();
-
-            System.out.println(userDetails.getUser(userDetails.getEmailUser())+"laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-            // Récupérez ou créez le panier de l'utilisateur connecté
-            //panier = user.getPanier(); // Assurez-vous d'avoir une méthode getPanier() dans votre modèle User
-            panier = userDetails.getUser(userDetails.getEmailUser()).getPanier(); // Assurez-vous que CustomUserDetails contient une référence à User
-
+        // Récupération de l'utilisateur connecté
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            String username = userDetails.getUsername();
+            User user = userService.getUserByEmail(username);
+            model.addAttribute("user", user);
         } else {
-            // L'utilisateur n'est pas connecté, récupérez le panier temporaire de la session
-            panier = (Panier) session.getAttribute("panierTemporaire");
-            if (panier == null) {
-                // Si l'utilisateur non connecté n'a pas de panier temporaire dans la session, créez-en un nouveau
-                panier = new Panier();
-                // ... Initialisation du panier temporaire ...
-                session.setAttribute("panierTemporaire", panier);
-            }
+            throw new IllegalStateException("L'utilisateur connecté n'est pas une instance de UserDetails");
         }
 
-        model.addAttribute("listProducts", productPage.getContent());
-        model.addAttribute("catList", categorieList);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+        //Page<Produit> produitsPage = produitService.getAllProduits(pageable, sortBy);
+        Page<Produit> produitsPage = produitService.getAllProduits(pageable, sortBy, null, null, null, null, null, null, null);
+
+
+        model.addAttribute("produitsPage", produitsPage);
         model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", productPage.getTotalPages());
-        model.addAttribute("panier", panier);
-
-        return "produit/index_produits";
-    }
-
-
-/**
-    @GetMapping("/produits/admin")//faire un autre pour les non admin gérent/manager
-    public String showAllProducts(Model model) {
-
-        List<Produit> productsList = produitService.getAllProduct();
-        List<Categorie> categorieList = categorieService.getAllCategorie();
-
-        model.addAttribute("listProducts", productsList);
+        model.addAttribute("totalPages", produitsPage.getTotalPages());
+        model.addAttribute("sortBy", sortBy);
         model.addAttribute("catList", categorieList);
+        model.addAttribute("marqueList", marqueList);
+        model.addAttribute("motCleList", motCleList);
+        model.addAttribute("title", title);
 
         return "produit/admin_produit";
-    }**/
+    }
+
+    @GetMapping("/api/admin/produits")
+    @ResponseBody
+    public Page<Produit> getProduits(
+            @RequestParam(defaultValue = "nom") String sortBy,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String searchId,
+            @RequestParam(required = false) String searchNom,
+            @RequestParam(required = false) String sortPrice,
+            @RequestParam(required = false) String sortDate,
+            @RequestParam(required = false) String filterCategorie,
+            @RequestParam(required = false) String filterMarque,
+            @RequestParam(required = false) String filterMotCle) {
+
+        Sort sort = Sort.by(sortBy);
+
+        // Appliquez le tri en fonction des valeurs de sortPrice et sortDate
+        if (sortPrice != null && !sortPrice.isEmpty()) {
+            sort = Sort.by(sortPrice.equals("priceAsc") ? Sort.Order.asc("prix") : Sort.Order.desc("prix"));
+        } else if (sortDate != null && !sortDate.isEmpty()) {
+            sort = Sort.by(sortDate.equals("dateAsc") ? Sort.Order.asc("dateCreation") : Sort.Order.desc("dateCreation"));
+        }
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+        return produitService.getAllProduits(pageable, sortBy, searchId, searchNom, sortPrice, sortDate, filterCategorie, filterMarque, filterMotCle);
+    }
+
 
     @GetMapping("/produits/admin")
     @PreAuthorize("isAuthenticated() and hasRole('ADMIN')")
@@ -316,7 +290,7 @@ public class ProduitController {
         return ResponseEntity.ok(produits);
     }
 
-    //a tester
+
     @RequestMapping("/quantite-produit/{produitId}")
     @ResponseBody
     public int getQuantiteProduit(@PathVariable Long produitId) {
@@ -392,10 +366,9 @@ public class ProduitController {
             @RequestParam("maxStock") String maxStock,
             @RequestParam(name = "actif", required = false) Boolean actif,
             Model model) throws CategorieNotFoundException {
-        
 
         Produit produit = new Produit();
-        System.out.println(produit+ "lalalalalalalalala");
+
 
         try {
             // Lire l'image à l'aide de ImageIO
@@ -494,16 +467,43 @@ public class ProduitController {
         return "redirect:/produits/admin";
     }
 
-    @GetMapping("produit/{id}/edit")//faire attention qu'il existe
-    public String edit(Model model, @PathVariable("id") String idStr, HttpServletRequest request) throws ProduitNotFoundException {
-        Long id = Long.parseLong(idStr);
+    @GetMapping("/admin/produit/{id}/edit")
+    public String edit2(Model model,
+                        @PathVariable("id") Long idStr,
+                        HttpServletRequest request,
+                        Authentication authentication) throws ProduitNotFoundException {
 
-        Produit validProduit = produitRepository.getPro(id);
+        Optional<Produit> validProduit = produitService.getProduitByIdOp(idStr);
+
         List<Categorie> categorieList = categorieService.getAllCategorie();
         List<MotCle> motCleList = motCleService.getAllMotCle();
         List<Marque> marqueList = marqueService.getAllMarque();
 
-        model.addAttribute("produit", validProduit);
+        // Récupération de l'utilisateur connecté
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails && validProduit.isPresent()) {
+            UserDetails userDetails = (UserDetails) principal;
+            String username = userDetails.getUsername();
+            User user = userService.getUserByEmail(username);
+
+            // Vérification des rôles et user non null
+            if (user != null){
+                if(user.hasRole("Admin"))  {
+                    model.addAttribute("user", user);
+                    model.addAttribute("produit", validProduit.get());
+                }else {
+                    model.addAttribute("errorMessage", "Vous n'avez pas les permissions nécessaires pour effectuer cette action.");
+                    System.out.println("errorMessage , vous n'avez pas les permissions nécessaires pour effectuer cette action.");
+                    return "redirect:/";
+                }
+            } else {
+                model.addAttribute("errorMessage", "Vous n'avez pas les permissions nécessaires pour effectuer cette action.");
+                return "redirect:/";
+            }
+        } else {
+            return "redirect:/";
+        }
+
         model.addAttribute("catList", categorieList);
         model.addAttribute("motCleList", motCleList);
         model.addAttribute("marqueList", marqueList);
@@ -514,10 +514,11 @@ public class ProduitController {
         if(referrer!=null && !referrer.equals("")) {
             model.addAttribute("back", referrer);
         } else {
-            model.addAttribute("back", "/produit/"+validProduit.getId());
+            model.addAttribute("back", "/produit/"+validProduit.get().getId());
         }
-        return "produit/edit";
+        return "produit/admin_edit";
     }
+
 
     @PutMapping("/produit/{id}/edit")
     public String updateProduit(
@@ -625,11 +626,12 @@ public class ProduitController {
         List<Produit> produitList = (List<Produit>) produitRepository.findAll();
 
         Produit produit = produitService.getProduitById(id);
-        //System.out.println("************test"+ produit+ "****** id="+ id);
+
         if(produitRepository.existsById(produit.getId())) {
             byte[] imageBytes = produit.getImagePrincipale().getBytes(1, (int) produit.getImagePrincipale().length());
             return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(imageBytes);
         }
         return ResponseEntity.noContent().build(); // Notez l'appel à .build() ici
     }
+
 }

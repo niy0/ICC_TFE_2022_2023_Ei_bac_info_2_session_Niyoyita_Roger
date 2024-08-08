@@ -24,6 +24,10 @@ public class MarqueService {
         return marqueList;
     }
 
+    public List<Marque> getAllMarques() {
+        return marqueRepository.findAll();
+    }
+
     public Marque getMarque(long id) {
         return marqueRepository.findById(id);
     }

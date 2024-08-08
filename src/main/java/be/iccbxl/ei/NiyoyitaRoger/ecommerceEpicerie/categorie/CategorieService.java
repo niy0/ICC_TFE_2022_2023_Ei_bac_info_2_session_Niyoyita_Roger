@@ -21,6 +21,10 @@ public class CategorieService {
         return categorieRepository.findAll();
     }
 
+    public List<Categorie> getAllCategories() {
+        return categorieRepository.findAll();
+    }
+
     public Categorie getCategorieById(Long id) throws CategorieNotFoundException {
         Optional<Categorie> cat_result = categorieRepository.findById(id);
         Categorie categorie = null;
