@@ -244,8 +244,8 @@
                     <i class="fas fa-users"></i> Gestion utilisateurs <span class="submenu-icon fas fa-caret-right"></span>
                 </a>
                 <div class="collapse marginR" id="userManagementSubmenu">
-                    <a href="#" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des utilisateurs</a>
-                    <a href="#" style="font-size: 14px;"><i class="fas fa-user-plus"></i> Ajouter un utilisateur</a>
+                    <a th:href="@{/admin/users}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des utilisateurs</a>
+                    <a th:href="@{/admin/add_new_user}" style="font-size: 14px;"><i class="fas fa-user-plus"></i> Ajouter un utilisateur</a>
                 </div>
             </div>
         </div>
@@ -290,7 +290,7 @@
                 </div>
                 <div class="text-center">
                     <button type="submit" class="btn btn-primary m-2">Mettre à jour</button>
-                    <a class="btn btn-secondary m-2" href="#" onclick="cancelForm();">Annuler</a>
+                    <a class="btn btn-secondary m-2" th:href="@{/admin/users}" onclick="cancelForm();">Annuler</a>
                 </div>
             </div>
         </form>

@@ -94,7 +94,7 @@ public class ProduitController {
     @Autowired
     private PanierService panierService;
 
-    
+
     @GetMapping("/")//faire un autre pour les non admin gérent/manager
     public String showIndex(Model model) {
         List<Produit> productsList = produitService.getAllProduct();

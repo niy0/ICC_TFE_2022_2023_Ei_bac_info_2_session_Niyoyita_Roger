@@ -5,6 +5,9 @@ import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.PanierRepository;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.role.Role;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.role.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -100,4 +103,32 @@ public class UserService {
     public void deleteUser(Long userId) {
         userRepository.deleteById(userId);
     }
+
+    public Page<User> getAllUsers(Pageable pageable, String sortBy, String searchId, String searchNom, String searchPrenom, String searchEmail, String sortRoles, String sortDate) {
+        Specification<User> spec = Specification.where(null);
+
+        if (searchId != null && !searchId.isEmpty()) {
+            spec = spec.and(UserSpecifications.hasId(searchId));
+        }
+        if (searchNom != null && !searchNom.isEmpty()) {
+            spec = spec.and(UserSpecifications.hasNom(searchNom));
+        }
+        if (searchPrenom != null && !searchPrenom.isEmpty()) {
+            spec = spec.and(UserSpecifications.hasPrenom(searchPrenom));
+        }
+        if (searchEmail != null && !searchEmail.isEmpty()) {
+            spec = spec.and(UserSpecifications.hasEmail(searchEmail));
+        }
+        if (sortRoles != null && !sortRoles.isEmpty()) {
+            spec = spec.and(UserSpecifications.hasRole(sortRoles));
+        }
+
+        return userRepository.findAll(spec, pageable);
+    }
+
+    public List<Role> getAllRoles() {
+        // Implémentez cette méthode pour récupérer tous les rôles
+        return userRepository.findAllRoles();
+    }
+
 }

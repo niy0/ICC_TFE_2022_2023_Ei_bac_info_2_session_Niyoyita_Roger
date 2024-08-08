@@ -5,6 +5,10 @@ import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.role.Role;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.role.RoleRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -92,6 +96,67 @@ public class UserController {
         return "redirect:/admin/user_list";
     }
 
+    @GetMapping("/admin/users")
+    public String getAllUsers(@RequestParam(defaultValue = "nom") String sortBy,
+                              @RequestParam(defaultValue = "0") int page,
+                              @RequestParam(defaultValue = "10") int size,
+                              Model model,
+                              Authentication authentication) {
+        String title = "Admin liste users";
+
+        // Récupération des rôles pour le filtre
+        List<Role> roleList = userService.getAllRoles();
+
+        // Récupération de l'utilisateur connecté
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            String username = userDetails.getUsername();
+            User user = userService.getUserByEmail(username);
+            model.addAttribute("user", user);
+        } else {
+            throw new IllegalStateException("L'utilisateur connecté n'est pas une instance de UserDetails");
+        }
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+        Page<User> usersPage = userService.getAllUsers(pageable, sortBy, null, null, null, null, null, null);
+
+        model.addAttribute("usersPage", usersPage);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", usersPage.getTotalPages());
+        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("roleList", roleList);
+        model.addAttribute("title", title);
+
+        return "user/admin_user_list";
+    }
+
+    @GetMapping("/api/admin/users")
+    @ResponseBody
+    public Page<User> getUsers(
+            @RequestParam(defaultValue = "nom") String sortBy,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String searchId,
+            @RequestParam(required = false) String searchNom,
+            @RequestParam(required = false) String searchPrenom,
+            @RequestParam(required = false) String searchEmail,
+            @RequestParam(required = false) String sortRoles,
+            @RequestParam(required = false) String sortDate) {
+
+        Sort sort = Sort.by(sortBy);
+
+        // Appliquez le tri en fonction des valeurs de sortRoles et sortDate
+        if (sortRoles != null && !sortRoles.isEmpty()) {
+            sort = Sort.by(Sort.Order.asc("roles.nom"));
+        } else if (sortDate != null && !sortDate.isEmpty()) {
+            sort = Sort.by(sortDate.equals("dateAsc") ? Sort.Order.asc("dateCreation") : Sort.Order.desc("dateCreation"));
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return userService.getAllUsers(pageable, sortBy, searchId, searchNom, searchPrenom, searchEmail, sortRoles, sortDate);
+    }
+
     @GetMapping("/admin/user_list")
     @PreAuthorize("hasRole('ADMIN')")
     public String listUsers(Model model,Authentication authentication) {
@@ -153,7 +218,7 @@ public class UserController {
         }
 
         userService.updateUserRoles(editUserId, roleIds);
-        return "redirect:/admin/user_list";
+        return "redirect:/admin/users";
     }
 
 
@@ -294,13 +359,6 @@ public class UserController {
         }else {
             return errorMessage;
         }
-    }
-
-
-    //permet pour l'admin d'afficher tous les users
-    @GetMapping("admin/users")
-    public String getAllUsers() {
-        return "";
     }
 
 
