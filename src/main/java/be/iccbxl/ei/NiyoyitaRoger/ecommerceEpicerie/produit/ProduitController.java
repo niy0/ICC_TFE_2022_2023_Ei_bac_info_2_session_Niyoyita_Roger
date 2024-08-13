@@ -106,69 +106,14 @@ public class ProduitController {
     }
 
 
-    /**
     @GetMapping("/produit")
     public String allProduit(Model model, @RequestParam(defaultValue = "0") int page, Principal principal, HttpSession session) {
-        Pageable pageable = PageRequest.of(page, 24); // 20 produits par page
-        Page<Produit> productPage = produitRepository.findAll(pageable); // Vous devriez avoir une méthode 'findAll' qui accepte un objet 'Pageable'
-        List<Categorie> categorieList = categorieService.getAllCategorie();
-
-        Panier panier = null;
-
-        if (principal != null && principal instanceof UsernamePasswordAuthenticationToken) {
-            UsernamePasswordAuthenticationToken authenticationToken = (UsernamePasswordAuthenticationToken) principal;
-
-            //CustomUserDetails customUserDetails = (CustomUserDetails) principal;
-            CustomUserDetails customUserDetails = (CustomUserDetails) authenticationToken.getPrincipal();
-            System.out.println(customUserDetails.getEmailUser());
-            User user = userRepository.findByEmail(customUserDetails.getEmailUser());
-            model.addAttribute("userConnecte",user);
-            System.out.println(user);
-
-            // Récupérez ou créez le panier de l'utilisateur connecté
-            panier = user.getPanier(); // Assurez-vous d'avoir une méthode getPanier() dans votre modèle User
-            System.out.println("panier ::::::::::::::" + panier);
-            // Récupérez le panier temporaire de la session s'il existe
-            Panier panierTemporaire = (Panier) session.getAttribute("panierTemporaire");
-            if (panierTemporaire != null) {
-                // Fusionnez le panier temporaire avec le panier de l'utilisateur connecté
-                panier.mergeWith(panierTemporaire);
-                // Supprimez le panier temporaire de la session
-                session.removeAttribute("panierTemporaire");
-            }
-
-        } else {
-            // L'utilisateur n'est pas connecté, récupérez le panier temporaire de la session
-            System.out.println(" TEst Utilisateur visiteur non connecté !!! :)");
-            panier = (Panier) session.getAttribute("panierTemporaire");
-            if (panier == null) {
-                // Si l'utilisateur non connecté n'a pas de panier temporaire dans la session, créez-en un nouveau
-                panier = new Panier();
-                panierRepository.save(panier);
-                // ... Initialisation du panier temporaire ...
-                session.setAttribute("panierTemporaire", panier);
-            }
-            System.out.println(" TEst Utilisateur visiteur non connecté !!! son panier :" + panier);
-        }
-
-        model.addAttribute("listProducts", productPage.getContent());
-        model.addAttribute("catList", categorieList);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", productPage.getTotalPages());
-        model.addAttribute("panier", panier);
-
-        return "produit/index_produits";
-    }**/
-
-
-    @GetMapping("/produit")
-    public String allProduit(Model model, @RequestParam(defaultValue = "0") int page, Principal principal, HttpSession session) {
-        Pageable pageable = PageRequest.of(page, 24);
+        Pageable pageable = PageRequest.of(page, 8);
         Page<Produit> productPage = produitRepository.findAll(pageable);
         List<Categorie> categorieList = categorieService.getAllCategorie();
 
-        Panier panier = panierService.getOrCreatePanier(principal, session);
-        System.out.println(panier);
+        Panier panierTest = panierService.getOrCreatePanier(principal, session);
+        Panier panier = panierService.getPanierById(panierTest.getId());
 
         BigDecimal montantTotal = panier.getLignesDeCommande().stream()
                 .map(ligne -> ligne.getProduit().getPrix().multiply(new BigDecimal(ligne.getQuantite())))
@@ -188,7 +133,7 @@ public class ProduitController {
     @GetMapping("/admin/produits")
     public String getAllProduits(@RequestParam(defaultValue = "nom") String sortBy,
                                  @RequestParam(defaultValue = "0") int page,
-                                 @RequestParam(defaultValue = "10") int size,
+                                 @RequestParam(defaultValue = "8") int size,
                                  Model model,
                                  Authentication authentication) {
         String title = "Liste des produits";
@@ -231,7 +176,7 @@ public class ProduitController {
     public Page<Produit> getProduits(
             @RequestParam(defaultValue = "nom") String sortBy,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "8") int size,
             @RequestParam(required = false) String searchId,
             @RequestParam(required = false) String searchNom,
             @RequestParam(required = false) String sortPrice,
@@ -252,6 +197,34 @@ public class ProduitController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
         return produitService.getAllProduits(pageable, sortBy, searchId, searchNom, sortPrice, sortDate, filterCategorie, filterMarque, filterMotCle);
     }
+
+    @GetMapping("/api/all/produits")
+    @ResponseBody
+    public Page<Produit> getProduits(
+            @RequestParam(defaultValue = "nom") String sortBy,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "8") int size,
+            @RequestParam(required = false) String searchQuery, // Un seul champ pour la recherche
+            @RequestParam(required = false) String sortPrice,
+            @RequestParam(required = false) String sortDate,
+            @RequestParam(required = false) String filterCategorie,
+            @RequestParam(required = false) String filterMarque,
+            @RequestParam(required = false) String filterMotCle) {
+
+        // Configuration du tri
+        Sort sort = Sort.by(sortBy);
+        if (sortPrice != null && !sortPrice.isEmpty()) {
+            sort = Sort.by(sortPrice.equals("priceAsc") ? Sort.Order.asc("prix") : Sort.Order.desc("prix"));
+        } else if (sortDate != null && !sortDate.isEmpty()) {
+            sort = Sort.by(sortDate.equals("dateAsc") ? Sort.Order.asc("dateCreation") : Sort.Order.desc("dateCreation"));
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        // Passer la recherche combinée à la méthode de service
+        return produitService.getApiAllProduits(pageable, searchQuery, sortPrice, sortDate, filterCategorie, filterMarque, filterMotCle);
+    }
+
 
 
     @GetMapping("/produits/admin")

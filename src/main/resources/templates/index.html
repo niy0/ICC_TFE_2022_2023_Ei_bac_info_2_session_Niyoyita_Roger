@@ -1,13 +1,18 @@
 <!DOCTYPE html>
-<html lang="fr"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
-      layout:decorate="~{layouts/main}">
-    <head>
-        <meta charset="UTF-8">
-        <title>Bienvenue</title>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
-        <style>
+<html lang="fr" xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
+      layout:decorate="~{layouts/main}" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Page d'acceuil</title>
+    <!-- Bootstrap 5 CSS -->
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <!-- jQuery (Nécessaire avant les scripts Bootstrap) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Votre script personnalisé -->
+    <script src="js/script.js"></script>
+    <style>
             .carousel-item {
                position: relative;
                overflow: hidden;
@@ -23,7 +28,7 @@
                       left: 50%;
                       transform: translate(-50%, -50%);
                   }
-        </style>
+    </style>
     </head>
     <body>
         <div layout:fragment="content" class="content">

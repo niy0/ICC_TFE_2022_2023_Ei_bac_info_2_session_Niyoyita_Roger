@@ -21,7 +21,7 @@
 <div class="container mt-4">
   <div layout:fragment="content">
     <div class="mt-5">
-      <h2><i class="bi bi-cart-fill"></i><input   th:value="${panier.id}" name="idPanier"> Mon panier</h2>
+      <h2><i class="bi bi-cart-fill"></i><input hidden   th:value="${panier.id}" name="idPanier"> Mon panier</h2>
       <div th:if="${not #lists.isEmpty(panier.lignesDeCommande)}">
         <form id="viderPanier" th:action="@{/viderPanier}" method="post">
           <input type="hidden"  th:value="${panier.id}" name="idPanier">

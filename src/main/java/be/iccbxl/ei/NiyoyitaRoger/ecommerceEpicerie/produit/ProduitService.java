@@ -96,5 +96,41 @@ public class ProduitService {
 
         return produitRepository.findAll(spec, pageable);
     }
+
+
+    //api de recherche page /produit
+    public Page<Produit> getApiAllProduits(Pageable pageable, String searchQuery, String sortPrice, String sortDate, String filterCategorie, String filterMarque, String filterMotCle) {
+        Specification<Produit> spec = Specification.where(null);
+
+        // Recherche par ID, nom, ou mot-clé
+        if (searchQuery != null && !searchQuery.isEmpty()) {
+            spec = spec.and(ProduitSpecifications.hasIdOrNomOrMotCle(searchQuery));
+        }
+
+        // Filtre par catégorie
+        if (filterCategorie != null && !filterCategorie.isEmpty()) {
+            spec = spec.and(ProduitSpecifications.hasCategorie(filterCategorie));
+        }
+
+        // Filtre par marque
+        if (filterMarque != null && !filterMarque.isEmpty()) {
+            spec = spec.and(ProduitSpecifications.hasMarque(filterMarque));
+        }
+
+        // Filtre par mot-clé
+        if (filterMotCle != null && !filterMotCle.isEmpty()) {
+            spec = spec.and(ProduitSpecifications.hasMotCle(filterMotCle));
+        }
+
+        // Applique le tri en fonction de la requête
+        if (sortPrice != null && !sortPrice.isEmpty()) {
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(sortPrice.equals("priceAsc") ? Sort.Order.asc("prix") : Sort.Order.desc("prix")));
+        } else if (sortDate != null && !sortDate.isEmpty()) {
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(sortDate.equals("dateAsc") ? Sort.Order.asc("dateCreation") : Sort.Order.desc("dateCreation")));
+        }
+
+        return produitRepository.findAll(spec, pageable);
+    }
+
 }
 

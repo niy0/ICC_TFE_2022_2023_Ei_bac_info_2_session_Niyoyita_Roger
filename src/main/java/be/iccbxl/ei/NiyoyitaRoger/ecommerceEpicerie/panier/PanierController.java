@@ -180,7 +180,7 @@ public class PanierController {
             int quantiteDemandee = ligneDeCommandeDTO.getQuantite();
 
             Panier panier = panierService.getPanierById(ligneDeCommandeDTO.getPanierId());
-            System.out.println();
+            System.out.println(panier.getId());
 
             // Vérifiez si la quantité demandée est inférieure à la quantité en stock du produit
             if (produit != null && quantiteDemandee <= produit.getQuantite() && quantiteDemandee > 0) {

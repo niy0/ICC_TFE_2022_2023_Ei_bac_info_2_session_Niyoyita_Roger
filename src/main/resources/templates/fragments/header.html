@@ -1,38 +1,126 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
+      layout:decorate="~{layouts/main}" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>Ajout d'un produit</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Bootstrap 5 CSS depuis unpkg CDN -->
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
-    <!-- jQuery (Nécessaire avant les scripts Bootstrap) -->
+    <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <!-- Bootstrap Bundle JS (inclut Popper) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Bootstrap Bundle JS (inclut Popper) depuis unpkg CDN -->
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Votre script personnalisé -->
     <script src="js/script.js"></script>
     <style>
-            .fieldError {color: red;}
-            .navbar-nav li {margin-right: 40px;}
-        </style>
+        /* Modernisation du header */
+        .navbar {
+            background: linear-gradient(135deg, #ff9966 0%, #ff5e62 50%, #ff9966 100%);
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            color: #fff;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-brand i {
+            margin-right: 10px;
+        }
+
+        .nav-link {
+            color: #fff !important;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            font-size: 1.1rem;
+            padding: 8px 15px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background-color: #ffcc00;
+            border: none;
+            border-radius: 50px;
+            padding: 8px 15px;
+            margin-right: 10px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .btn-warning:hover {
+            background-color: #ffb700;
+            transform: translateY(-2px);
+        }
+
+        .btn-success, .btn-danger {
+            border-radius: 50px;
+            padding: 8px 15px;
+            margin-left: 10px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .navbar-toggler {
+            border: none;
+            background-color: #ffcc00;
+            color: #fff;
+        }
+
+        .navbar-toggler-icon {
+            color: #fff;
+        }
+
+        .dropdown-menu {
+            background-color: #ff5e62;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .dropdown-item {
+            color: #fff;
+            transition: background-color 0.3s;
+        }
+
+        .dropdown-item:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+    </style>
 </head>
 <body>
 <header th:fragment="header">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand font-weight-bold text-warning" href="#" style="left:0px;">
-            <i class="fa-solid fa-shop fa-flip-horizontal fa-xl" style="color: #e6c51e;margin-right:10px;"></i>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <a class="navbar-brand" href="#">
+            <i class="fa-solid fa-shop fa-flip-horizontal"></i>
             L'épicerie de l'houmeau
         </a>
-        <div class="container" style="display:flex;">
+        <div class="container-fluid">
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"><i class="fas fa-bars"></i></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav mr-auto" style="display:flex;justify-content:space-between;">
+                <ul class="navbar-nav mr-auto me-auto mb-2 mb-lg-0">
                     <li class="nav-item active">
                         <a class="nav-link" th:href="@{/}" href="#">Accueil</a>
                     </li>
@@ -40,7 +128,7 @@
                         <a class="nav-link" th:href="@{/produit}" href="#">Produits</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/user/{user.id}/profile}" >Profile</a>
+                        <a class="nav-link" th:href="@{/user/{user.id}/profile}">Profil</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/contact}" href="#">Contact</a>
@@ -49,36 +137,39 @@
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Plus
                         </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" th:href="@{/about}" href="#">À Propos</a>
-                            <a class="dropdown-item" th:href="@{/faq}" href="#">FAQ</a>
-                            <a class="dropdown-item" th:href="@{/livraison}" href="#">Politique de Livraison</a>
-                            <a class="dropdown-item" th:href="@{/retour}" href="#">Politique de Retour</a>
-                            <a class="dropdown-item" th:href="@{/conditions}" href="#">Conditions d'Utilisation</a>
-                            <a class="dropdown-item" th:href="@{/privacy}" href="#">Politique de Confidentialité</a>
-                        </div>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" th:href="@{/about}" href="#">À Propos</a></li>
+                            <li><a class="dropdown-item" th:href="@{/faq}" href="#">FAQ</a></li>
+                            <li><a class="dropdown-item" th:href="@{/livraison}" href="#">Politique de Livraison</a></li>
+                            <li><a class="dropdown-item" th:href="@{/retour}" href="#">Politique de Retour</a></li>
+                            <li><a class="dropdown-item" th:href="@{/conditions}" href="#">Conditions d'Utilisation</a></li>
+                            <li><a class="dropdown-item" th:href="@{/privacy}" href="#">Politique de Confidentialité</a></li>
+                        </ul>
                     </li>
                 </ul>
-            </div>
-            <div style="display:flex;">
-                <a class="btn btn-warning" th:href="@{/panier}" href="#"><i class="fa fa-shopping-cart"></i></a>
+                <div style="display:flex;">
+                    <a class="btn btn-warning" th:href="@{/panier}" href="#"><i class="fa fa-shopping-cart"></i></a>
 
-                <!-- Affichez ces boutons si l'utilisateur est un utilisateur anonyme -->
-                <div th:if="${isAnonymousUser}">
-                    <a class="btn btn-success" th:href="@{/user/signup}" >S'inscrire</a>
-                    <a class="btn btn-success" th:href="@{/login}" >Se connecter</a>
+                    <!-- Affichez ces boutons si l'utilisateur est un utilisateur anonyme -->
+                    <div th:if="${isAnonymousUser}">
+                        <a class="btn btn-success" th:href="@{/user/signup}">S'inscrire</a>
+                        <a class="btn btn-success" th:href="@{/login}">Se connecter</a>
+                    </div>
+
+                    <!-- Affichez ce bouton si l'utilisateur n'est PAS un utilisateur anonyme -->
+                    <form th:if="${!isAnonymousUser}" th:action="@{/logout}" method="post">
+                        <button type="submit" class="btn btn-danger">Se déconnecter</button>
+                    </form>
                 </div>
-
-                <!-- Affichez ce bouton si l'utilisateur n'est PAS un utilisateur anonyme -->
-                <form th:if="${!isAnonymousUser}" th:action="@{/logout}" method="post">
-                    <button type="submit" class="btn btn-danger">Se déconnecter</button>
-                </form>
             </div>
         </div>
     </nav>
 </header>
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
+<!-- jQuery doit être chargé avant Bootstrap JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<!-- Bootstrap 5 Bundle JS (inclut Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Votre script personnalisé -->
+<script src="js/script.js"></script>
 </body>
 </html>

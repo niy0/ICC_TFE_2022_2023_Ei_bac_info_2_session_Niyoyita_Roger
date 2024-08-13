@@ -3,6 +3,8 @@
       layout:decorate="~{layouts/main}" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <title>Login</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
     <style>
         .fieldError { color: red; }
          .vue {
@@ -52,33 +54,36 @@
 </style>
 </head>
 <body>
-    <div align="center">
-        <div layout:fragment="content" class="vue">
-            <h1>Se connecter</h1>
+    <div class="container">
+        <div align="center">
+            <div layout:fragment="content" class="vue">
+                <h1>Se connecter</h1>
 
-            <div th:if="${param.error}">
-                <h4 style="color:red;">Mauvaise comibaison</h4>
+                <div th:if="${param.error}">
+                    <h4 style="color:red;">Mauvaise comibaison</h4>
+                </div>
+
+                <form th:action="@{/login/test}" method="post">
+                    <table>
+                        <tr>
+                            <td>E-mail</td>
+                            <td><input type="email" name="email" required></td>
+                        </tr>
+                        <tr>
+                            <td>Password</td>
+                            <td><input type="password" name="password" required></td>
+                        </tr>
+                        <tr>
+                            <td>&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2"><input type="submit" value="Se connecter"></td>
+                        </tr>
+                    </table>
+                </form>
             </div>
-
-            <form th:action="@{/login/test}" method="post">
-                <table>
-                    <tr>
-                        <td>E-mail</td>
-                        <td><input type="email" name="email" required></td>
-                    </tr>
-                    <tr>
-                        <td>Password</td>
-                        <td><input type="password" name="password" required></td>
-                    </tr>
-                    <tr>
-                        <td>&nbsp;</td>
-                    </tr>
-                    <tr>
-                        <td colspan="2"><input type="submit" value="Se connecter"></td>
-                    </tr>
-                </table>
-            </form>
         </div>
     </div>
+
 </body>
 </html>

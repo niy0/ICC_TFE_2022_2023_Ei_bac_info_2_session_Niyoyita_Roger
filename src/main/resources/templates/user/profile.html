@@ -5,25 +5,36 @@
 <head>
   <meta charset="UTF-8">
   <title>Page Membre</title>
-  <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
+  <!-- Bootstrap 5 CSS depuis unpkg CDN -->
+  <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+  <!-- jQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <!-- Bootstrap Bundle JS (inclut Popper) depuis unpkg CDN -->
+  <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <style>
     body {
-        background-color: #f0f2f5;
-        font-family: Arial, sans-serif;
+       padding: 20px;
+        transition: margin-left 0.3s;
+        position: relative; /* Ajouter cette ligne */
     }
 
+    .content-wrapper {
+        display: flex;
+        align-items: flex-start; /* Aligne les éléments au début */
+        max-height: 100vh; /* Limite la hauteur du conteneur à la hauteur de la fenêtre */
+    }
+
+    /* Stylisation de la sidenav */
     .sidenav {
-        position: fixed;
-        left: 0;
-        height: calc(100vh - 60px);
-        width: 300px;
         background-color: #343a40;
         color: white;
-        padding-top: 0px;
+        padding-top: 0;
         overflow-y: auto;
-        transition: width 0.3s ease-in-out;
-        border-radius: 0 0.5rem 0 0;
+        height: auto; /* Pour que la hauteur s'adapte au contenu sur les petits écrans */
+        border-radius: 0.5rem;
+        margin: 0;
     }
 
     .sidenav a {
@@ -48,9 +59,26 @@
     }
 
     .content {
-        margin-left: 300px;
+        display: flex;
+        flex-wrap: wrap; /* Pour permettre l'adaptation des colonnes */
+        height: auto;
+        align-items: flex-start;
+    }
+
+    .main-content {
         padding: 20px;
-        transition: margin-left 0.3s;
+        box-sizing: border-box;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .sidenav {
+            width: 100%; /* Prend toute la largeur sur les petits écrans */
+            margin-bottom: 20px; /* Ajoute un espacement en bas pour séparer du contenu principal */
+        }
+        .main-content {
+            width: 100%; /* Prend toute la largeur sur les petits écrans */
+        }
     }
 
     .card {
@@ -147,9 +175,9 @@
   </style>
 </head>
 <body>
-<div class="container">
-  <div layout:fragment="content" class="content">
-    <div class="sidenav">
+<div class="container-fluid">
+  <div layout:fragment="content" class="row content">
+    <div class="col-12 col-md-4 col-lg-3 sidenav">
       <a href="javascript:location.reload()" class="btn-refresh">
         <span class="refresh-text marginL">Replier les sous-menus</span> <i class="fas fa-sync-alt" style="color: rgb(255, 193, 7);"></i>
       </a>
@@ -200,45 +228,46 @@
         </div>
       </div>
     </div>
-
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">Page profil</h5>
-        <h6 class="card-subtitle mb-2 text-muted" th:text="${user.nom} + ' ' + ${user.prenom}"></h6>
-        <p class="card-text"><strong>Nom:</strong> <span th:text="${user.nom}"></span></p>
-        <p class="card-text"><strong>Prénom:</strong> <span th:text="${user.prenom}"></span></p>
-        <p class="card-text"><strong>Email:</strong> <span th:text="${user.email}"></span></p>
-        <p class="card-text"><strong>Sexe:</strong> <span th:text="${user.sexe}"></span></p>
-        <p class="card-text"><strong>Téléphone:</strong>
-          <span th:if="${user.telephone != null}" th:text="${user.telephone}"></span>
-          <span th:if="${user.telephone == null}">Pas de numéro enregistré</span>
-        </p>
-        <p class="card-text"><strong>Date de création:</strong> <span th:text="${user.dateCreation}"></span></p>
-        <p class="card-text"><strong>Rôles:</strong>
-          <span th:each="role : ${user.roles}" th:text="${role.nom} + ' '"></span>
-        </p>
-        <div class="address-section">
-          <h6><strong>Adresse:</strong></h6>
-          <span th:if="${adresse == null}">Aucune adresse enregistrée</span>
-          <div th:if="${adresse != null}">
-            <div class="card address-card">
-              <div class="card-body">
-                <div class="address-detail">
-                  <p><strong>Rue:</strong> <span th:text="${adresse.rue}" th:if="${adresse.rue != null}"></span></p>
-                  <p><strong>Numéro:</strong> <span th:text="${adresse.numero}" th:if="${adresse.numero != null}"></span></p>
-                  <p><strong>Localité:</strong> <span th:text="${adresse.localite}" th:if="${adresse.localite != null}"></span></p>
-                  <p><strong>Code Postal:</strong> <span th:text="${adresse.codePostal}" th:if="${adresse.codePostal != null}"></span></p>
-                  <p><strong>Ville:</strong> <span th:text="${adresse.ville}" th:if="${adresse.ville != null}"></span></p>
-                  <p><strong>Pays:</strong> <span th:text="${adresse.pays}" th:if="${adresse.pays != null}"></span></p>
-                  <p th:if="${adresse.departement != null}"><strong>Département:</strong> <span th:text="${adresse.departement}"></span></p>
+    <div class="col-12 col-md-8 col-lg-9 main-content">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Page profil</h5>
+          <h6 class="card-subtitle mb-2 text-muted" th:text="${user.nom} + ' ' + ${user.prenom}"></h6>
+          <p class="card-text"><strong>Nom:</strong> <span th:text="${user.nom}"></span></p>
+          <p class="card-text"><strong>Prénom:</strong> <span th:text="${user.prenom}"></span></p>
+          <p class="card-text"><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+          <p class="card-text"><strong>Sexe:</strong> <span th:text="${user.sexe}"></span></p>
+          <p class="card-text"><strong>Téléphone:</strong>
+            <span th:if="${user.telephone != null}" th:text="${user.telephone}"></span>
+            <span th:if="${user.telephone == null}">Pas de numéro enregistré</span>
+          </p>
+          <p class="card-text"><strong>Date de création:</strong> <span th:text="${user.dateCreation}"></span></p>
+          <p class="card-text"><strong>Rôles:</strong>
+            <span th:each="role : ${user.roles}" th:text="${role.nom} + ' '"></span>
+          </p>
+          <div class="address-section">
+            <h6><strong>Adresse:</strong></h6>
+            <span th:if="${adresse == null}">Aucune adresse enregistrée</span>
+            <div th:if="${adresse != null}">
+              <div class="card address-card">
+                <div class="card-body">
+                  <div class="address-detail">
+                    <p><strong>Rue:</strong> <span th:text="${adresse.rue}" th:if="${adresse.rue != null}"></span></p>
+                    <p><strong>Numéro:</strong> <span th:text="${adresse.numero}" th:if="${adresse.numero != null}"></span></p>
+                    <p><strong>Localité:</strong> <span th:text="${adresse.localite}" th:if="${adresse.localite != null}"></span></p>
+                    <p><strong>Code Postal:</strong> <span th:text="${adresse.codePostal}" th:if="${adresse.codePostal != null}"></span></p>
+                    <p><strong>Ville:</strong> <span th:text="${adresse.ville}" th:if="${adresse.ville != null}"></span></p>
+                    <p><strong>Pays:</strong> <span th:text="${adresse.pays}" th:if="${adresse.pays != null}"></span></p>
+                    <p th:if="${adresse.departement != null}"><strong>Département:</strong> <span th:text="${adresse.departement}"></span></p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        <div>
-          <a class="btn btn-outline-warning" th:href="@{'/user/' + ${user.id} + '/profile/edit'}">Modifier profil</a>
-          <a class="btn btn-outline-primary" th:href="@{'/user/' + ${user.id} + '/adresse/edit'}">Modifier adresse</a>
+          <div>
+            <a class="btn btn-outline-warning" th:href="@{'/user/' + ${user.id} + '/profile/edit'}">Modifier profil</a>
+            <a class="btn btn-outline-primary" th:href="@{'/user/' + ${user.id} + '/adresse/edit'}">Modifier adresse</a>
+          </div>
         </div>
       </div>
     </div>

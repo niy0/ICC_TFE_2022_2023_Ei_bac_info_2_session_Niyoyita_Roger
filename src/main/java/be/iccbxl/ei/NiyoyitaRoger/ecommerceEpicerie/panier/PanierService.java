@@ -83,6 +83,7 @@ public class PanierService {
             existingLigneDeCommande.setQuantite(existingLigneDeCommande.getQuantite() + quantite);
             ligneDeCommandeRepository.save(existingLigneDeCommande);
             System.out.println("existe deeeeeeeeejjaaa"+ existingLigneDeCommande);
+            System.out.println(panier.getLignesDeCommande() +"ligne de comm");
         } else {
             LigneDeCommande nouvelleLigneDeCommande = new LigneDeCommande(produit, panier, quantite, produit.getPrix());
             ligneDeCommandeRepository.save(nouvelleLigneDeCommande);
