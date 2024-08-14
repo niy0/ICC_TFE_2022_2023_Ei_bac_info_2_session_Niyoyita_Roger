@@ -16,7 +16,7 @@
     <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Votre script personnalisé -->
     <link rel="icon"  href="src/main/resources/static/js/favicon.ico" type="image/x-icon">
-    <script src="js/script.js"></script>
+    <script src="/js/script.js"></script>
     <!-- Balises meta pour le jeton CSRF -->
     <meta name="_csrf.parameterName" th:content="${_csrf.parameterName}" />
     <meta name="_csrf.token" th:content="${_csrf.token}" />
@@ -292,12 +292,11 @@
                             </div>
                         </div>
 
-
+                        <input type="hidden" th:value="${panier.id}" name="panierId" id="panierId">
                         <div class="row justify-content-center g-3" id="liste-produits">
                             <div th:each="produit : ${listProducts}" class="col-12 col-sm-6 col-md-6 col-lg-4"> <!-- Augmente la largeur des cartes -->
                                 <div class="card product-card">
                                     <input type="hidden" th:value="${produit.id}" th:id="'produitId-' + ${produit.id}" name="produitId">
-                                    <input type="hidden" th:value="${panier.id}" name="panierId" id="panierId">
 
                                     <img class="card-img-top product-image" th:src="@{${'/display?id=' + produit.id}}" alt="Image du produit">
                                     <div class="card-body product-details" style="padding-bottom:0;padding-top:0;">
@@ -426,7 +425,7 @@
                         </div>
                     </div>
                 </div>
-                <script src="/js/script.js"></script>
+
                 <script>
                     // Déclarez la fonction en dehors de $(document).ready pour la rendre accessible globalement
                     function loadProduits(page, sortBy) {
@@ -448,6 +447,7 @@
                                     produitsContainer.append(`
                                         <div class="col-12 col-sm-6 col-md-6 col-lg-4">
                                             <div class="card product-card">
+
                                                 <img class="card-img-top product-image" src="/display?id=${produit.id}" alt="Image du produit">
                                                 <div class="card-body product-details">
                                                     <h2 class="product-title">${produit.nom}</h2>
@@ -462,7 +462,12 @@
                                                     <h4 class="product-price">${produit.prix} €</h4>
                                                     <div class="form-group mb-3" style="display: flex;">
                                                         <div class="input-group input-spinner">
-                                                            <input style="width: 80px; margin: 0;" type="number" step="1" min="1" max="${produit.quantite}" value="1" class="form-control form-control-sm form-input text-center">
+                                                            <div style="display: flex;">
+                                                                <input type="hidden" th:value="${produit.quantite}">
+                                                                <input style="width: 80px; margin: 0;" type="number" step="1" min="1" th:max="${produit.quantite}" value="1"
+                                                                       id="quantite-${produit.id}" name="quantite" th:attr="data-productId=${produit.id}"
+                                                                       class="form-control form-control-sm form-input text-center" >
+                                                            </div>
                                                         </div>
                                                         <button id="favorite-btn-${produit.id}" class="favorite-btn" title="Ajouter aux favoris">
                                                             <i class="far fa-heart" style="color: #d91717;"></i>

@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.1.5</version>
+		<version>3.3.2</version> <!-- Mise à jour à la dernière version -->
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>be.iccbxl.ei.NiyoyitaRoger</groupId>
@@ -16,6 +16,13 @@
 	<properties>
 		<java.version>17</java.version>
 	</properties>
+	<repositories>
+		<repository>
+			<id>spring-milestone</id>
+			<url>https://repo.spring.io/milestone</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -34,6 +41,7 @@
 		<dependency>
 			<groupId>nz.net.ultraq.thymeleaf</groupId>
 			<artifactId>thymeleaf-layout-dialect</artifactId>
+			<version>3.3.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -46,10 +54,12 @@
 		<dependency>
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-core</artifactId>
+			<version>9.22.0</version> <!-- Mise à jour à la dernière version -->
 		</dependency>
 		<dependency>
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-mysql</artifactId>
+			<version>9.22.0</version> <!-- Mise à jour à la dernière version -->
 		</dependency>
 
 		<dependency>
@@ -61,6 +71,7 @@
 		<dependency>
 			<groupId>com.mysql</groupId>
 			<artifactId>mysql-connector-j</artifactId>
+			<version>8.1.0</version> <!-- Mise à jour à la dernière version -->
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -69,9 +80,9 @@
 			<version>5.3.3</version>
 		</dependency>
 		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>4.0.1</version> <!-- Utilisez la version la plus récente -->
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
+			<version>6.0.0</version> <!-- Mise à jour pour correspondre à Spring Boot 3.x -->
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -91,20 +102,23 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.12.0</version> <!-- Utilisez la version la plus récente -->
+			<version>3.14.0</version> <!-- Utilisez la version la plus récente -->
 		</dependency>
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>webjars-locator-core</artifactId>
+			<version>0.50</version> <!-- Ajout de la version pour assurer la compatibilité -->
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+			<version>1.18.30</version> <!-- Mise à jour à la dernière version -->
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
+			<version>3.3.2</version> <!-- Mise à jour à la dernière version -->
 			<scope>test</scope>
 		</dependency>
 
@@ -112,25 +126,33 @@
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-config</artifactId>
-			<version>6.1.5</version> <!-- Mettez à jour avec la version actuelle -->
+			<version>6.3.1</version> <!-- Mettez à jour avec la version actuelle -->
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-web</artifactId>
-			<version>6.1.5</version> <!-- Mettez à jour avec la version actuelle -->
+			<version>6.3.1</version> <!-- Mettez à jour avec la version actuelle -->
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+			<version>3.3.2</version> <!-- Mettez à jour avec la version actuelle -->
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
+			<version>4.13.2</version> <!-- Mise à jour à la dernière version -->
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
+			<version>5.5.0</version> <!-- Mise à jour à la dernière version -->
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-junit-jupiter</artifactId>
+			<version>5.5.0</version> <!-- Mise à jour à la dernière version -->
 		</dependency>
 
 		<!-- Stripe Dependency -->
@@ -146,11 +168,11 @@
 		</dependency>
 
 
-		<!-- javax.annotation Dependency -->
+		<!-- jakarta.annotation Dependency -->
 		<dependency>
-			<groupId>javax.annotation</groupId>
-			<artifactId>javax.annotation-api</artifactId>
-			<version>1.3.2</version>
+			<groupId>jakarta.annotation</groupId>
+			<artifactId>jakarta.annotation-api</artifactId>
+			<version>2.1.1</version> <!-- Mise à jour pour correspondre à Jakarta EE -->
 		</dependency>
 	</dependencies>
 
@@ -159,6 +181,7 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>3.3.2</version> <!-- Mise à jour à la dernière version -->
 				<configuration>
 					<excludes>
 						<exclude>

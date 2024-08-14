@@ -2,10 +2,6 @@ $(document).ready(function () {
     var csrfToken = $("meta[name='_csrf']").attr("content");
     var csrfHeader = $("meta[name='_csrf_header']").attr("content");
 
-
-
-
-
     function validateForm() {
         let isValid = true;
         const requiredFields = document.querySelectorAll('#orderInfoForm [required]');

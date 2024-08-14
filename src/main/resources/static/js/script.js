@@ -259,6 +259,8 @@ function addToCart(produitId) {
         panierId: panierId
     };
 
+    //alert("Données envoyées :\nProduit ID: " + produitIdValue + "\nQuantité: " + quantite + "\nPanier ID: " + panierId);
+
     // Effectuez la requête Ajax POST
     $.ajax({
         url: '/addToCart',

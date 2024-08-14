@@ -180,7 +180,7 @@ public class PanierController {
             int quantiteDemandee = ligneDeCommandeDTO.getQuantite();
 
             Panier panier = panierService.getPanierById(ligneDeCommandeDTO.getPanierId());
-            System.out.println(panier.getId());
+            System.out.println(panier.getId() + "je suis laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" + quantiteDemandee + ligneDeCommandeDTO.getPanierId());
 
             // Vérifiez si la quantité demandée est inférieure à la quantité en stock du produit
             if (produit != null && quantiteDemandee <= produit.getQuantite() && quantiteDemandee > 0) {
@@ -225,8 +225,8 @@ public class PanierController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Quantité demandée invalide.");
             }
         } catch (Exception e) {
-            // Gérez les erreurs internes, par exemple, une erreur de base de données
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de l'ajout de la ligne de commande.");
+            e.printStackTrace(); // Journalise la pile d'appel complète de l'exception
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de l'ajout de la ligne de commande: " + e.getMessage());
         }
     }
 
