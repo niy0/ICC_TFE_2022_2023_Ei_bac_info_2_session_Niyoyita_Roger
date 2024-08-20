@@ -76,10 +76,12 @@ public class PanierController {
     }
 
 
+    //A tester pour user non connecter
     @GetMapping("/panier")
     public String showPanier(Model model, Principal principal, HttpSession session) {
        // Panier panier = getOrCreatePanier(principal, session);
-        Panier panier = panierService.getOrCreatePanier(principal,session);
+        Panier panierTest = panierService.getOrCreatePanier(principal, session);
+        Panier panier = panierService.getPanierById(panierTest.getId());
         System.out.println(panier);
 
         System.out.println(principal+" pppppprincipal");
@@ -230,26 +232,4 @@ public class PanierController {
         }
     }
 
-    @PostMapping("/addToCart2")//modifier
-    public String addToCart(@RequestParam("quantite")Integer qty, @RequestParam("produitId")Long productId ) {
-        // Obtenez le produit à partir de la base de données en utilisant l'ID du produit
-        //Produit produit = produitService.getProduitById(productId);
-        String s = "1";
-        Long idTest = Long.parseLong(s);
-        Optional<Panier> panier = panierRepository.findById(idTest);
-        //panierRepository.save(panier.get());
-        Produit produit = produitRepository.getPro(productId);
-
-        // Créez une nouvelle ligne de commande
-        //Produit produit, Panier panier, int quantite, double prixUnitaire, double montantTotal
-        LigneDeCommande ligneDeCommande = new LigneDeCommande(produit,panier.get(),qty,produit.getPrix());
-        ligneDeCommande.setProduit(produit);
-        ligneDeCommande.setQuantite(1); // Vous pouvez ajuster la quantité comme vous le souhaitez
-
-        // Ajoutez la ligne de commande au panier
-        panierService.addToCart(ligneDeCommande);
-
-        // Redirigez l'utilisateur vers la page du panier ou une autre page appropriée
-        return "redirect:/panier/show";
-    }
 }

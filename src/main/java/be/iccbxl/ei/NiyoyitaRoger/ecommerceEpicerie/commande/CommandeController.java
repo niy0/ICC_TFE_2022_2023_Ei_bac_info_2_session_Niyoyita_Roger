@@ -82,7 +82,7 @@ public class CommandeController {
     public Page<Commande> getCommandes(
             @RequestParam(defaultValue = "dateCommande") String sortBy,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "2") int size,
             @RequestParam(required = false) String searchId,
             @RequestParam(required = false) String searchVille,
             @RequestParam(required = false) String searchCodePostal,

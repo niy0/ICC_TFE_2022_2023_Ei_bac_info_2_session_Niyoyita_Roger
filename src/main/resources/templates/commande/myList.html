@@ -8,19 +8,16 @@
   <style>
     body {
       background-color: #f0f2f5;
-      font-family: Arial, sans-serif;
     }
     .sidenav {
-      position: fixed;
-      left: 0;
-      height: 100%;
-      width: 300px;
-      background-color: #343a40;
-      color: white;
-      padding-top: 0px;
-      overflow-y: auto;
-      transition: width 0.3s ease-in-out;
-      border-radius: 0 0.5rem 0 0;
+        background-color: #343a40;
+        color: white;
+        padding-top: 0;
+        overflow-y: auto;
+        height: auto; /* Pour que la hauteur s'adapte au contenu sur les petits écrans */
+        border-radius: 0.5rem;
+        margin: 0;
+        width: 300px;
     }
     .sidenav a {
       padding: 15px 25px;
@@ -39,6 +36,13 @@
       background-color: #007bff;
       color: white;
       padding-left: 35px;
+    }
+
+    .content {
+        display: flex;
+        flex-wrap: wrap; /* Pour permettre l'adaptation des colonnes */
+        height: auto;
+        align-items: flex-start;
     }
     .container {
       max-width: 1200px;
@@ -105,6 +109,12 @@
     .order-info div {
       margin-bottom: 10px;
     }
+
+    .title {
+        font-weight: bold;
+        color: #343a40;
+    }
+
     .order-total {
       font-size: 1.2rem;
       font-weight: bold;
@@ -154,9 +164,9 @@
   </style>
 </head>
 <body>
-<div class="container mt-4">
-  <div layout:fragment="content">
-    <div class="sidenav">
+<div class="container-fluid">
+  <div layout:fragment="content" class="row content">
+    <div class="col-12 col-md-4 col-lg-3  sidenav">
       <a href="javascript:location.reload()" class="btn-refresh">
         <span class="refresh-text marginL">Replier les sous-menus</span> <i class="fas fa-sync-alt" style="color: rgb(255, 193, 7);"></i>
       </a>
@@ -177,8 +187,7 @@
         <i class="fas fa-briefcase"></i> Employé <span class="submenu-icon fas fa-caret-right"></span>
       </a>
       <div class="collapse marginR" id="employeeSubmenu">
-        <a href="#" style="font-size: 16px;"><i class="fas fa-list"></i> Liste des commandes</a>
-        <a href="#" style="font-size: 16px;"><i class="fas fa-chart-bar"></i> Commandes à traiter</a>
+        <a th:href="@{/employe/commandes}" style="font-size: 16px;"><i class="fas fa-list"></i> Liste des commandes</a>
         <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#statSubmenu" role="button" aria-expanded="false" aria-controls="statSubmenu">
           <i class="fas fa-chart-line"></i> Statistiques <span class="submenu-icon fas fa-caret-right"></span>
         </a>
@@ -208,16 +217,17 @@
         </div>
       </div>
     </div>
-    <div class="mt-5">
-      <h2> Mes Commandes</h2>
-      <div th:if="${#lists.isEmpty(commandes.content)}">
-        <p>Vous n'avez pas encore passé de commande.</p>
-      </div>
-      <div th:each="commande : ${commandes.content}" class="order-card">
-        <div class="order-card">
-          <div class="order-header">
-            <div class="order-id">Commande #<span th:text="${commande.id}"></span></div>
-            <div class="order-status" th:classappend="${'status-' + commande.statut.toString().toLowerCase()}">
+    <div class="col-12 col-md-8 col-lg-9 main-content">
+      <div>
+        <h2 class="title"> Mes Commandes</h2>
+        <div th:if="${#lists.isEmpty(commandes.content)}">
+          <p>Vous n'avez pas encore passé de commande.</p>
+        </div>
+        <div th:each="commande : ${commandes.content}" class="order-card">
+          <div class="order-card">
+            <div class="order-header">
+              <div class="order-id">Commande #<span th:text="${commande.id}"></span></div>
+              <div class="order-status" th:classappend="${'status-' + commande.statut.toString().toLowerCase()}">
                 <span th:text="${
                   (commande.statut.name() == 'EN_ATTENTE') ? 'En attente' :
                   (commande.statut.name() == 'EN_COURS') ? 'En cours' :
@@ -226,33 +236,34 @@
                   (commande.statut.name() == 'LIVREE') ? 'Livrée' :
                   (commande.statut.name() == 'ANNULEE') ? 'Annulée' :
                   '' }"></span>
+              </div>
+            </div>
+            <div class="order-info">
+              <div>Date: <span th:text="${#dates.format(commande.dateCommande, 'dd/MM/yyyy HH:mm')}"></span></div>
+              <div>Méthode: <span th:text="${commande.methodCommande == 'PICKUP' ? 'Récupérer au magasin' : 'Livraison'}"></span></div>
+              <div class="order-total">Total: <span th:text="${commande.montantCommande} + ' €'"></span></div>
+            </div>
+            <div class="order-actions">
+              <a th:href="@{/commande/detail/{id}(id=${commande.id})}" class="btn btn-info">Voir Détails</a>
             </div>
           </div>
-          <div class="order-info">
-            <div>Date: <span th:text="${#dates.format(commande.dateCommande, 'dd/MM/yyyy HH:mm')}"></span></div>
-            <div>Méthode: <span th:text="${commande.methodCommande == 'PICKUP' ? 'Récupérer au magasin' : 'Livraison'}"></span></div>
-            <div class="order-total">Total: <span th:text="${commande.montantCommande} + ' €'"></span></div>
-          </div>
-          <div class="order-actions">
-            <a th:href="@{/commande/detail/{id}(id=${commande.id})}" class="btn btn-info">Voir Détails</a>
-          </div>
         </div>
-      </div>
-      <div th:if="${commandes.totalPages > 1}" class="d-flex justify-content-center">
-        <nav aria-label="Page navigation">
-          <ul class="pagination">
-            <li class="page-item" th:classappend="${commandes.hasPrevious() ? '' : 'disabled'}">
-              <a class="page-link" th:href="@{/mes-commandes(page=${commandes.number - 1}, size=${commandes.size})}">Précédent</a>
-            </li>
-            <li class="page-item" th:each="i : ${#numbers.sequence(1, commandes.totalPages)}"
-                th:classappend="${i == commandes.number + 1 ? 'active' : ''}">
-              <a class="page-link" th:href="@{/mes-commandes(page=${i - 1}, size=${commandes.size})}" th:text="${i}">1</a>
-            </li>
-            <li class="page-item" th:classappend="${commandes.hasNext() ? '' : 'disabled'}">
-              <a class="page-link" th:href="@{/mes-commandes(page=${commandes.number + 1}, size=${commandes.size})}">Suivant</a>
-            </li>
-          </ul>
-        </nav>
+        <div th:if="${commandes.totalPages > 1}" class="d-flex justify-content-center">
+          <nav aria-label="Page navigation">
+            <ul class="pagination">
+              <li class="page-item" th:classappend="${commandes.hasPrevious() ? '' : 'disabled'}">
+                <a class="page-link" th:href="@{/mes-commandes(page=${commandes.number - 1}, size=${commandes.size})}">Précédent</a>
+              </li>
+              <li class="page-item" th:each="i : ${#numbers.sequence(1, commandes.totalPages)}"
+                  th:classappend="${i == commandes.number + 1 ? 'active' : ''}">
+                <a class="page-link" th:href="@{/mes-commandes(page=${i - 1}, size=${commandes.size})}" th:text="${i}">1</a>
+              </li>
+              <li class="page-item" th:classappend="${commandes.hasNext() ? '' : 'disabled'}">
+                <a class="page-link" th:href="@{/mes-commandes(page=${commandes.number + 1}, size=${commandes.size})}">Suivant</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
       </div>
     </div>
   </div>

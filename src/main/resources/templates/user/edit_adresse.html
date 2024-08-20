@@ -10,20 +10,18 @@
   <style>
     body {
         background-color: #f0f2f5;
-        font-family: Arial, sans-serif;
     }
 
     .sidenav {
-        position: fixed;
-        left: 0;
-        height: calc(100vh - 60px);
-        width: 300px;
         background-color: #343a40;
         color: white;
-        padding-top: 0px;
+        padding-top: 0;
         overflow-y: auto;
-        transition: width 0.3s ease-in-out;
-        border-radius: 0 0.5rem 0 0;
+        height: auto;
+        border-radius: 0.5rem;
+        margin: 0;
+        width: 300px;
+        flex-shrink: 0;
     }
 
     .sidenav a {
@@ -48,9 +46,10 @@
     }
 
     .content {
-        margin-left: 300px;
-        padding: 20px;
-        transition: margin-left 0.3s;
+        display: flex;
+        flex-wrap: wrap; /* Pour permettre l'adaptation des colonnes */
+        height: auto;
+        align-items: flex-start;
     }
 
     .card {
@@ -144,12 +143,17 @@
         color: rgb(255, 193, 7);
     }
 
+    .title {
+      font-weight: bold;
+      color: #343a40;
+    }
+
   </style>
 </head>
 <body>
-<div class="container">
-  <div layout:fragment="content" class="content">
-    <div class="sidenav">
+<div class="container-fluid">
+  <div layout:fragment="content" class="row content">
+    <div class="col-12 col-md-4 col-lg-3 sidenav">
       <a href="javascript:location.reload()" class="btn-refresh">
         <span class="refresh-text marginL">Replier les sous-menus</span> <i class="fas fa-sync-alt" style="color: rgb(255, 193, 7);"></i>
       </a>
@@ -200,42 +204,44 @@
         </div>
       </div>
     </div>
-
-    <div class="card mt-5">
-      <div class="card-body">
-        <h5 class="card-title">Modifier l'adresse</h5>
-        <form th:object="${adresse}" th:action="@{'/user/' + ${user.id} + '/adresse/save'}" method="post">
-          <div class="form-group">
-            <label for="rue">Rue :</label>
-            <input type="text" th:field="*{rue}" class="form-control" id="rue" name="rue" required>
-          </div>
-          <div class="form-group">
-            <label for="numero">Numéro :</label>
-            <input type="text" th:field="*{numero}" class="form-control" id="numero" name="numero" required>
-          </div>
-          <div class="form-group">
-            <label for="localite">Localité :</label>
-            <input type="text" th:field="*{localite}" class="form-control" id="localite" name="localite" required>
-          </div>
-          <div class="form-group">
-            <label for="codePostal">Code Postal :</label>
-            <input type="text" th:field="*{codePostal}" class="form-control" id="codePostal" name="codePostal" required>
-          </div>
-          <div class="form-group">
-            <label for="ville">Ville :</label>
-            <input type="text" th:field="*{ville}" class="form-control" id="ville" name="ville" required>
-          </div>
-          <div class="form-group">
-            <label for="pays">Pays :</label>
-            <input type="text" th:field="*{pays}" class="form-control" id="pays" name="pays" required>
-          </div>
-          <div class="form-group">
-            <label for="departement">Département :</label>
-            <input type="text" th:field="*{departement}" class="form-control" id="departement" name="departement">
-          </div>
-          <button type="submit" class="btn btn-primary mt-3">Enregistrer</button>
-        </form>
-        <a class="btn btn-outline-secondary mt-3" th:href="@{'/user/' + ${user.id} + '/profile'}">Annuler</a>
+    <div class="col-12 col-md-8 col-lg-9  main-content">
+      <h1 class="title" >Modifier l'adresse</h1>
+      <div class="card mt-5">
+        <div class="card-body">
+          <h5 class="card-title" hidden>Modifier l'adresse</h5>
+          <form th:action="@{'/user/' + ${user.id} + '/adresse/save'}" method="post">
+            <div class="form-group">
+              <label for="rue">Rue :</label>
+              <input type="text" class="form-control" id="rue" name="rue" th:value="${adresse != null ? adresse.rue : ''}" required>
+            </div>
+            <div class="form-group">
+              <label for="numero">Numéro :</label>
+              <input type="text" class="form-control" id="numero" name="numero" th:value="${adresse != null ? adresse.numero : ''}" required>
+            </div>
+            <div class="form-group">
+              <label for="localite">Localité :</label>
+              <input type="text" class="form-control" id="localite" name="localite" th:value="${adresse != null ? adresse.localite : ''}" required>
+            </div>
+            <div class="form-group">
+              <label for="codePostal">Code Postal :</label>
+              <input type="text" class="form-control" id="codePostal" name="codePostal" th:value="${adresse != null ? adresse.codePostal : ''}" required>
+            </div>
+            <div class="form-group">
+              <label for="ville">Ville :</label>
+              <input type="text" class="form-control" id="ville" name="ville" th:value="${adresse != null ? adresse.ville : ''}" required>
+            </div>
+            <div class="form-group">
+              <label for="pays">Pays :</label>
+              <input type="text" class="form-control" id="pays" name="pays" th:value="${adresse != null ? adresse.pays : ''}" required>
+            </div>
+            <div class="form-group">
+              <label for="departement">Département :</label>
+              <input type="text" class="form-control" id="departement" name="departement" th:value="${adresse != null ? adresse.departement : ''}">
+            </div>
+            <button type="submit" class="btn btn-primary mt-3" th:disabled="${adresse == null}">Enregistrer</button>
+          </form>
+          <a class="btn btn-outline-secondary mt-3" th:href="@{'/user/' + ${user.id} + '/profile'}">Annuler</a>
+        </div>
       </div>
     </div>
   </div>

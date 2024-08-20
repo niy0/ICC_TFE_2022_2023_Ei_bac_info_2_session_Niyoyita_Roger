@@ -2,26 +2,24 @@
 <html lang="fr" xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
       layout:decorate="~{layouts/main}" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
-    <title>Modifier les rôles d'un utilisateur</title>
+    <title>Modifier les rôles  utilisateur</title>
     <link rel="stylesheet" type="text/css" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
     <style>
         body {
             background-color: #f0f2f5;
-            font-family: Arial, sans-serif;
         }
 
         .sidenav {
-            position: fixed;
-            left: 0;
-            height: calc(100vh - 60px);
-            width: 300px;
             background-color: #343a40;
             color: white;
-            padding-top: 0px;
+            padding-top: 0;
             overflow-y: auto;
-            transition: width 0.3s ease-in-out;
-            border-radius: 0 0.5rem 0 0;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 0;
+            width: 300px;
+            flex-shrink: 0;
         }
 
         .sidenav a {
@@ -46,9 +44,10 @@
         }
 
         .content {
-            margin-left: 300px;
-            padding: 20px;
-            transition: margin-left 0.3s;
+            display: flex;
+            flex-wrap: wrap; /* Pour permettre l'adaptation des colonnes */
+            height: auto;
+            align-items: flex-start;
         }
 
         .card {
@@ -57,7 +56,6 @@
             border-radius: 0.5rem;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s;
-            margin-top: 20px;
         }
 
         .card:hover {
@@ -133,6 +131,11 @@
             content: "\f0d7"; /* FontAwesome icon for up arrow */
         }
 
+        .title {
+          font-weight: bold;
+          color: #343a40;
+        }
+
         .btn-refresh {
             color: rgb(255, 193, 7);
             font-size: 20px;
@@ -196,9 +199,9 @@
     </style>
 </head>
 <body>
-<div class="container">
-    <div layout:fragment="content" class="content">
-        <div class="sidenav">
+<div class="container-fluid">
+    <div layout:fragment="content" class="row content">
+        <div class="col-12 col-md-4 col-lg-3 sidenav">
             <a href="javascript:location.reload()" class="btn-refresh">
                 <span class="refresh-text marginL">Replier les sous-menus</span> <i class="fas fa-sync-alt" style="color: rgb(255, 193, 7);"></i>
             </a>
@@ -249,51 +252,61 @@
                 </div>
             </div>
         </div>
-        <h1>Modification  rôles utilisateur</h1>
-        <form th:action="@{/admin/user/{id}/edit(id=${user.id})}" method="post" style="max-width: 700px; margin: 0 auto;">
-            <input type="hidden" th:value="${editUser.id}" name="editUserId">
-            <div class="border border-secondary rounded p-3">
-                <div class="form-group row">
-                    <label class="col-sm-4 col-form-label">Nom :</label>
-                    <div class="col-sm-8">
-                        <input type="text" th:value="${editUser.nom}" class="form-control" disabled />
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-4 col-form-label">Prénom :</label>
-                    <div class="col-sm-8">
-                        <input type="text" th:value="${editUser.prenom}" class="form-control" disabled />
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-4 col-form-label">Email :</label>
-                    <div class="col-sm-8">
-                        <input type="email" th:value="${editUser.email}" class="form-control" disabled />
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-4 col-form-label">Téléphone :</label>
-                    <div class="col-sm-8">
-                        <input type="email" th:value="${editUser.telephone}" class="form-control" disabled />
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-4 col-form-label">Rôles :</label>
-                    <div class="col-sm-8">
-                        <div th:each="role : ${roles}">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" th:name="roleIds" th:value="${role.id}" th:checked="${editUser.roles.contains(role)}" th:id="'role_' + ${role.id}">
-                                <label class="form-check-label" th:for="'role_' + ${role.id}" th:text="${role.nom}"></label>
+        <div class="col-12 col-md-8 col-lg-9 main-content">
+            <h1 class="title">Modification  rôles utilisateur</h1>
+            <div class="card mt-5">
+                <div class="card-body">
+                    <form th:action="@{/admin/user/{id}/edit(id=${user.id})}" method="post">
+                        <input type="hidden" th:value="${editUser.id}" name="editUserId">
+
+                        <div class="form-group row align-items-center">
+                            <label class="col-sm-3 col-form-label mb-0" style="padding-right: 0;">Nom :</label>
+                            <div class="col-sm-6" style="padding-left: 0;">
+                                <input type="text" th:value="${editUser.nom}" class="form-control" disabled />
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="text-center">
-                    <button type="submit" class="btn btn-primary m-2">Mettre à jour</button>
-                    <a class="btn btn-secondary m-2" th:href="@{/admin/users}" onclick="cancelForm();">Annuler</a>
+
+                        <div class="form-group row align-items-center">
+                            <label class="col-sm-3 col-form-label mb-0" style="padding-right: 0;">Prénom :</label>
+                            <div class="col-sm-6" style="padding-left: 0;">
+                                <input type="text" th:value="${editUser.prenom}" class="form-control" disabled />
+                            </div>
+                        </div>
+
+                        <div class="form-group row align-items-center">
+                            <label class="col-sm-3 col-form-label mb-0" style="padding-right: 0;">Email :</label>
+                            <div class="col-sm-6" style="padding-left: 0;">
+                                <input type="email" th:value="${editUser.email}" class="form-control" disabled />
+                            </div>
+                        </div>
+
+                        <div class="form-group row align-items-center">
+                            <label class="col-sm-3 col-form-label mb-0" style="padding-right: 0;">Téléphone :</label>
+                            <div class="col-sm-6" style="padding-left: 0;">
+                                <input type="text" th:value="${editUser.telephone}" class="form-control" disabled />
+                            </div>
+                        </div>
+
+                        <div class="form-group row align-items-center">
+                            <label class="col-sm-3 col-form-label mb-0" style="padding-right: 0;">Rôles :</label>
+                            <div class="col-sm-6" style="padding-left: 0;">
+                                <div th:each="role : ${roles}">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" th:name="roleIds" th:value="${role.id}" th:checked="${editUser.roles.contains(role)}" th:id="'role_' + ${role.id}">
+                                        <label class="form-check-label" th:for="'role_' + ${role.id}" th:text="${role.nom}"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary m-2">Mettre à jour</button>
+                            <a class="btn btn-secondary m-2" th:href="@{/admin/users}" onclick="cancelForm();">Annuler</a>
+                        </div>
+                    </form>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 </body>

@@ -9,20 +9,18 @@
     <style>
         body {
             background-color: #f0f2f5;
-            font-family: Arial, sans-serif;
         }
 
         .sidenav {
-            position: fixed;
-            left: 0;
-            height: 100%;
-            width: 300px;
             background-color: #343a40;
             color: white;
-            padding-top: 0px;
+            padding-top: 0;
             overflow-y: auto;
-            transition: width 0.3s ease-in-out;
-            border-radius: 0 0.5rem 0 0;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 0;
+            width: 300px;
+            flex-shrink: 0;
         }
 
         .sidenav a {
@@ -47,26 +45,10 @@
         }
 
         .content {
-            margin-left: 300px;
-            padding: 20px;
-            transition: margin-left 0.3s;
-        }
-
-        .centeredContent {
             display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            min-height: 90%;
-            margin-top: auto;
-            margin-bottom: 10px;
-            align-self: flex-start;
-        }
-
-        .title {
-            font-family: Roboto;
-            font-weight: bold;
-            color: #007bff;
+            flex-wrap: wrap; /* Pour permettre l'adaptation des colonnes */
+            height: auto;
+            align-items: flex-start;
         }
 
         .fieldError {
@@ -107,6 +89,11 @@
 
         .btn-outline-warning, .btn-outline-danger, .btn-outline-success {
             margin: 5px;
+        }
+
+        .title {
+            font-weight: bold;
+            color: #343a40;
         }
 
         .marginR {
@@ -167,9 +154,9 @@
     </style>
 </head>
 <body>
-<div class="container">
-    <div layout:fragment="content" class="content">
-        <div class="sidenav">
+<div class="container-fluid">
+    <div layout:fragment="content" class="row content">
+        <div class="col-12 col-md-4 col-lg-3 sidenav">
             <a href="javascript:location.reload()" class="btn-refresh">
                 <span class="refresh-text marginL">Replier les sous-menus</span> <i class="fas fa-sync-alt" style="color: rgb(255, 193, 7);"></i>
             </a>
@@ -178,18 +165,18 @@
                 <span class="submenu-icon fas fa-caret-right"></span>
             </a>
             <div class="collapse marginR" id="profileSubmenu">
-                <a th:href="@{'/user/' + ${user.id} + '/profile'}" style="font-size: 16px;"><i class="fas fa-user-circle"></i>Voir profil</a>
                 <a th:href="@{'/user/' + ${user.id} + '/profile/edit'}" style="font-size: 16px;"><i class="fas fa-user-edit"></i> Modifier profil</a>
                 <a th:href="@{'/user/' + ${user.id} + '/adresse/edit'}" style="font-size: 16px;"><i class="fas fa-address-card"></i> Modifier adresse</a>
             </div>
+
             <a th:href="@{/commandes}"><i class="fas fa-shopping-cart"></i> Mes commandes</a>
             <a th:href="@{/user/favoris}"><i class="fas fa-heart"></i> Mes produits favoris</a>
+
             <a class="collapsed" data-bs-toggle="collapse" href="#employeeSubmenu" role="button" aria-expanded="false" aria-controls="employeeSubmenu">
                 <i class="fas fa-briefcase"></i> Employé <span class="submenu-icon fas fa-caret-right"></span>
             </a>
             <div class="collapse marginR" id="employeeSubmenu">
-                <a href="#" style="font-size: 16px;"><i class="fas fa-list"></i> Liste des commandes</a>
-                <a href="#" style="font-size: 16px;"><i class="fas fa-chart-bar"></i> Commandes à traiter</a>
+                <a th:href="@{/employe/commandes}"style="font-size: 16px;"><i class="fas fa-list"></i> Liste des commandes</a>
                 <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#statSubmenu" role="button" aria-expanded="false" aria-controls="statSubmenu">
                     <i class="fas fa-chart-line"></i> Statistiques <span class="submenu-icon fas fa-caret-right"></span>
                 </a>
@@ -198,6 +185,7 @@
                     <a href="#" style="font-size: 14px;"><i class="fas fa-chart-pie"></i> Répartition des produits</a>
                 </div>
             </div>
+
             <a class="collapsed" data-bs-toggle="collapse" href="#adminSubmenu" role="button" aria-expanded="false" aria-controls="adminSubmenu">
                 <i class="fas fa-cog"></i> Admin <span class="submenu-icon fas fa-caret-right"></span>
             </a>
@@ -206,7 +194,7 @@
                     <i class="fas fa-box"></i> Gestion stock <span class="submenu-icon fas fa-caret-right"></span>
                 </a>
                 <div class="collapse marginR" id="stockSubmenu">
-                    <a th:href="@{/produits/admin}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des produits</a>
+                    <a th:href="@{/admin/produits}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des produits</a>
                     <a th:href="@{/produit/create}" style="font-size: 14px;"><i class="fas fa-plus-square"></i> Ajouter un produit</a>
                 </div>
                 <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#userManagementSubmenu" role="button" aria-expanded="false" aria-controls="userManagementSubmenu">
@@ -214,12 +202,12 @@
                 </a>
                 <div class="collapse marginR" id="userManagementSubmenu">
                     <a th:href="@{/admin/users}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des utilisateurs</a>
-                    <a th:href="@{/admin/add_new_user}"   style="font-size: 14px;"><i class="fas fa-user-plus"></i> Ajouter un utilisateur</a>
+                    <a th:href="@{/admin/add_new_user}"  style="font-size: 14px;"><i class="fas fa-user-plus"></i> Ajouter un utilisateur</a>
                 </div>
             </div>
         </div>
-        <div class="centeredContent">
-            <h1 th:text="${title}" class="title" style="color : #343a40;"></h1>
+        <div class="col-12 col-md-8 col-lg-9  main-content">
+            <h1 th:text="${title}"  class="title"></h1>
             <div class="row">
                 <div class="col-md-6 col-lg-4 mb-3">
                     <div class="border border-info rounded p-3">

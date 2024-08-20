@@ -418,14 +418,13 @@
 
                                 <!-- Bloc conditionnel si le panier est vide -->
                                 <div th:if="${panier.lignesDeCommande.size() == 0}">
-                                    <h4 th:text="${panier.id}" class="title text-center mb-4">Ajout nouveau produit</h4>
+                                    <h4 th:text="${panier.id}" class="title text-center mb-4"></h4>
                                     <p>Votre panier est vide.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
                 <script>
                     // Déclarez la fonction en dehors de $(document).ready pour la rendre accessible globalement
                     function loadProduits(page, sortBy) {

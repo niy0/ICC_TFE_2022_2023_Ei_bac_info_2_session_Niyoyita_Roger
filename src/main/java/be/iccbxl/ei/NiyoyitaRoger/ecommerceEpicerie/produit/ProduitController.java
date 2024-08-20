@@ -107,13 +107,24 @@ public class ProduitController {
 
 
     @GetMapping("/produit")
-    public String allProduit(Model model, @RequestParam(defaultValue = "0") int page, Principal principal, HttpSession session) {
+    public String allProduit(Model model,
+                             @RequestParam(defaultValue = "0") int page,
+                             Principal principal,
+                             HttpSession session,
+                             Authentication authentication) {
+
         Pageable pageable = PageRequest.of(page, 8);
         Page<Produit> productPage = produitRepository.findAll(pageable);
         List<Categorie> categorieList = categorieService.getAllCategorie();
 
         Panier panierTest = panierService.getOrCreatePanier(principal, session);
         Panier panier = panierService.getPanierById(panierTest.getId());
+
+        // Récupération de l'utilisateur connecté
+        if(panier.getUtilisateur() != null) {
+            User user = userService.getUserById(panier.getUtilisateur().getId());
+            model.addAttribute("user", user);
+        }
 
         BigDecimal montantTotal = panier.getLignesDeCommande().stream()
                 .map(ligne -> ligne.getProduit().getPrix().multiply(new BigDecimal(ligne.getQuantite())))
@@ -133,7 +144,7 @@ public class ProduitController {
     @GetMapping("/admin/produits")
     public String getAllProduits(@RequestParam(defaultValue = "nom") String sortBy,
                                  @RequestParam(defaultValue = "0") int page,
-                                 @RequestParam(defaultValue = "8") int size,
+                                 @RequestParam(defaultValue = "5") int size,
                                  Model model,
                                  Authentication authentication) {
         String title = "Liste des produits";
@@ -176,7 +187,7 @@ public class ProduitController {
     public Page<Produit> getProduits(
             @RequestParam(defaultValue = "nom") String sortBy,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "8") int size,
+            @RequestParam(defaultValue = "5") int size,
             @RequestParam(required = false) String searchId,
             @RequestParam(required = false) String searchNom,
             @RequestParam(required = false) String sortPrice,
@@ -233,9 +244,14 @@ public class ProduitController {
         String title = "Liste des produits";
         List<Produit> productsList = produitService.getAllProduct();
         List<Categorie> categorieList = categorieService.getAllCategorie();
+        List<Marque> marqueList = marqueService.getAllMarques();
+        List<MotCle> motCleList = motCleService.getAllMotsCles();
+
 
         model.addAttribute("listProducts", productsList);
         model.addAttribute("catList", categorieList);
+        model.addAttribute("marqueList",marqueList);
+        model.addAttribute("motcleList", motCleList);
         model.addAttribute("title",title);
 
         // Récupération de l'utilisateur connecté

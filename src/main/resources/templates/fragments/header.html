@@ -7,7 +7,7 @@
     <!-- Bootstrap 5 CSS depuis unpkg CDN -->
     <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.0/css/all.min.css" rel="stylesheet">
     <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <!-- Bootstrap Bundle JS (inclut Popper) depuis unpkg CDN -->
@@ -128,7 +128,10 @@
                         <a class="nav-link" th:href="@{/produit}" href="#">Produits</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/user/{user.id}/profile}">Profil</a>
+                        <a class="nav-link"
+                           th:href="${user != null} ? @{/user/{id}/profile(id=${user.id})} : @{/profile}">
+                            Profile
+                        </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{/contact}" href="#">Contact</a>

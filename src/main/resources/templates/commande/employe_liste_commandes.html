@@ -8,20 +8,17 @@
         <style>
             body {
                 background-color: #f0f2f5;
-                font-family: Arial, sans-serif;
             }
 
             .sidenav {
-                position: fixed;
-                left: 0;
-                height: calc(100vh - 60px);
-                width: 300px;
                 background-color: #343a40;
                 color: white;
-                padding-top: 0px;
+                padding-top: 0;
                 overflow-y: auto;
-                transition: width 0.3s ease-in-out;
-                border-radius: 0 0.5rem 0 0;
+                height: auto; /* Pour que la hauteur s'adapte au contenu sur les petits écrans */
+                border-radius: 0.5rem;
+                margin: 0;
+                width: 300px;
             }
 
             .sidenav a {
@@ -46,10 +43,10 @@
             }
 
             .content {
-                margin-top: 0;
-                margin-left: 300px;
-                padding: 20px;
-                transition: margin-left 0.3s;
+                display: flex;
+                flex-wrap: wrap; /* Pour permettre l'adaptation des colonnes */
+                height: auto;
+                align-items: flex-start;
             }
 
             .centered-content {
@@ -57,16 +54,12 @@
                 flex-direction: column;
                 justify-content: flex-start;
                 align-items: center;
-                min-height: 90%;
-                margin-top: 5%;
-                margin-bottom: 10px;
                 width: 100%;
             }
 
             .title {
-                font-family: Arial, sans-serif;
                 font-weight: bold;
-                color: #007bff;
+                color: #343a40;
             }
 
             .fieldError {
@@ -82,7 +75,6 @@
                 background-color: #d1ecf1; /* Couleur de fond bleu clair */
                 color: #0c5460; /* Couleur du texte */
             }
-
 
             .btn-refresh {
                 color: white;
@@ -153,66 +145,99 @@
                 color: rgb(255, 193, 7);
             }
 
-            @media (max-width: 768px) {
-                .sidenav {
-                    width: 100%;
-                    height: auto;
-                    position: relative;
-                }
-                .sidenav a {
-                    float: left;
-                    padding: 15px;
-                }
-                .sidenav a:hover {
-                    padding-left: 15px;
-                }
-                .content {
-                    margin-left: 0;
-                    padding: 20px;
-                }
-                .centered-content {
-                    margin-top: 20px;
-                    width: 100%;
-                }
-                .card {
-                    margin-top: 20px;
-                    width: 100%;
-                }
-                .table-responsive {
-                    display: block;
-                    width: 100%;
-                    overflow-x: auto;
-                }
+            @media (max-width: 1024px) {
+            .sidenav {
+                width: 75%;
+                height: auto;
+                position: relative;
             }
+            .sidenav a {
+                float: left;
+                padding: 15px;
+            }
+            .sidenav a:hover {
+                padding-left: 15px;
+            }
+            .content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            .centered-content {
+                margin-top: 20px;
+                width: 90%;
+            }
+            .card {
+                margin-top: 20px;
+                width: 90%;
+            }
+            .table-responsive {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+            }
+        }
 
-            @media (max-width: 600px) {
-                .sidenav a, .sidenav a:hover {
-                    padding-left: 15px;
-                }
-                .content {
-                    margin-left: 0;
-                    padding: 10px;
-                }
-                .centered-content {
-                    margin-top: 10px;
-                    width: 100%;
-                }
-                .card {
-                    margin-top: 10px;
-                    width: 100%;
-                }
-                .table-responsive {
-                    display: block;
-                    width: 100%;
-                    overflow-x: auto;
-                }
+        @media (max-width: 768px) {
+            .sidenav {
+                width: 100%;
+                height: auto;
+                position: relative;
             }
+            .sidenav a {
+                float: left;
+                padding: 12px;
+            }
+            .sidenav a:hover {
+                padding-left: 12px;
+            }
+            .content {
+                margin-left: 0;
+                padding: 15px;
+            }
+            .centered-content {
+                margin-top: 15px;
+                width: 95%;
+            }
+            .card {
+                margin-top: 15px;
+                width: 95%;
+            }
+            .table-responsive {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .sidenav a, .sidenav a:hover {
+                padding-left: 10px;
+            }
+            .content {
+                margin-left: 0;
+                padding: 10px;
+            }
+            .centered-content {
+                margin-top: 10px;
+                width: 100%;
+            }
+            .card {
+                margin-top: 10px;
+                width: 100%;
+            }
+            .table-responsive {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+            }
+        }
+
         </style>
     </head>
     <body>
-        <div class="container">
-            <div layout:fragment="content" class="content">
-                <div class="sidenav">
+        <div class="container-fluid">
+            <div layout:fragment="content" class="row content">
+                <div class="col-12 col-md-4 col-lg-3 sidenav">
                     <a href="javascript:location.reload()" class="btn-refresh">
                         <span class="refresh-text marginL">Replier les sous-menus</span> <i class="fas fa-sync-alt" style="color: rgb(255, 193, 7);"></i>
                     </a>
@@ -234,7 +259,6 @@
                     </a>
                     <div class="collapse marginR" id="employeeSubmenu">
                         <a th:href="@{/employe/commandes}"style="font-size: 16px;"><i class="fas fa-list"></i> Liste des commandes</a>
-                        <a href="#" style="font-size: 16px;"><i class="fas fa-chart-bar"></i> Commandes à traiter</a>
                         <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#statSubmenu" role="button" aria-expanded="false" aria-controls="statSubmenu">
                             <i class="fas fa-chart-line"></i> Statistiques <span class="submenu-icon fas fa-caret-right"></span>
                         </a>
@@ -263,8 +287,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="container centered-content">
-                    <h1 class="title" style="color: #343a40; font-family: 'Montserrat', sans-serif;">Liste des commandes</h1>
+                <div class="col-12 col-md-8 col-lg-9 main-content">
+                    <h1 class="title" >Liste des commandes</h1>
                     <div class="filters mb-3">
                         <div class="row">
                             <div class="col-md-4">
@@ -319,11 +343,14 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <nav aria-label="Page navigation">
-                                <ul class="pagination">
-                                    <!-- La pagination sera injectée ici via Ajax -->
-                                </ul>
-                            </nav>
+                            <div style="display:flex;align-items:center;">
+                                <!-- Pagination -->
+                                <nav aria-label="Page navigation" class="mx-auto">
+                                    <ul class="pagination">
+                                        <!-- La pagination injectée ici via Ajax -->
+                                    </ul>
+                                </nav>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -332,70 +359,92 @@
                 <!-- Bootstrap 5 Bundle JS (inclut Popper) -->
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
                 <script>
-                    $(document).ready(function() {
-                        function loadCommandes(page, sortBy) {
-                            $.ajax({
-                                url: '/api/employe/commandes',
-                                data: {
-                                    page: page,
-                                    sortBy: sortBy,
-                                    searchId: $('#searchId').val(),
-                                    searchVille: $('#searchVille').val(),
-                                    searchCodePostal: $('#searchCodePostal').val(),
-                                    filterStatut: $('#filterStatut').val(),
-                                    filterMethodCommande: $('#filterMethodCommande').val()
-                                },
-                                success: function(data) {
-                                    var commandesTableBody = $('#commandesTableBody');
-                                    commandesTableBody.empty();
-                                    $.each(data.content, function(index, commande) {
-                                        commandesTableBody.append(`
-                                            <tr>
-                                                <td>${commande.id}</td>
-                                                <td>${commande.nom}</td>
-                                                <td>${new Date(commande.dateCommande).toLocaleDateString()}</td>
-                                                <td>${commande.statut}</td>
-                                                <td>${commande.ville}</td>
-                                                <td>${commande.codePostal}</td>
-                                                <td>${commande.methodCommande}</td>
-                                                <td>
-                                                    <a class="btn btn-outline-warning" href="/employe/commande/detail/${commande.id}">
-                                                        <i class="fas fa-chart-bar"></i> Traiter commande
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        `);
-                                    });
-                                    // Mise à jour de la pagination
-                                    var pagination = $('.pagination');
-                                    pagination.empty();
-                                    for (var i = 0; i < data.totalPages; i++) {
-                                        pagination.append(`
-                                            <li class="page-item ${data.number === i ? 'active' : ''}">
-                                                <a class="page-link" href="#" onclick="loadCommandes(${i}, '${sortBy}')">${i + 1}</a>
-                                            </li>
-                                        `);
-                                    }
+                    // Déclarez la fonction en dehors de $(document).ready pour la rendre accessible globalement
+                    function loadCommandes(page, sortBy) {
+                        $.ajax({
+                            url: '/api/employe/commandes',
+                            data: {
+                                page: page,
+                                sortBy: sortBy,
+                                searchId: $('#searchId').val(),
+                                searchVille: $('#searchVille').val(),
+                                searchCodePostal: $('#searchCodePostal').val(),
+                                filterStatut: $('#filterStatut').val(),
+                                filterMethodCommande: $('#filterMethodCommande').val()
+                            },
+                            success: function(data) {
+                                // Mise à jour de la table des commandes
+                                var commandesTableBody = $('#commandesTableBody');
+                                commandesTableBody.empty();
+                                $.each(data.content, function(index, commande) {
+                                    commandesTableBody.append(`
+                                        <tr>
+                                            <td>${commande.id}</td>
+                                            <td>${commande.nom}</td>
+                                            <td>${new Date(commande.dateCommande).toLocaleDateString()}</td>
+                                            <td>${commande.statut}</td>
+                                            <td>${commande.ville}</td>
+                                            <td>${commande.codePostal}</td>
+                                            <td>${commande.methodCommande}</td>
+                                            <td>
+                                                <a class="btn btn-outline-warning" href="/employe/commande/detail/${commande.id}">
+                                                    <i class="fas fa-chart-bar"></i> Traiter commande
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    `);
+                                });
+
+                                // Mise à jour de la pagination
+                                var pagination = $('.pagination');
+                                pagination.empty();
+                                pagination.append(`
+                                    <li class="page-item ${data.number === 0 ? 'disabled' : ''}">
+                                        <a class="page-link" href="#" aria-label="Previous" onclick="loadCommandes(${data.number - 1}, '${sortBy}')">
+                                            <span aria-hidden="true">&laquo;</span>
+                                        </a>
+                                    </li>
+                                `);
+
+                                for (var i = 0; i < data.totalPages; i++) {
+                                    pagination.append(`
+                                        <li class="page-item ${data.number === i ? 'active' : ''}">
+                                            <a class="page-link" href="#" onclick="loadCommandes(${i}, '${sortBy}')">${i + 1}</a>
+                                        </li>
+                                    `);
                                 }
-                            });
-                        }
+
+                                pagination.append(`
+                                    <li class="page-item ${data.number + 1 === data.totalPages ? 'disabled' : ''}">
+                                        <a class="page-link" href="#" aria-label="Next" onclick="loadCommandes(${data.number + 1}, '${sortBy}')">
+                                            <span aria-hidden="true">&raquo;</span>
+                                        </a>
+                                    </li>
+                                `);
+                            }
+                        });
+                    }
+
+                    $(document).ready(function() {
+                        // Initialisation de la fonction au chargement
+                        loadCommandes(0, 'dateCommande');
 
                         // Événements pour les filtres et le tri
                         $('#searchId, #searchVille, #searchCodePostal').on('input', function() {
                             loadCommandes(0, 'dateCommande');
                         });
+
                         $('#filterStatut, #filterMethodCommande').on('change', function() {
                             loadCommandes(0, 'dateCommande');
                         });
+
                         $('.sortable').on('click', function() {
                             var sortBy = $(this).data('sort');
                             loadCommandes(0, sortBy);
                         });
-
-                        // Chargement initial des commandes
-                        loadCommandes(0, 'dateCommande');
                     });
                 </script>
+
             </div>
         </div>
         <!-- Footer -->

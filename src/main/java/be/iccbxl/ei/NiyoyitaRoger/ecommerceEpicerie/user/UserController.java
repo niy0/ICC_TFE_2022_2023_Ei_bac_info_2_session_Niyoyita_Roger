@@ -63,6 +63,8 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public String adminNewUserForm(Model model,Authentication authentication) {
 
+        String title = "Ajouter un utilisateur";
+
         Object principal = authentication.getPrincipal();
         if (principal instanceof UserDetails) {
             UserDetails userDetails = (UserDetails) principal;
@@ -75,6 +77,7 @@ public class UserController {
         
         model.addAttribute("newUser", new User()); // changer le nom user par newUser
         model.addAttribute("roles", roleRepository.findAll());
+        model.addAttribute("title",title);
         return "user/admin_create_user";
     }
 
@@ -136,7 +139,7 @@ public class UserController {
     public Page<User> getUsers(
             @RequestParam(defaultValue = "nom") String sortBy,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "2") int size,
             @RequestParam(required = false) String searchId,
             @RequestParam(required = false) String searchNom,
             @RequestParam(required = false) String searchPrenom,
@@ -242,7 +245,7 @@ public class UserController {
     }
 
     //permet d'affiche la page profile de l'user
-    @GetMapping("/user/{userId}/profile")
+    @GetMapping("/user/{userId}/profile")// sécurisé ce liens
     public String getUserProfilById(Model model, @PathVariable("userId") long id) {
         User user = userService.getUserById(id);
         Adresse adresse = user.getAdresse();
@@ -272,7 +275,7 @@ public class UserController {
             throw new IllegalStateException("L'utilisateur connecté n'est pas une instance de UserDetails");
         }
 
-        return "/user/edit";
+        return "/user/edit_profile";
     }
 
 
@@ -288,8 +291,16 @@ public class UserController {
             String username = userDetails.getUsername();
             User user = userService.getUserByEmail(username);
             Adresse adresse = user.getAdresse();
+            System.out.println(adresse + "**********/////////*********adressssssssssseeeeeeeeeessssss");
+
             model.addAttribute("user", user);
-            model.addAttribute("adresse", adresse);
+
+            if( adresse == null){
+                model.addAttribute("adresse", new Adresse());
+            }else {
+                model.addAttribute("adresse", adresse);
+            }
+
         } else {
             // Optionally log or handle the case where principal is not a UserDetails instance
             throw new IllegalStateException("L'utilisateur connecté n'est pas une instance de UserDetails");
@@ -353,7 +364,6 @@ public class UserController {
     @PutMapping("/admin/user/{userId}/profile/edit")
     public String adminUpdateUser(@PathVariable("userId") long userId, @RequestBody User updatedUser) {
         String errorMessage = userService.updateUser(userId,updatedUser);
-        System.out.println(errorMessage + " : meeeeeesssssssaaaaaaage");
         if(errorMessage.length() == 0) {
             return "redirect:/user/" + updatedUser.getId()+ "/profile";
         }else {
