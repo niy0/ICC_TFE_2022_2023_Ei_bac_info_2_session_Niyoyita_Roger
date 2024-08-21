@@ -34,6 +34,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -45,14 +46,13 @@ import org.springframework.web.server.ResponseStatusException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.attribute.UserPrincipal;
 import java.security.Principal;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import javax.imageio.ImageIO;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -105,7 +105,6 @@ public class ProduitController {
         return "index";
     }
 
-
     @GetMapping("/produit")
     public String allProduit(Model model,
                              @RequestParam(defaultValue = "0") int page,
@@ -121,10 +120,15 @@ public class ProduitController {
         Panier panier = panierService.getPanierById(panierTest.getId());
 
         // Récupération de l'utilisateur connecté
-        if(panier.getUtilisateur() != null) {
-            User user = userService.getUserById(panier.getUtilisateur().getId());
-            model.addAttribute("user", user);
+        User user = null;
+        if (panier.getUtilisateur() != null) {
+            user = userService.getUserById(panier.getUtilisateur().getId());
         }
+
+        model.addAttribute("user", user);
+
+        System.out.println(user);
+
 
         BigDecimal montantTotal = panier.getLignesDeCommande().stream()
                 .map(ligne -> ligne.getProduit().getPrix().multiply(new BigDecimal(ligne.getQuantite())))
@@ -138,6 +142,42 @@ public class ProduitController {
         model.addAttribute("montantTotalPanier", montantTotal);
 
         return "produit/index_produits";
+    }
+
+    @GetMapping("/produit/{id}")
+    public String getProduitById(@PathVariable long id,
+                                 Model model,
+                                 Principal principal,
+                                 HttpSession session,
+                                 Authentication authentication) throws ProduitNotFoundException {
+        Produit produit = produitRepository.getPro(id);
+
+        Panier panierTest = panierService.getOrCreatePanier(principal, session);
+        Panier panier = panierService.getPanierById(panierTest.getId());
+
+        // Récupération de l'utilisateur connecté
+        Object principalTest = authentication.getPrincipal();
+        if (principalTest instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principalTest;
+            String username = userDetails.getUsername();
+            User user = userService.getUserByEmail(username);
+            model.addAttribute("user", user);
+
+            if (produit != null) {
+                model.addAttribute("produit", produit);
+                model.addAttribute("panier", panier);
+                return "/produit/show";
+            }
+        }
+        return "redirect:/produits/admin";
+    }
+
+    @GetMapping("/api/produit/{id}")
+    public ResponseEntity<Produit> getProduitById(@PathVariable long id) throws ProduitNotFoundException {
+        Produit produit = produitRepository.findById(id)
+                .orElseThrow(() -> new ProduitNotFoundException("Produit non trouvé avec l'ID : " + id));
+
+        return ResponseEntity.ok(produit);
     }
 
 
@@ -236,6 +276,65 @@ public class ProduitController {
         return produitService.getApiAllProduits(pageable, searchQuery, sortPrice, sortDate, filterCategorie, filterMarque, filterMotCle);
     }
 
+    @GetMapping("/api/user/favoris")
+    @ResponseBody
+    public Page<Produit> getUserFavoris(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(defaultValue = "nom") String sortBy,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "4") int size,
+            @RequestParam(required = false) String searchNom,
+            @RequestParam(required = false) String sortPrice,
+            @RequestParam(required = false) String sortDate,
+            @RequestParam(required = false) String filterCategorie,
+            @RequestParam(required = false) String filterMarque,
+            @RequestParam(required = false) String filterMotCle) {
+
+        // Récupération de l'utilisateur connecté
+        String username = userDetails.getUsername();  // Adaptez cette ligne selon votre UserDetails
+        User user = userService.getUserByEmail(username);
+        Long userId = user.getId();
+
+        // Configuration du tri
+        Sort sort = Sort.by(sortBy);
+        if (sortPrice != null && !sortPrice.isEmpty()) {
+            sort = Sort.by(sortPrice.equals("priceAsc") ? Sort.Order.asc("prix") : Sort.Order.desc("prix"));
+        } else if (sortDate != null && !sortDate.isEmpty()) {
+            sort = Sort.by(sortDate.equals("dateAsc") ? Sort.Order.asc("dateCreation") : Sort.Order.desc("dateCreation"));
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return produitService.getUserFavoris(userId, pageable, searchNom, sortPrice, sortDate, filterCategorie, filterMarque, filterMotCle);
+    }
+
+    @GetMapping("/user/favoris")
+    public String showFavoris(Model model,
+                              Authentication authentication) {
+
+        // Récupération des données pour les filtres
+        List<Categorie> categorieList = categorieService.getAllCategories();
+        List<Marque> marqueList = marqueService.getAllMarques();
+        List<MotCle> motCleList = motCleService.getAllMotsCles();
+
+
+        // Récupération de l'utilisateur connecté
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            String username = userDetails.getUsername();
+            User user = userService.getUserByEmail(username);
+            List<Produit> listProduitFavoris = user.getProduitsFavoris();
+            model.addAttribute("user", user);
+            model.addAttribute("listProduitFavoris", listProduitFavoris);
+            System.out.println(user);
+        }
+
+        model.addAttribute("catList", categorieList);
+        model.addAttribute("marqueList", marqueList);
+        model.addAttribute("motCleList", motCleList);
+        return "produit/produit_favoris";
+    }
 
 
     @GetMapping("/produits/admin")
@@ -250,9 +349,9 @@ public class ProduitController {
 
         model.addAttribute("listProducts", productsList);
         model.addAttribute("catList", categorieList);
-        model.addAttribute("marqueList",marqueList);
+        model.addAttribute("marqueList", marqueList);
         model.addAttribute("motcleList", motCleList);
-        model.addAttribute("title",title);
+        model.addAttribute("title", title);
 
         // Récupération de l'utilisateur connecté
         Object principal = authentication.getPrincipal();
@@ -265,6 +364,7 @@ public class ProduitController {
 
         return "produit/admin_produit";
     }
+
 
     @GetMapping("produit/api/{id}")
     public ResponseEntity<Produit> getProduitById(@PathVariable Long id) {
@@ -286,15 +386,6 @@ public class ProduitController {
         return produitService.getQuantiteProduit(produitId);
     }
 
-    @GetMapping("/produit/{id}")
-    public String getProduitById(@PathVariable long id, Model model) throws ProduitNotFoundException {
-        Produit produit = produitRepository.getPro(id);
-        if(produit != null){
-            model.addAttribute("produit", produit);
-            return "/produit/show";
-        }
-        return "redirect:/produits/admin";
-    }
 
     @GetMapping("/produit/create")
     @PreAuthorize("isAuthenticated() and hasRole('Admin')")
@@ -325,17 +416,17 @@ public class ProduitController {
         //Générer le lien retour pour l'annulation
         String referrer = request.getHeader("Referer");
 
-        if(referrer!=null && !referrer.equals("")) {
+        if (referrer != null && !referrer.equals("")) {
             model.addAttribute("back", referrer);
         } else {
             model.addAttribute("back", "/produits");
         }
-        model.addAttribute("title",title);
+        model.addAttribute("title", title);
         model.addAttribute("produit", new Produit());
         model.addAttribute("catList", categorieList);
         model.addAttribute("motCleList", motCleList);
         model.addAttribute("marqueList", marqueList);
-        model.addAttribute("message",message);
+        model.addAttribute("message", message);
 
         return "produit/create";
     }
@@ -393,9 +484,9 @@ public class ProduitController {
             MotCle motCle = motCleService.getMotCle(motCleId);
             produit.getMotsCles().add(motCle);
         }
-        if(description == null || description.trim().isEmpty()){
+        if (description == null || description.trim().isEmpty()) {
             description = "";
-        }else {
+        } else {
             description = description.trim();
         }
 
@@ -416,9 +507,9 @@ public class ProduitController {
 
         produit.setActif(actif != null && actif);
 
-        if(marque != null && !marque.trim().isEmpty()) {
+        if (marque != null && !marque.trim().isEmpty()) {
             Optional<Marque> marqueRes = Optional.ofNullable(marqueRepository.findById(Long.parseLong(marque)));
-            if(marqueRes.isPresent()) {
+            if (marqueRes.isPresent()) {
                 Marque marque1 = marqueRes.get();
                 produit.setMarque(marque1);
             }
@@ -433,13 +524,13 @@ public class ProduitController {
 
 
     @DeleteMapping("/produit/{id}")
-    public String deleteProduit(@PathVariable("id") long id)  {
+    public String deleteProduit(@PathVariable("id") long id) {
         try {
             // Vérifiez si le produit existe avant de le supprimer
             if (produitRepository.existsById(id)) {
                 List<Produit> produitList = (List<Produit>) produitRepository.findAll();
-                for(Produit pro : produitList){
-                    if(pro.getId() == id){
+                for (Produit pro : produitList) {
+                    if (pro.getId() == id) {
                         produitService.deleteProductById(id);
                         return "redirect:/produits/admin";
                     }
@@ -476,11 +567,11 @@ public class ProduitController {
             User user = userService.getUserByEmail(username);
 
             // Vérification des rôles et user non null
-            if (user != null){
-                if(user.hasRole("Admin"))  {
+            if (user != null) {
+                if (user.hasRole("Admin")) {
                     model.addAttribute("user", user);
                     model.addAttribute("produit", validProduit.get());
-                }else {
+                } else {
                     model.addAttribute("errorMessage", "Vous n'avez pas les permissions nécessaires pour effectuer cette action.");
                     System.out.println("errorMessage , vous n'avez pas les permissions nécessaires pour effectuer cette action.");
                     return "redirect:/";
@@ -500,10 +591,10 @@ public class ProduitController {
         //Générer le lien retour pour l'annulation
         String referrer = request.getHeader("Referer");
 
-        if(referrer!=null && !referrer.equals("")) {
+        if (referrer != null && !referrer.equals("")) {
             model.addAttribute("back", referrer);
         } else {
-            model.addAttribute("back", "/produit/"+validProduit.get().getId());
+            model.addAttribute("back", "/produit/" + validProduit.get().getId());
         }
         return "produit/admin_edit";
     }
@@ -616,11 +707,93 @@ public class ProduitController {
 
         Produit produit = produitService.getProduitById(id);
 
-        if(produitRepository.existsById(produit.getId())) {
+        if (produitRepository.existsById(produit.getId())) {
             byte[] imageBytes = produit.getImagePrincipale().getBytes(1, (int) produit.getImagePrincipale().length());
             return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(imageBytes);
         }
         return ResponseEntity.noContent().build(); // Notez l'appel à .build() ici
     }
 
+    @PostMapping("/user/add/favoris")
+    public ResponseEntity<Map<String, Object>> ajouterAuxFavoris(@RequestBody Map<String, String> requestData) throws ProduitNotFoundException {
+        Map<String, Object> response = new HashMap<>();
+
+        // Vérification des données de la requête
+        if (!requestData.containsKey("produitId") || !requestData.containsKey("userId")) {
+            response.put("success", false);
+            response.put("message", "Les IDs de produit et d'utilisateur sont requis.");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        Long produitId;
+        Long userId;
+
+        try {
+            produitId = Long.parseLong(requestData.get("produitId"));
+            userId = Long.parseLong(requestData.get("userId"));
+        } catch (NumberFormatException e) {
+            response.put("success", false);
+            response.put("message", "Les IDs fournis ne sont pas valides.");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        // Vérification de l'existence de l'utilisateur
+        Optional<User> optionalUser = Optional.ofNullable(userService.getUserById(userId));
+        if (optionalUser.isEmpty()) {
+            response.put("success", false);
+            response.put("message", "Utilisateur non trouvé.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        User user = optionalUser.get();
+
+        // Vérification de l'existence du produit
+        Optional<Produit> optionalProduit = Optional.ofNullable(produitService.getProduitById(produitId));
+        if (optionalProduit.isEmpty()) {
+            response.put("success", false);
+            response.put("message", "Produit non trouvé.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        Produit produit = optionalProduit.get();
+
+        // Vérification si le produit est déjà dans les favoris
+        if (user.getProduitsFavoris().contains(produit)) {
+            response.put("success", true);
+            response.put("message", "Produit déjà dans les favoris.");
+            response.put("isAlreadyFavorited", true);
+            return ResponseEntity.ok(response);
+        } else {
+            // Ajout du produit aux favoris de l'utilisateur
+            user.getProduitsFavoris().add(produit);
+            userService.save(user);
+            response.put("success", true);
+            response.put("message", "Produit ajouté aux favoris.");
+            response.put("isAlreadyFavorited", false);
+            return ResponseEntity.ok(response);
+        }
+    }
+
+    @PostMapping("/user/remove/favoris")
+    public ResponseEntity<String> removeFromFavoris(@RequestParam Long produitId, @AuthenticationPrincipal UserDetails userDetails) throws ProduitNotFoundException {
+        // Récupérer l'utilisateur connecté
+        String email = userDetails.getUsername();
+        User user = userService.getUserByEmail(email);
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Utilisateur non authentifié");
+        }
+
+        // Récupérer le produit à partir de l'ID
+        Produit produit = produitService.getProduitById(produitId);
+        if (produit == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Produit non trouvé");
+        }
+
+        // Supprimer le produit des favoris de l'utilisateur
+        user.getProduitsFavoris().remove(produit);
+        userService.save(user); // Sauvegarder les modifications
+
+        return ResponseEntity.ok("Produit retiré des favoris avec succès");
+    }
 }

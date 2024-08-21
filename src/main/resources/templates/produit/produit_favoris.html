@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+<head>
+    <meta charset="UTF-8">
+    <title>Mes Produits Favoris</title>
+    <!-- Bootstrap 5 CSS depuis unpkg CDN -->
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Bootstrap Bundle JS (inclut Popper) depuis unpkg CDN -->
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/script.js"></script>
+    <link rel="manifest" href="/js/manifest.json">
+
+    <style>
+        body {
+            background-color: #f0f2f5;
+        }
+
+        .sidenav {
+            background-color: #343a40;
+            color: white;
+            padding-top: 0;
+            overflow-y: auto;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 0;
+            width: 300px;
+            flex-shrink: 0;
+        }
+
+        .sidenav a {
+            padding: 15px 25px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+            transition: background 0.2s, color 0.2s, padding-left 0.2s;
+        }
+
+        .sidenav a:hover {
+            background-color: #495057;
+            color: rgb(255, 193, 7);
+            padding-left: 35px;
+       }
+
+       .sidenav .active, .sidenav .active:hover {
+           background-color: #007bff;
+           color: white;
+           padding-left: 35px;
+       }
+
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            height: auto;
+            align-items: flex-start;
+        }
+
+        .centered-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            width: 100%;
+            overflow-x: hidden;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .title {
+            font-weight: bold;
+            color: #343a40;
+        }
+
+        .card {
+            background-color: white;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            margin-top: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .card-body {
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-title {
+            color: #007bff;
+        }
+
+        .card-subtitle {
+            color: #6c757d;
+        }
+
+        .btn-outline-danger {
+            margin: 5px;
+        }
+
+        .pagination {
+            margin-top: 20px;
+        }
+
+        .submenu-icon {
+            float: right;
+            transition: transform 0.3s;
+        }
+
+        .submenu-icon.collapsed::before {
+            content: "\f0da"; /* FontAwesome icon for down arrow */
+        }
+
+        .submenu-icon:not(.collapsed)::before {
+            content: "\f0d7"; /* FontAwesome icon for up arrow */
+        }
+
+        @media (max-width: 600px) {
+            .content {
+                padding: 10px;
+            }
+            .centered-content {
+                margin-top: 10px;
+                width: 100%;
+            }
+            .card {
+                margin-top: 10px;
+                width: 100%;
+            }
+            .table-responsive {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div layout:fragment="content" class="row content">
+        <div class="col-12 col-md-4 col-lg-3 sidenav">
+            <a href="javascript:location.reload()" class="btn-refresh">
+                <span class="refresh-text marginL">Replier les sous-menus</span> <i class="fas fa-sync-alt"
+                                                                                    style="color: rgb(255, 193, 7);"></i>
+            </a>
+            <a class="collapsed" data-bs-toggle="collapse" href="#profileSubmenu" role="button" aria-expanded="false"
+               aria-controls="profileSubmenu">
+                <i class="fas fa-user-circle"></i> Profile : <span th:text="${user.nom} + ' ' + ${user.prenom}"></span>
+                <span class="submenu-icon fas fa-caret-right"></span>
+            </a>
+            <div class="collapse marginR" id="profileSubmenu">
+                <a th:href="@{'/user/' + ${user.id} + '/profile'}" style="font-size: 16px;"><i
+                        class="fas fa-user-circle"></i>Voir profil</a>
+                <a th:href="@{'/user/' + ${user.id} + '/profile/edit'}" style="font-size: 16px;"><i
+                        class="fas fa-user-edit"></i> Modifier profil</a>
+                <a th:href="@{'/user/' + ${user.id} + '/adresse/edit'}" style="font-size: 16px;"><i
+                        class="fas fa-address-card"></i> Modifier adresse</a>
+            </div>
+
+            <a th:href="@{/commandes}"><i class="fas fa-shopping-cart"></i> Mes commandes</a>
+            <a th:href="@{/user/favoris}"><i class="fas fa-heart"></i> Mes produits favoris</a>
+
+            <a class="collapsed" data-bs-toggle="collapse" href="#employeeSubmenu" role="button" aria-expanded="false"
+               aria-controls="employeeSubmenu">
+                <i class="fas fa-briefcase"></i> Employé <span class="submenu-icon fas fa-caret-right"></span>
+            </a>
+            <div class="collapse marginR" id="employeeSubmenu">
+                <a th:href="@{/employe/commandes}" style="font-size: 16px;"><i class="fas fa-list"></i> Liste des
+                    commandes</a>
+                <a href="#" style="font-size: 16px;"><i class="fas fa-chart-bar"></i> Commandes à traiter</a>
+                <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#statSubmenu"
+                   role="button" aria-expanded="false" aria-controls="statSubmenu">
+                    <i class="fas fa-chart-line"></i> Statistiques <span class="submenu-icon fas fa-caret-right"></span>
+                </a>
+                <div class="collapse marginR" id="statSubmenu">
+                    <a href="#" style="font-size: 14px;"><i class="fas fa-chart-bar"></i> Ventes</a>
+                    <a href="#" style="font-size: 14px;"><i class="fas fa-chart-pie"></i> Répartition des produits</a>
+                </div>
+            </div>
+            <a class="collapsed" data-bs-toggle="collapse" href="#adminSubmenu" role="button" aria-expanded="false"
+               aria-controls="adminSubmenu">
+                <i class="fas fa-cog"></i> Admin <span class="submenu-icon fas fa-caret-right"></span>
+            </a>
+            <div class="collapse marginR" id="adminSubmenu">
+                <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#stockSubmenu"
+                   role="button" aria-expanded="false" aria-controls="stockSubmenu">
+                    <i class="fas fa-box"></i> Gestion stock <span class="submenu-icon fas fa-caret-right"></span>
+                </a>
+                <div class="collapse marginR" id="stockSubmenu">
+                    <a th:href="@{/admin/produits}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des
+                        produits</a>
+                    <a th:href="@{/produit/create}" style="font-size: 14px;"><i class="fas fa-plus-square"></i> Ajouter
+                        un produit</a>
+                </div>
+                <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#userManagementSubmenu"
+                   role="button" aria-expanded="false" aria-controls="userManagementSubmenu">
+                    <i class="fas fa-users"></i> Gestion utilisateurs <span
+                        class="submenu-icon fas fa-caret-right"></span>
+                </a>
+                <div class="collapse marginR" id="userManagementSubmenu">
+                    <a th:href="@{/admin/users}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des
+                        utilisateurs</a>
+                    <a th:href="@{/admin/add_new_user}" style="font-size: 14px;"><i class="fas fa-user-plus"></i>
+                        Ajouter un utilisateur</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-8 col-lg-9  main-content">
+            <h1 class="title">Mes Produits Favoris</h1>
+            <div class="filters mb-3">
+                <div class="row">
+                    <div class="col-12 col-md-4 mb-2 mb-md-0">
+                        <input type="text" id="searchNom" class="form-control" placeholder="Rechercher par nom">
+                    </div>
+                    <div class="col-12 col-md-4 mb-2 mb-md-0">
+                        <select id="sortPrice" class="form-control">
+                            <option value="">Trier par prix</option>
+                            <option value="priceAsc">Prix croissant</option>
+                            <option value="priceDesc">Prix décroissant</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-4 mb-2 mb-md-0">
+                        <select id="sortDate" class="form-control">
+                            <option value="">Trier par date d'ajout</option>
+                            <option value="dateAsc">Date croissante</option>
+                            <option value="dateDesc">Date décroissante</option>
+                        </select>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12 col-md-4 mb-2 mb-md-0">
+                            <select id="filterCategorie" class="form-control">
+                                <option value="">Filtrer par catégorie</option>
+                                <option th:each="categorie : ${catList}" th:value="${categorie.id}"
+                                        th:text="${categorie.nom}"></option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-4 mb-2 mb-md-0">
+                            <select id="filterMarque" class="form-control">
+                                <option value="">Filtrer par marque</option>
+                                <option th:each="marque : ${marqueList}" th:value="${marque.id}"
+                                        th:text="${marque.nom}"></option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-4 mb-2 mb-md-0">
+                            <select id="filterMotCle" class="form-control">
+                                <option value="">Filtrer par mot-clé</option>
+                                <option th:each="motCle : ${motCleList}" th:value="${motCle.id}"
+                                        th:text="${motCle.nom}"></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-info">
+                            <tr>
+                                <th scope="col">Image</th>
+                                <th scope="col" class="sortable" data-sort="nom">Nom</th>
+                                <th scope="col">Description</th>
+                                <th scope="col" class="sortable" data-sort="prix">Prix</th>
+                                <th scope="col" class="sortable" data-sort="dateAjout">Date d'ajout</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody id="favorisTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="display:flex;align-items:center;">
+                        <!-- Pagination -->
+                        <nav aria-label="Page navigation" class="mx-auto">
+                            <ul class="pagination">
+                                <!-- La pagination injectée ici via Ajax -->
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- jQuery (Nécessaire avant les scripts Bootstrap) -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <!-- Bootstrap 5 Bundle JS (inclut Popper) -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            function removeFromFavoris(produitId) {
+                if (confirm('Êtes-vous sûr de vouloir retirer ce produit des favoris?')) {
+                    const csrfToken = $('meta[name="_csrf"]').attr('content');
+                    const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
+
+                    $.ajax({
+                        url: '/user/remove/favoris',
+                        type: 'POST',
+                        data: { produitId: produitId },
+                        beforeSend: function(xhr) {
+                            xhr.setRequestHeader(csrfHeader, csrfToken);
+                        },
+                        success: function(response) {
+                            alert('Produit retiré des favoris avec succès');
+                            loadFavoris(0, 'dateCreation');
+                        },
+                        error: function(error) {
+                            console.error('Erreur lors du retrait des favoris:', error);
+                            alert('Une erreur est survenue lors du retrait du produit des favoris.');
+                        }
+                    });
+                }
+            }
+
+            function loadFavoris(page, sortBy) {
+                $.ajax({
+                    url: '/api/user/favoris',
+                    data: {
+                        page: page,
+                        sortBy: sortBy,
+                        searchNom: $('#searchNom').val(),
+                        sortPrice: $('#sortPrice').val(),
+                        sortDate: $('#sortDate').val(),
+                        filterCategorie: $('#filterCategorie').val(),
+                        filterMarque: $('#filterMarque').val(),
+                        filterMotCle: $('#filterMotCle').val(),
+                    },
+                    success: function(data) {
+                        var favorisTableBody = $('#favorisTableBody');
+                        favorisTableBody.empty();
+                        $.each(data.content, function(index, produit) {
+                            favorisTableBody.append(`
+                                <tr>
+                                    <td><img src="/display?id=${produit.id}" alt="Image du produit" height="100px" width="auto"></td>
+                                    <td>${produit.nom}</td>
+                                    <td>${produit.description}</td>
+                                    <td>${produit.prix}€</td>
+                                    <td>${new Date(produit.dateCreation).toLocaleDateString()}</td>
+                                    <td>
+                                        <button class="btn btn-outline-danger" onclick="removeFromFavoris(${produit.id})">
+                                            <i class="fas fa-trash-alt"></i> Retirer
+                                        </button>
+                                    </td>
+                                </tr>
+                            `);
+                        });
+
+                        // Gestion de la pagination (à ajuster en fonction de votre API)
+                        var pagination = $('.pagination');
+                        pagination.empty();
+                        pagination.append(`
+                            <li class="page-item ${data.number === 0 ? 'disabled' : ''}">
+                                <a class="page-link" href="#" aria-label="Previous" onclick="loadFavoris(${data.number - 1}, '${sortBy}')">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        `);
+
+                        for (var i = 0; i < data.totalPages; i++) {
+                            pagination.append(`
+                                <li class="page-item ${data.number === i ? 'active' : ''}">
+                                    <a class="page-link" href="#" onclick="loadFavoris(${i}, '${sortBy}')">${i + 1}</a>
+                                </li>
+                            `);
+                        }
+
+                        pagination.append(`
+                            <li class="page-item ${data.number + 1 === data.totalPages ? 'disabled' : ''}">
+                                <a class="page-link" href="#" aria-label="Next" onclick="loadFavoris(${data.number + 1}, '${sortBy}')">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        `);
+                    },
+                    error: function(error) {
+                        console.error('Erreur lors du chargement des favoris:', error);
+                        // Ajoutez du code ici pour gérer l'erreur, par exemple, afficher un message à l'utilisateur.
+                    }
+                });
+            }
+
+            $(document).ready(function() {
+                loadFavoris(0, 'dateCreation'); // Utiliser 'dateCreation' ou une autre valeur valide
+
+                $('#searchNom, #sortPrice, #sortDate, #filterCategorie, #filterMarque, #filterMotCle').on('change input', function() {
+                    loadFavoris(0, 'dateCreation');
+                });
+
+                // Événements pour les filtres et le tri
+                $('#searchNom').on('input', function() {
+                    loadFavoris(0, 'id');
+                });
+
+                $('#sortPrice, #sortDate, #filterCategorie, #filterMarque, #filterMotCle').on('change', function() {
+                    loadFavoris(0, 'id');
+                });
+
+                $('.sortable').on('click', function() {
+                    var sortBy = $(this).data('sort');
+                    loadFavoris(0, sortBy);
+                });
+            });
+
+
+
+
+
+        </script>
+    </div>
+</div>
+</body>
+</html>
+

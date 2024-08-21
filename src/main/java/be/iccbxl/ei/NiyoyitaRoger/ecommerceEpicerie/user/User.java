@@ -83,7 +83,7 @@ public class User implements Serializable {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "produit_id")
     )
-    private Set<Produit> produitsFavoris = new HashSet<>();
+    private List<Produit> produitsFavoris = new ArrayList<>();
 
     @OneToOne(mappedBy = "utilisateur", cascade = CascadeType.ALL)
     private Panier panier;
@@ -194,11 +194,11 @@ public class User implements Serializable {
         this.commandes = commandes;
     }
 
-    public Set<Produit> getProduitsFavoris() {
+    public List<Produit> getProduitsFavoris() {
         return produitsFavoris;
     }
 
-    public void setProduitsFavoris(Set<Produit> produitsFavoris) {
+    public void setProduitsFavoris(List<Produit> produitsFavoris) {
         this.produitsFavoris = produitsFavoris;
     }
 
@@ -225,6 +225,19 @@ public class User implements Serializable {
     public void setDateModification(LocalDateTime dateModification) {
         this.dateModification = dateModification;
     }
+
+    public void ajouterProduitFavori(Produit produit) {
+        this.produitsFavoris.add(produit);
+    }
+
+    public void supprimerProduitFavori(Produit produit) {
+        this.produitsFavoris.remove(produit);
+    }
+
+    public boolean estProduitFavori(Produit produit) {
+        return this.produitsFavoris.contains(produit);
+    }
+
 
     @Override
     public String toString() {

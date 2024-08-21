@@ -329,18 +329,58 @@ function getProduitDetails(produitId) {
     });
 }
 
+
 $(document).ready(function () {
-    /**
-    $('#cart-items').on('change', '.quantity-input', function() {
-       var quantity = parseInt($(this).val());
-       var price = parseFloat($(this).closest('tr').find('#prix-produit').text());
-       var total = quantity * price;
-       $(this).closest('tr').find('#total-produit').text(total.toFixed(2));
-       updateCartTotal();
+
+    $(document).on('click', '.favorite-btn', function() {
+        var produitId = $(this).closest('.product-card').find('input[name="produitId"]').val();
+        if(produitId == ''){
+            var produitId = $(this).data('product-id');
+        }
+        var userId = $('#userId').val();
+
+        if (userId) {
+            // Afficher une alerte avec les données envoyées
+            //alert("Données envoyées :\nProduit ID: " + produitId + "\nUtilisateur ID: " + userId);
+
+            ajouterAuxFavoris(produitId, userId);
+        } else {
+            alert("Veuillez vous connecter pour ajouter des produits aux favoris.");
+        }
     });
-    **/
 
+    function ajouterAuxFavoris(produitId, userId) {
+        // Récupérez le jeton CSRF depuis les balises meta
+        var csrfParameterName = $("meta[name='_csrf.parameterName']").attr("content");
+        var csrfToken = $("meta[name='_csrf.token']").attr("content");
 
+        // Créer l'objet de données
+        var data = {
+            produitId: produitId,
+            userId: userId
+        };
+        // Affichez une alerte avec les données envoyées
+        //alert("Données envoyées :\nProduit ID: " + produitId + "\nUtilisateur ID: " + userId);
+
+        $.ajax({
+            url: '/user/add/favoris', // Assurez-vous que l'URL est correcte
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader(csrfParameterName, csrfToken); // Ajouter les en-têtes CSRF
+            },
+            success: function(response) {
+                // Toggle icon based on whether the product is now a favorite or not
+                var button = $('#favorite-btn-' + produitId);
+                button.find('.far').toggle();
+                button.find('.fas').toggle();
+            },
+            error: function(error) {
+                console.error('Erreur lors de l\'ajout aux favoris:', error);
+            }
+        });
+    }
 
     //Avoir la quantite d'un produit (version modifiée pour retourner une promesse)
     // Fonction modifiée pour définir l'attribut 'max' de l'input

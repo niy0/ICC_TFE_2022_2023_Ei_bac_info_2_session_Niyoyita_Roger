@@ -1,5 +1,9 @@
 package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit;
 
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.motCle.MotCle;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.User;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
 
 public class ProduitSpecifications {
@@ -22,6 +26,22 @@ public class ProduitSpecifications {
 
     public static Specification<Produit> hasMotCle(String motCle) {
         return (produit, query, builder) -> builder.isMember(motCle, produit.get("motsCles"));
+    }
+
+    public static Specification<Produit> hasMotCleFav(String motCleId) {
+        return (produit, query, builder) -> {
+            Join<Produit, MotCle> motCleJoin = produit.join("motsCles", JoinType.INNER);
+            return builder.equal(motCleJoin.get("id"), motCleId);
+        };
+    }
+
+
+    // Filtrer les produits favoris pour un utilisateur spécifique
+    public static Specification<Produit> isFavoriForUser(Long userId) {
+        return (root, query, criteriaBuilder) -> {
+            Join<Produit, User> favorisJoin = root.join("utilisateursFavoris", JoinType.LEFT);
+            return criteriaBuilder.equal(favorisJoin.get("id"), userId);
+        };
     }
 
     // Recherche par ID, nom, ou mot-clé

@@ -49,7 +49,7 @@ public class UserService {
     }
 
     //ajouter un nouvel utilisateur + role User
-    public void addNewUser(User user){
+    public void addNewUser(User user) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         Optional<Role> roleUSer = roleRepository.findById(1L);
         String encodedPassword = encoder.encode(user.getPassword());
@@ -65,7 +65,7 @@ public class UserService {
     }
 
     //ajout d'un nouvel utilisateur par un admin
-    public void adminNewUser(User user){
+    public void adminNewUser(User user) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String encodedPassword = encoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
@@ -77,6 +77,16 @@ public class UserService {
         Panier panier = new Panier();
         panier.setUtilisateur(user);
         panierRepository.save(panier);
+    }
+
+    //a finir !!
+    public void supprimerUtilisateur(User user) {
+        // Vider les produits favoris de l'utilisateur
+        user.getProduitsFavoris().clear();
+        userRepository.save(user);
+
+        // supprimer l'utilisateur
+        userRepository.delete(user);
     }
 
     public String updateUser(Long userId, User updatedUser) {
@@ -127,7 +137,6 @@ public class UserService {
     }
 
     public List<Role> getAllRoles() {
-        // Implémentez cette méthode pour récupérer tous les rôles
         return userRepository.findAllRoles();
     }
 

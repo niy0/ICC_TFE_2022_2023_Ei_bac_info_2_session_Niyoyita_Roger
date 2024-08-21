@@ -27,13 +27,6 @@ public class ProduitService {
         return (List<Produit>) produitRepository.findAll();
     }
 
-    public List<Produit> getAllProduct(String keyword) {
-        if(keyword != null) {
-            return produitRepository.getAllProduct(keyword);
-        } else {
-            return (List<Produit>) produitRepository.findAll();
-        }
-    }
 
     public List<Produit> getProduitsAvecQuantiteMinEtActif() {
         return produitRepository.findProduitsAvecQuantiteMin();
@@ -47,7 +40,7 @@ public class ProduitService {
         return 0; // ou une autre valeur par défaut si le produit n'est pas trouvé
     }
 
-    public void updateProduit(Produit produit){
+    public void updateProduit(Produit produit) {
         produitRepository.save(produit);
     }
 
@@ -64,9 +57,6 @@ public class ProduitService {
         produitRepository.deleteById(id);
     }
 
-    public Page<Produit> getAllProduits(Pageable pageable, String sortBy) {
-        return produitRepository.findAll(pageable);
-    }
 
     public Page<Produit> getAllProduits(Pageable pageable, String sortBy, String searchId, String searchNom, String sortPrice, String sortDate, String filterCategorie, String filterMarque, String filterMotCle) {
         Specification<Produit> spec = Specification.where(null);
@@ -97,7 +87,6 @@ public class ProduitService {
         return produitRepository.findAll(spec, pageable);
     }
 
-
     //api de recherche page /produit
     public Page<Produit> getApiAllProduits(Pageable pageable, String searchQuery, String sortPrice, String sortDate, String filterCategorie, String filterMarque, String filterMotCle) {
         Specification<Produit> spec = Specification.where(null);
@@ -123,6 +112,34 @@ public class ProduitService {
         }
 
         // Applique le tri en fonction de la requête
+        if (sortPrice != null && !sortPrice.isEmpty()) {
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(sortPrice.equals("priceAsc") ? Sort.Order.asc("prix") : Sort.Order.desc("prix")));
+        } else if (sortDate != null && !sortDate.isEmpty()) {
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(sortDate.equals("dateAsc") ? Sort.Order.asc("dateCreation") : Sort.Order.desc("dateCreation")));
+        }
+
+        return produitRepository.findAll(spec, pageable);
+    }
+
+    public Page<Produit> getUserFavoris(Long userId, Pageable pageable, String searchNom, String sortPrice, String sortDate, String filterCategorie, String filterMarque, String filterMotCle) {
+        Specification<Produit> spec = ProduitSpecifications.isFavoriForUser(userId);
+
+        if (searchNom != null && !searchNom.isEmpty()) {
+            spec = spec.and(ProduitSpecifications.hasNom(searchNom));
+        }
+
+        if (filterCategorie != null && !filterCategorie.isEmpty()) {
+            spec = spec.and(ProduitSpecifications.hasCategorie(filterCategorie));
+        }
+
+        if (filterMarque != null && !filterMarque.isEmpty()) {
+            spec = spec.and(ProduitSpecifications.hasMarque(filterMarque));
+        }
+
+        if (filterMotCle != null && !filterMotCle.isEmpty()) {
+            spec = spec.and(ProduitSpecifications.hasMotCleFav(filterMotCle));
+        }
+
         if (sortPrice != null && !sortPrice.isEmpty()) {
             pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(sortPrice.equals("priceAsc") ? Sort.Order.asc("prix") : Sort.Order.desc("prix")));
         } else if (sortDate != null && !sortDate.isEmpty()) {

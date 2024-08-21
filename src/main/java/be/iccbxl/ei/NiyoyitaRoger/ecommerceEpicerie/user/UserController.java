@@ -39,11 +39,11 @@ public class UserController {
     private final AdresseRepository adresseRepository;
 
     @Autowired
-    public UserController( UserService userService,
-                           CustomUserDetailsService customUserDetailsService,
-                           UserSessionService userSessionService,
-                           RoleRepository roleRepository,
-                           AdresseRepository adresseRepository) {
+    public UserController(UserService userService,
+                          CustomUserDetailsService customUserDetailsService,
+                          UserSessionService userSessionService,
+                          RoleRepository roleRepository,
+                          AdresseRepository adresseRepository) {
 
         this.userService = userService;
         this.customUserDetailsService = customUserDetailsService;
@@ -65,7 +65,7 @@ public class UserController {
 
     @GetMapping("/admin/add_new_user")
     @PreAuthorize("hasRole('ADMIN')")
-    public String adminNewUserForm(Model model,Authentication authentication) {
+    public String adminNewUserForm(Model model, Authentication authentication) {
 
         String title = "Ajouter un utilisateur";
 
@@ -78,10 +78,10 @@ public class UserController {
         } else {
             throw new IllegalStateException("L'utilisateur connecté n'est pas une instance de UserDetails");
         }
-        
+
         model.addAttribute("newUser", new User()); // changer le nom user par newUser
         model.addAttribute("roles", roleRepository.findAll());
-        model.addAttribute("title",title);
+        model.addAttribute("title", title);
         return "user/admin_create_user";
     }
 
@@ -166,7 +166,7 @@ public class UserController {
 
     @GetMapping("/admin/user_list")
     @PreAuthorize("hasRole('ADMIN')")
-    public String listUsers(Model model,Authentication authentication) {
+    public String listUsers(Model model, Authentication authentication) {
 
         Object principal = authentication.getPrincipal();
         if (principal instanceof UserDetails) {
@@ -228,9 +228,8 @@ public class UserController {
         return "redirect:/admin/users";
     }
 
-
     @GetMapping("/user/signup")
-    public String affichageInscription(Model model){
+    public String affichageInscription(Model model) {
         model.addAttribute("user", new User());
         return "user/user_signup_form";
     }
@@ -243,8 +242,8 @@ public class UserController {
             return "redirect:/signup";
         } else {
             userService.addNewUser(user);
-            model.addAttribute("user",user);
-            return "redirect:/user/"+user.getId()+"/profile";
+            model.addAttribute("user", user);
+            return "redirect:/user/" + user.getId() + "/profile";
         }
     }
 
@@ -262,7 +261,7 @@ public class UserController {
             String username = userDetails.getUsername();
             User user = userService.getUserByEmail(username);
 
-            if(userTest.getId() == user.getId()) {
+            if (userTest.getId() == user.getId()) {
                 Adresse adresse = user.getAdresse();
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
                 String formattedDate = user.getDateCreation().format(formatter);
@@ -271,8 +270,8 @@ public class UserController {
                 model.addAttribute("user", user);
                 model.addAttribute("adresse", adresse);
                 model.addAttribute("title", "Fiche d'un user");
-            }else {
-                return "redirect:/user/"+user.getId()+"/profile";
+            } else {
+                return "redirect:/user/" + user.getId() + "/profile";
             }
         } else {
             // Optionally log or handle the case where principal is not a UserDetails instance
@@ -296,10 +295,10 @@ public class UserController {
             String username = userDetails.getUsername();
             User user = userService.getUserByEmail(username);
 
-            if(user.getId() == userTest.getId()){
+            if (user.getId() == userTest.getId()) {
                 model.addAttribute("user", user);
-            }else {
-                return "redirect:/user/"+user.getId()+"/profile/edit";
+            } else {
+                return "redirect:/user/" + user.getId() + "/profile/edit";
             }
         } else {
             // Optionally log or handle the case where principal is not a UserDetails instance
@@ -312,8 +311,8 @@ public class UserController {
 
     @GetMapping("/user/{userId}/adresse/edit")
     public String getUpdateAdresseUser(@PathVariable("userId") long userId,
-                                Model model,
-                                Authentication authentication) {
+                                       Model model,
+                                       Authentication authentication) {
 
         User userTest = userService.getUserById(userId);
 
@@ -325,7 +324,7 @@ public class UserController {
             User user = userService.getUserByEmail(username);
             Adresse adresse = user.getAdresse();
 
-            System.out.println(adresse +"aaaaaaaaaaaaaaaaaaaaaddddddddddddddddddddddrrrrrrrrrrrrrrreeeeeeeeeeeessssssssssssss************");
+            System.out.println(adresse + "aaaaaaaaaaaaaaaaaaaaaddddddddddddddddddddddrrrrrrrrrrrrrrreeeeeeeeeeeessssssssssssss************");
 
             if (user.getId() == userTest.getId()) {
                 model.addAttribute("adresse", adresse != null ? adresse : new Adresse()).addAttribute("user", user);
@@ -367,7 +366,7 @@ public class UserController {
 
             if (user.getId() == userTest.getId()) {
                 if (adresse == null) {
-                    adresse = new Adresse(localite,rue,numero,codePostal,departement,ville,pays);
+                    adresse = new Adresse(localite, rue, numero, codePostal, departement, ville, pays);
                     adresse.setUtilisateur(user);
                     user.setAdresse(adresse);  // Associez la nouvelle adresse à l'utilisateur
                 }
@@ -400,18 +399,18 @@ public class UserController {
                              @RequestParam("sexe") String sexe,
                              @RequestParam("telephone") String telepone) {
 
-        String erroMessage ="";
+        String erroMessage = "";
         User user = userService.getUserById(id);
 
-        if(user != null) {
+        if (user != null) {
             user.setNom(nom);
             user.setPrenom(prenom);
             user.setSexe(Sexe.valueOf(sexe));
             user.setTelephone(telepone);
             user.setDateModification(LocalDateTime.now());
             userService.save(user);
-            return "redirect:/user/" + user.getId()+ "/profile";
-        }else {
+            return "redirect:/user/" + user.getId() + "/profile";
+        } else {
             erroMessage = "Utilisateur vide";
         }
 
@@ -420,14 +419,13 @@ public class UserController {
 
     @PutMapping("/admin/user/{userId}/profile/edit")
     public String adminUpdateUser(@PathVariable("userId") long userId, @RequestBody User updatedUser) {
-        String errorMessage = userService.updateUser(userId,updatedUser);
-        if(errorMessage.length() == 0) {
-            return "redirect:/user/" + updatedUser.getId()+ "/profile";
-        }else {
+        String errorMessage = userService.updateUser(userId, updatedUser);
+        if (errorMessage.length() == 0) {
+            return "redirect:/user/" + updatedUser.getId() + "/profile";
+        } else {
             return errorMessage;
         }
     }
-
 
     @DeleteMapping("/{userId}")
     public void deleteUser(@PathVariable Long userId) {

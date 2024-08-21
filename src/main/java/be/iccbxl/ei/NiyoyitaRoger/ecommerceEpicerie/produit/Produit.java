@@ -14,6 +14,7 @@ import java.util.Set;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.categorie.Categorie;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.marque.Marque;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.motCle.MotCle;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -55,9 +56,6 @@ public class Produit implements Serializable {
 
     private transient byte[] imagePrincipaleJson;
 
-    //*************admin/manager manage*************
-    //min,middle,max,cote,actif, type de prix
-
     @Column()
     private Integer minStock = 1;
 
@@ -75,7 +73,6 @@ public class Produit implements Serializable {
 
     @Column(name = "type_prix", nullable = false)
     private String typePrix;
-    //******************************
 
     @ManyToOne
     @JoinColumn(name = "categorie_id", nullable = false)
@@ -98,11 +95,13 @@ public class Produit implements Serializable {
     )
     private Set<MotCle> motsCles = new HashSet<>();
 
-    public Produit() {
-        // Constructeur vide nécessaire pour JPA
+    @ManyToMany(mappedBy = "produitsFavoris")
+    private Set<User> utilisateursFavoris = new HashSet<>();
+
+    protected Produit() {
     }
 
-    // Les getters et setters pour tous les attributs
+    // Les getters et setters
 
     public Long getId() {
         return id;
@@ -289,8 +288,4 @@ public class Produit implements Serializable {
     public String getTypePrix() {
         return typePrix;
     }
-
-    // ... (autres méthodes)
-
-    // equals() et hashCode() si nécessaire, particulièrement si vous utilisez des collections qui requièrent ces méthodes pour fonctionner correctement.
 }

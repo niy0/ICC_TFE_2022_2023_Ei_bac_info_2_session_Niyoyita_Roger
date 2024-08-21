@@ -257,6 +257,9 @@
         <div class="col-lg-8">
             <div layout:fragment="content">
                 <div class="row">
+                    <th:block th:if="${user != null}">
+                        <input type="hidden" th:value="${user.id}" name="userId" id="userId">
+                    </th:block>
                     <div class="col-md-8">
                         <!-- Contenu des produits -->
                         <div class="row mb-3 align-items-center">
@@ -329,9 +332,9 @@
                                                 </div>
                                             </div>
                                             <div>
-                                                <button id="favorite-btn-${produit.id}" class="favorite-btn" title="Ajouter aux favoris">
-                                                    <i class="far fa-heart" style="color: #d91717;"></i>
-                                                    <i class="fas fa-heart" style="color: #d91717;"></i>
+                                                <button id="favorite-btn-${produit.id}" class="favorite-btn btn btn-outline-danger" title="Ajouter aux favoris" data-product-id="${produit.id}" style="border-radius: 50%;">
+                                                    <i class="far fa-heart"></i>
+                                                    <i class="fas fa-heart" style="display: none;"></i>
                                                 </button>
                                             </div>
                                         </div>
@@ -446,7 +449,7 @@
                                     produitsContainer.append(`
                                         <div class="col-12 col-sm-6 col-md-6 col-lg-4">
                                             <div class="card product-card">
-
+                                                <input type="hidden" th:value="${produit.id}" th:id="'produitId-' + ${produit.id}" name="produitId">
                                                 <img class="card-img-top product-image" src="/display?id=${produit.id}" alt="Image du produit">
                                                 <div class="card-body product-details">
                                                     <h2 class="product-title">${produit.nom}</h2>
@@ -468,10 +471,12 @@
                                                                        class="form-control form-control-sm form-input text-center" >
                                                             </div>
                                                         </div>
-                                                        <button id="favorite-btn-${produit.id}" class="favorite-btn" title="Ajouter aux favoris">
-                                                            <i class="far fa-heart" style="color: #d91717;"></i>
-                                                            <i class="fas fa-heart" style="color: #d91717;"></i>
+                                                        <!-- Ajoutez un attribut data-product-id au bouton -->
+                                                        <button id="favorite-btn-${produit.id}" class="favorite-btn btn btn-outline-danger" title="Ajouter aux favoris" data-product-id="${produit.id}" style="border-radius: 50%;">
+                                                            <i class="far fa-heart"></i>
+                                                            <i class="fas fa-heart" style="display: none;"></i>
                                                         </button>
+
                                                     </div>
                                                     <button class="btn btn-success" onclick="addToCart(${produit.id})"><i class="bi bi-cart-plus"></i> Ajouter au panier</button>
                                                 </div>
