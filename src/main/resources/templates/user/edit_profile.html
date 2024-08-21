@@ -224,10 +224,14 @@
                         </p>
                         <!-- Ajoutez d'autres champs selon les besoins -->
 
-                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Enregistrer
+                        </button>
                     </form>
 
-                    <a class="btn btn-outline-warning" th:href="@{'/user/' + ${user.id}+'/profile'}">Annuler</a>
+                    <a class="btn btn-outline-warning" th:href="@{'/user/' + ${user.id}+'/profile'}">
+                        <i class="fas fa-times"></i> Annuler
+                    </a>
                 </div>
             </div>
         </div>

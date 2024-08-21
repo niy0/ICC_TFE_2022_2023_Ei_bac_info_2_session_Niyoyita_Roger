@@ -14,16 +14,15 @@
             }
 
             .sidenav {
-                position: fixed;
-                left: 0;
-                height: calc(100vh - 60px);
-                width: 300px;
                 background-color: #343a40;
                 color: white;
-                padding-top: 0px;
+                padding-top: 0;
                 overflow-y: auto;
-                transition: width 0.3s ease-in-out;
-                border-radius: 0 0.5rem 0 0;
+                height: auto;
+                border-radius: 0.5rem;
+                margin: 0;
+                width: 300px;
+                flex-shrink: 0;
             }
 
             .sidenav a {
@@ -48,10 +47,10 @@
             }
 
             .content {
-                margin-top: 0;
-                margin-left: 300px;
-                padding: 20px;
-                transition: margin-left 0.3s;
+              display: flex;
+              flex-wrap: wrap; /* Pour permettre l'adaptation des colonnes */
+              height: auto;
+              align-items: flex-start;
             }
 
             .centered-content {
@@ -66,9 +65,8 @@
             }
 
             .title {
-                font-family: Arial, sans-serif;
                 font-weight: bold;
-                color: #007bff;
+                color: #343a40;
             }
 
             .fieldError {
@@ -101,7 +99,7 @@
             }
 
             .card-title {
-                color: #007bff;
+                color: #343a40;
             }
 
             .card-subtitle {
@@ -252,9 +250,9 @@
         </style>
     </head>
     <body>
-        <div class="container">
-            <div layout:fragment="content" class="content">
-                <div class="sidenav">
+        <div class="container-fluid">
+            <div layout:fragment="content" class="row content">
+                <div class="col-12 col-md-4 col-lg-3 sidenav">
                     <a href="javascript:location.reload()" class="btn-refresh">
                         <span class="refresh-text marginL">Replier les sous-menus</span> <i class="fas fa-sync-alt" style="color: rgb(255, 193, 7);"></i>
                     </a>
@@ -305,126 +303,132 @@
                         </div>
                     </div>
                 </div>
-                <div class="container centered-content">
+                <div class="col-12 col-md-8 col-lg-9  main-content">
+                    <h1 class="title" >Modifier produit</h1>
                     <div class="form-container">
-                    <div class="card mb-4">
-                        <img class="card-img-left" th:src="@{'/display?id=' + ${produit.id}}" alt="Image du produit">
-                        <div class="card-body">
-                            <form th:action="@{'/produit/' + ${produit.id} + '/edit'}" th:object="${produit}" method="post" enctype="multipart/form-data">
-                                <input type="hidden" name="_method" value="put" />
+                        <div class="card mb-4">
+                            <img class="card-img-left" th:src="@{'/display?id=' + ${produit.id}}" alt="Image du produit">
+                            <div class="card-body">
+                                <form th:action="@{'/produit/' + ${produit.id} + '/edit'}" th:object="${produit}" method="post" enctype="multipart/form-data">
+                                    <input type="hidden" name="_method" value="put" />
 
-                                <input type="hidden" name="id" th:value="${produit.id}" />
+                                    <input type="hidden" name="id" th:value="${produit.id}" />
 
-                                <div class="form-group">
-                                    <label for="nom">Nom</label>
-                                    <input type="text" class="form-control" name="nom" id="nom" th:field="*{nom}" required />
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="description">Description</label>
-                                    <textarea id="description" class="form-control" name="description" th:field="*{description}" required></textarea>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="cat">Catégorie</label>
-                                    <select class="form-control" id="cat" name="catId" required
-                                            onchange="var selectElement = document.getElementById('cat');
-                                                  var selectedOption = selectElement.options[selectElement.selectedIndex];
-                                                  if (selectedOption.value === '') {
-                                                      document.getElementById('catId').value = '${catList[0].id}'; // Prend le premier ID
-                                                  } else {
-                                                      document.getElementById('catId').value = selectedOption.value;
-                                                  }">
-                                        <option value="" th:value="${produit.categorie.nom}" th:text="${produit.categorie.nom}"></option>
-                                        <option th:each="cat: ${catList}" th:value="${cat.id}" th:data-id="${cat.id}" th:text="${cat.nom}"></option>
-                                    </select>
-                                    <input class="form-group" hidden name="catId" id="catId"/>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="typePrix">Type de Prix</label>
-                                    <select class="form-control" id="typePrix" name="typePrix" th:field="*{typePrix}" required>
-                                        <option value="piece" selected>Prix à la pièce</option>
-                                        <option value="kilo">Prix au kilo</option>
-                                        <option value="litre">Prix au litre</option>
-                                        <option value="promotion">Prix promotionnel</option>
-                                        <option value="gros">Prix en gros</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="prix">Prix</label>
-                                    <input type="number" class="form-control" name="prix" min="0.01" id="prix" step="0.01" th:field="*{prix}" required />
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="quantite">Quantité stock</label>
-                                    <div style="display:flex;justify-content: space-between;">
-                                        <input type="number" class="form-control" min="1" name="quantite" id="quantite" th:field="*{quantite}" readonly/>
-                                        <input type="number" placeholder="Rajouter dans le stock" class="form-control" min="0" />
+                                    <div class="form-group">
+                                        <label for="nom">Nom</label>
+                                        <input type="text" class="form-control" name="nom" id="nom" th:field="*{nom}" required />
                                     </div>
-                                </div>
 
-                                <div class="form-group">
-                                    <label for="minStock">Min stock</label>
-                                    <input type="number" placeholder="min : stock" class="form-control" id="minStock" min="1" th:field="*{minStock}" />
-                                </div>
+                                    <div class="form-group">
+                                        <label for="description">Description</label>
+                                        <textarea id="description" class="form-control" name="description" th:field="*{description}" required></textarea>
+                                    </div>
 
-                                <div class="form-group">
-                                    <label for="maxStock">Max stock</label>
-                                    <input type="number" placeholder="max : stock" class="form-control" id="maxStock" th:field="*{maxStock}"
-                                           onchange="var maxStockValue = this.value;
-                                                  var quantiteValue = document.getElementById('quantite').value;
-                                                  var maxStockError = document.getElementById('maxStockError');
+                                    <div class="form-group">
+                                        <label for="cat">Catégorie</label>
+                                        <select class="form-control" id="cat" name="catId" required
+                                                onchange="var selectElement = document.getElementById('cat');
+                                                      var selectedOption = selectElement.options[selectElement.selectedIndex];
+                                                      if (selectedOption.value === '') {
+                                                          document.getElementById('catId').value = '${catList[0].id}'; // Prend le premier ID
+                                                      } else {
+                                                          document.getElementById('catId').value = selectedOption.value;
+                                                      }">
+                                            <option value="" th:value="${produit.categorie.nom}" th:text="${produit.categorie.nom}"></option>
+                                            <option th:each="cat: ${catList}" th:value="${cat.id}" th:data-id="${cat.id}" th:text="${cat.nom}"></option>
+                                        </select>
+                                        <input class="form-group" hidden name="catId" id="catId"/>
+                                    </div>
 
-                                                  if (quantiteValue !== '' && maxStockValue !== '' && parseFloat(maxStockValue) < parseFloat(quantiteValue)) {
-                                                      maxStockError.style.display = 'block';
-                                                      maxStockError.innerHTML = '<i class=\'fas fa-exclamation-circle\' style=\'color: #ea4848;\'></i> MaxStock doit être plus grand ou égal à quantité : ' + quantiteValue;
-                                                  } else {
-                                                      maxStockError.style.display = 'none';
-                                                  }" />
-                                    <p style="color: red; display: none;" id="maxStockError">
-                                        <i class="fas fa-exclamation-circle" style="color: #ea4848;"></i>
-                                        MaxStock doit être plus grand ou égal à quantité qui est à : <span id="quantiteValue"></span>
-                                    </p>
-                                </div>
+                                    <div class="form-group">
+                                        <label for="typePrix">Type de Prix</label>
+                                        <select class="form-control" id="typePrix" name="typePrix" th:field="*{typePrix}" required>
+                                            <option value="piece" selected>Prix à la pièce</option>
+                                            <option value="kilo">Prix au kilo</option>
+                                            <option value="litre">Prix au litre</option>
+                                            <option value="promotion">Prix promotionnel</option>
+                                            <option value="gros">Prix en gros</option>
+                                        </select>
+                                    </div>
 
-                                <div class="form-group">
-                                    <label for="image">Image Principale</label>
-                                    <input type="file" class="form-control" id="image" name="image" accept="image/*" />
-                                </div>
+                                    <div class="form-group">
+                                        <label for="prix">Prix</label>
+                                        <input type="number" class="form-control" name="prix" min="0.01" id="prix" step="0.01" th:field="*{prix}" required />
+                                    </div>
 
-                                <div class="form-group">
-                                    <label for="marque">Marque</label>
-                                    <select class="form-control selectpicker" id="marque" onchange="var selectElement = document.getElementById('marque'); var selectedOption = selectElement.options[selectElement.selectedIndex]; document.getElementById('marqueId').value = selectedOption.value;">
-                                        <option th:each="marque: ${marqueList}" th:value="${marque.id}" th:data-id="${marque.id}" th:text="${marque.nom}" th:field="*{marque}"></option>
-                                    </select>
-                                    <input class="form-group" hidden name="marqueId" id="marqueId" />
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="actif">Actif (dans le site)</label>
-                                    <input type="checkbox" class="form-check-input custom-checkbox ml-2" id="actif" name="actif" th:checked="${produit.actif}" />
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Mots clés</label>
-                                    <div>
-                                        <div th:each="motcle: ${motCleList}" style="display: inline-block; margin-right: 10px;">
-                                            <input type="checkbox" th:value="${motcle.id}" name="motCleIds" th:id="${'motCle' + motcle.id}" th:checked="${produit.motsCles.contains(motcle)}" />
-                                            <label th:for="${'motCle' + motcle.id}" th:text="${motcle.nom}"></label>
+                                    <div class="form-group">
+                                        <label for="quantite">Quantité stock</label>
+                                        <div style="display:flex;justify-content: space-between;">
+                                            <input type="number" class="form-control" min="1" name="quantite" id="quantite" th:field="*{quantite}" readonly/>
+                                            <input type="number" placeholder="Rajouter dans le stock" class="form-control" min="0" />
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="form-group">
-                                    <button class="btn btn-outline-success" type="submit">Modifier</button>
-                                    <a th:href="@{/admin/produits}" class="btn btn-outline-warning">Annuler</a>
-                                </div>
-                            </form>
+                                    <div class="form-group">
+                                        <label for="minStock">Min stock</label>
+                                        <input type="number" placeholder="min : stock" class="form-control" id="minStock" min="1" th:field="*{minStock}" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="maxStock">Max stock</label>
+                                        <input type="number" placeholder="max : stock" class="form-control" id="maxStock" th:field="*{maxStock}"
+                                               onchange="var maxStockValue = this.value;
+                                                      var quantiteValue = document.getElementById('quantite').value;
+                                                      var maxStockError = document.getElementById('maxStockError');
+
+                                                      if (quantiteValue !== '' && maxStockValue !== '' && parseFloat(maxStockValue) < parseFloat(quantiteValue)) {
+                                                          maxStockError.style.display = 'block';
+                                                          maxStockError.innerHTML = '<i class=\'fas fa-exclamation-circle\' style=\'color: #ea4848;\'></i> MaxStock doit être plus grand ou égal à quantité : ' + quantiteValue;
+                                                      } else {
+                                                          maxStockError.style.display = 'none';
+                                                      }" />
+                                        <p style="color: red; display: none;" id="maxStockError">
+                                            <i class="fas fa-exclamation-circle" style="color: #ea4848;"></i>
+                                            MaxStock doit être plus grand ou égal à quantité qui est à : <span id="quantiteValue"></span>
+                                        </p>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="image">Image Principale</label>
+                                        <input type="file" class="form-control" id="image" name="image" accept="image/*" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="marque">Marque</label>
+                                        <select class="form-control selectpicker" id="marque" onchange="var selectElement = document.getElementById('marque'); var selectedOption = selectElement.options[selectElement.selectedIndex]; document.getElementById('marqueId').value = selectedOption.value;">
+                                            <option th:each="marque: ${marqueList}" th:value="${marque.id}" th:data-id="${marque.id}" th:text="${marque.nom}" th:field="*{marque}"></option>
+                                        </select>
+                                        <input class="form-group" hidden name="marqueId" id="marqueId" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="actif">Actif (dans le site)</label>
+                                        <input type="checkbox" class="form-check-input custom-checkbox ml-2" id="actif" name="actif" th:checked="${produit.actif}" />
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Mots clés</label>
+                                        <div>
+                                            <div th:each="motcle: ${motCleList}" style="display: inline-block; margin-right: 10px;">
+                                                <input type="checkbox" th:value="${motcle.id}" name="motCleIds" th:id="${'motCle' + motcle.id}" th:checked="${produit.motsCles.contains(motcle)}" />
+                                                <label th:for="${'motCle' + motcle.id}" th:text="${motcle.nom}"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <button class="btn btn-outline-success" type="submit">
+                                            <i class="fas fa-edit"></i> Modifier
+                                        </button>
+                                        <a th:href="@{/admin/produits}" class="btn btn-outline-warning">
+                                            <i class="fas fa-times"></i> Annuler
+                                        </a>
+                                    </div>
+
+                                </form>
+                            </div>
                         </div>
                     </div>
-                </div>
                 </div>
             </div>
         </div>

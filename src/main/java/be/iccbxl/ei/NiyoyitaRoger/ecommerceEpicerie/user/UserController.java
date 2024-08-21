@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -35,17 +36,20 @@ public class UserController {
     private final CustomUserDetailsService customUserDetailsService;
     private final UserSessionService userSessionService;
     private final RoleRepository roleRepository;
+    private final AdresseRepository adresseRepository;
 
     @Autowired
     public UserController( UserService userService,
                            CustomUserDetailsService customUserDetailsService,
                            UserSessionService userSessionService,
-                           RoleRepository roleRepository) {
+                           RoleRepository roleRepository,
+                           AdresseRepository adresseRepository) {
 
         this.userService = userService;
         this.customUserDetailsService = customUserDetailsService;
         this.userSessionService = userSessionService;
         this.roleRepository = roleRepository;
+        this.adresseRepository = adresseRepository;
     }
 
     @GetMapping("/auth/debug")
@@ -245,14 +249,35 @@ public class UserController {
     }
 
     //permet d'affiche la page profile de l'user
-    @GetMapping("/user/{userId}/profile")// sécurisé ce liens
-    public String getUserProfilById(Model model, @PathVariable("userId") long id) {
-        User user = userService.getUserById(id);
-        Adresse adresse = user.getAdresse();
+    @GetMapping("/user/{userId}/profile")
+    public String getUserProfilById(Model model,
+                                    @PathVariable("userId") long id,
+                                    Authentication authentication) {
 
-        model.addAttribute("user", user);
-        model.addAttribute("adresse", adresse);
-        model.addAttribute("title", "Fiche d'un user");
+        User userTest = userService.getUserById(id);
+
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            String username = userDetails.getUsername();
+            User user = userService.getUserByEmail(username);
+
+            if(userTest.getId() == user.getId()) {
+                Adresse adresse = user.getAdresse();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+                String formattedDate = user.getDateCreation().format(formatter);
+
+                model.addAttribute("formattedDateCreation", formattedDate);
+                model.addAttribute("user", user);
+                model.addAttribute("adresse", adresse);
+                model.addAttribute("title", "Fiche d'un user");
+            }else {
+                return "redirect:/user/"+user.getId()+"/profile";
+            }
+        } else {
+            // Optionally log or handle the case where principal is not a UserDetails instance
+            throw new IllegalStateException("L'utilisateur connecté n'est pas une instance de UserDetails");
+        }
 
         return "user/profile";
     }
@@ -261,15 +286,21 @@ public class UserController {
     public String getUpdateUser(@PathVariable("userId") long userId,
                                 Model model,
                                 Authentication authentication) {
-        //User user = userService.getUserById(userId);
-        //model.addAttribute("user", user);
+
+        User userTest = userService.getUserById(userId);
+
         // Récupération de l'utilisateur connecté
         Object principal = authentication.getPrincipal();
         if (principal instanceof UserDetails) {
             UserDetails userDetails = (UserDetails) principal;
             String username = userDetails.getUsername();
             User user = userService.getUserByEmail(username);
-            model.addAttribute("user", user);
+
+            if(user.getId() == userTest.getId()){
+                model.addAttribute("user", user);
+            }else {
+                return "redirect:/user/"+user.getId()+"/profile/edit";
+            }
         } else {
             // Optionally log or handle the case where principal is not a UserDetails instance
             throw new IllegalStateException("L'utilisateur connecté n'est pas une instance de UserDetails");
@@ -284,6 +315,8 @@ public class UserController {
                                 Model model,
                                 Authentication authentication) {
 
+        User userTest = userService.getUserById(userId);
+
         // Récupération de l'utilisateur connecté
         Object principal = authentication.getPrincipal();
         if (principal instanceof UserDetails) {
@@ -291,14 +324,13 @@ public class UserController {
             String username = userDetails.getUsername();
             User user = userService.getUserByEmail(username);
             Adresse adresse = user.getAdresse();
-            System.out.println(adresse + "**********/////////*********adressssssssssseeeeeeeeeessssss");
 
-            model.addAttribute("user", user);
+            System.out.println(adresse +"aaaaaaaaaaaaaaaaaaaaaddddddddddddddddddddddrrrrrrrrrrrrrrreeeeeeeeeeeessssssssssssss************");
 
-            if( adresse == null){
-                model.addAttribute("adresse", new Adresse());
-            }else {
-                model.addAttribute("adresse", adresse);
+            if (user.getId() == userTest.getId()) {
+                model.addAttribute("adresse", adresse != null ? adresse : new Adresse()).addAttribute("user", user);
+            } else {
+                return "redirect:/user/" + user.getId() + "/adresse/edit";
             }
 
         } else {
@@ -309,32 +341,57 @@ public class UserController {
         return "/user/edit_adresse";
     }
 
-    @PostMapping("/user/{userId}/adresse/edit")
-    public String updateAdresseUser(@RequestParam("id") long id,
-                             @RequestParam("rue") String nom,
-                             @RequestParam("prenom") String prenom,
-                             @RequestParam("email") String email,
-                             @RequestParam("sexe") String sexe,
-                             @RequestParam("telephone") String telepone) {
 
-        String erroMessage ="";
-        User user = userService.getUserById(id);
+    @PostMapping("/user/{userId}/adresse/save")
+    public String updateAdresseUser(
+            @PathVariable("userId") long userId,
+            @RequestParam("rue") String rue,
+            @RequestParam("numero") String numero,
+            @RequestParam("localite") String localite,
+            @RequestParam("codePostal") String codePostal,
+            @RequestParam("ville") String ville,
+            @RequestParam("pays") String pays,
+            @RequestParam(value = "departement", required = false) String departement,
+            Authentication authentication) {
 
-        if(user != null) {
-            user.setNom(nom);
-            user.setPrenom(prenom);
-            user.setEmail(email);
-            user.setSexe(Sexe.valueOf(sexe));
-            user.setTelephone(telepone);
-            user.setDateModification(LocalDateTime.now());
-            userService.save(user);
-            return "redirect:/user/" + user.getId()+ "/profile";
-        }else {
-            erroMessage = "Utilisateur vide";
+
+        User userTest = userService.getUserById(userId);
+
+        // Récupération de l'utilisateur connecté
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails && userTest != null) {
+            UserDetails userDetails = (UserDetails) principal;
+            String username = userDetails.getUsername();
+            User user = userService.getUserByEmail(username);
+            Adresse adresse = user.getAdresse();
+
+            if (user.getId() == userTest.getId()) {
+                if (adresse == null) {
+                    adresse = new Adresse(localite,rue,numero,codePostal,departement,ville,pays);
+                    adresse.setUtilisateur(user);
+                    user.setAdresse(adresse);  // Associez la nouvelle adresse à l'utilisateur
+                }
+                adresse.setRue(rue);
+                adresse.setNumero(numero);
+                adresse.setLocalite(localite);
+                adresse.setCodePostal(codePostal);
+                adresse.setVille(ville);
+                adresse.setPays(pays);
+                adresse.setDepartement(departement);
+
+                adresseRepository.save(adresse);
+                userService.save(user);
+                return "redirect:/user/" + user.getId() + "/profile";
+            } else {
+                return "redirect:/user/" + user.getId() + "/adresse/edit";
+            }
+
+        } else {
+            // Optionally log or handle the case where principal is not a UserDetails instance
+            throw new IllegalStateException("L'utilisateur connecté n'est pas une instance de UserDetails");
         }
-
-        return erroMessage;
     }
+
 
     @PostMapping("/user/{userId}/profile/edit")
     public String updateUser(@RequestParam("id") long id,

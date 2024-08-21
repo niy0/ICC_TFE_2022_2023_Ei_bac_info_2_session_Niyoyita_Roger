@@ -11,8 +11,8 @@ CREATE TABLE `adresse` (
     `numero` varchar(10) NOT NULL,
     `code_postal` varchar(10) NOT NULL,
     `departement` varchar(50),
-    `nom` varchar(50) NOT NULL,
-    `prenom` varchar(50) NOT NULL,
+    `nom` varchar(50),
+    `prenom` varchar(50),
     `date_creation` datetime(6) NOT NULL,
     `date_modification` datetime(6) NOT NULL,
     FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)

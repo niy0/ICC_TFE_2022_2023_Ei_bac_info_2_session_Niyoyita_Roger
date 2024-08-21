@@ -91,7 +91,7 @@ public class AdminSecurityConfig {
                 //.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 //.ignoringRequestMatchers("/addToCart")
                 // Autres configurations CSRF ici si nécessaire
-                .formLogin( formLogin -> formLogin.loginPage("/login/test")
+                .formLogin( formLogin -> formLogin.loginPage("/login")
                         .usernameParameter("email")
                         .successHandler(successHadeler)
                         .permitAll())

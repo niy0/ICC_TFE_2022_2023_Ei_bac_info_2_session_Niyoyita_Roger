@@ -39,13 +39,9 @@ public class Adresse {
     @Size(max = 50)
     private String pays;
 
-    @NotNull
-    @NotBlank
     @Size(max = 50)
     private String nom;
 
-    @NotNull
-    @NotBlank
     @Size(max = 50)
     private String prenom;
 
@@ -62,6 +58,16 @@ public class Adresse {
     private Date dateModification;
 
     protected Adresse() {
+    }
+
+    public Adresse(String localite, String rue, String numero, String codePostal, String departement, String ville, String pays) {
+        this.localite = localite;
+        this.rue = rue;
+        this.numero = numero;
+        this.codePostal = codePostal;
+        this.departement = departement;
+        this.ville = ville;
+        this.pays = pays;
     }
 
     public Adresse(String localite, String rue, String numero, String codePostal, String departement, String ville, String pays, String nom, String prenom) {

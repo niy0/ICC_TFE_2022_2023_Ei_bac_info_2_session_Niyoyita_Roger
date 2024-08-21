@@ -240,7 +240,7 @@
             <span th:if="${user.telephone != null}" th:text="${user.telephone}"></span>
             <span th:if="${user.telephone == null}">Pas de numéro enregistré</span>
           </p>
-          <p class="card-text"><strong>Date de création:</strong> <span th:text="${user.dateCreation}"></span></p>
+          <p class="card-text"><strong>Date inscription:</strong> <span th:text="${formattedDateCreation}"></span></p>
           <p class="card-text"><strong>Rôles:</strong>
             <span th:each="role : ${user.roles}" th:text="${role.nom} + ' '"></span>
           </p>
