@@ -106,6 +106,14 @@
         .dropdown-item:hover {
             background-color: rgba(255, 255, 255, 0.2);
         }
+
+
+
+
+
+
+
+
     </style>
 </head>
 <body>
@@ -116,7 +124,9 @@
             L'épicerie de l'houmeau
         </a>
         <div class="container-fluid">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"><i class="fas fa-bars"></i></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -134,36 +144,54 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/contact}" href="#">Contact</a>
+                        <a class="nav-link" th:href="@{/info-contact}">Contact</a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Plus
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" th:href="@{/about}" href="#">À Propos</a></li>
+                            <li><a class="dropdown-item" th:href="@{/a-propos}" href="#">À Propos</a></li>
                             <li><a class="dropdown-item" th:href="@{/faq}" href="#">FAQ</a></li>
-                            <li><a class="dropdown-item" th:href="@{/livraison}" href="#">Politique de Livraison</a></li>
+                            <li><a class="dropdown-item" th:href="@{/livraison}" href="#">Politique de Livraison</a>
+                            </li>
                             <li><a class="dropdown-item" th:href="@{/retour}" href="#">Politique de Retour</a></li>
-                            <li><a class="dropdown-item" th:href="@{/conditions}" href="#">Conditions d'Utilisation</a></li>
-                            <li><a class="dropdown-item" th:href="@{/privacy}" href="#">Politique de Confidentialité</a></li>
+                            <li><a class="dropdown-item" th:href="@{/conditions}" href="#">Conditions d'Utilisation</a>
+                            </li>
+                            <li><a class="dropdown-item" th:href="@{/politique-de-confidentialite}" href="#">Politique
+                                de Confidentialité</a></li>
                         </ul>
                     </li>
+
                 </ul>
-                <div style="display:flex;">
-                    <a class="btn btn-warning" th:href="@{/panier}" href="#"><i class="fa fa-shopping-cart"></i></a>
+                <div style="display:flex; gap: 10px;">
+                    <a class="btn btn-warning" th:href="@{/panier}"
+                       style="background-color: #ff9966; border-color: #ffc107; ">
+                        <i class="fa fa-shopping-cart"></i>
+                    </a>
 
                     <!-- Affichez ces boutons si l'utilisateur est un utilisateur anonyme -->
-                    <div th:if="${isAnonymousUser}">
-                        <a class="btn btn-success" th:href="@{/user/signup}">S'inscrire</a>
-                        <a class="btn btn-success" th:href="@{/login}">Se connecter</a>
+                    <div th:if="${isAnonymousUser}" style="display:flex; gap: 10px;">
+                        <a class="btn btn-success" th:href="@{/user/signup}"
+                           style="background-color: #ff5e62; border-color: #fff; color: #fff;">
+                            <i class="fas fa-user-plus"></i> S'inscrire
+                        </a>
+                        <a class="btn btn-success" th:href="@{/login}"
+                           style="background-color: #ff5e62; border-color: #fff; color: #fff;">
+                            <i class="fas fa-sign-in-alt"></i> Se connecter
+                        </a>
                     </div>
 
                     <!-- Affichez ce bouton si l'utilisateur n'est PAS un utilisateur anonyme -->
                     <form th:if="${!isAnonymousUser}" th:action="@{/logout}" method="post">
-                        <button type="submit" class="btn btn-danger">Se déconnecter</button>
+                        <button type="submit" class="btn btn-danger"
+                                style="background-color: #ff5e62; border-color: #ff5e62; color: #fff;">
+                            <i class="fas fa-sign-out-alt"></i> Se déconnecter
+                        </button>
                     </form>
                 </div>
+
             </div>
         </div>
     </nav>

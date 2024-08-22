@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+<head>
+    <meta charset="UTF-8">
+    <title>FAQ - L'épicerie de l'Houmeau</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Bootstrap Bundle JS (inclut Popper) -->
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        .custom-title {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #ff5e62;
+        }
+        .accordion-button {
+            background-color: #ff9966;
+            color: white;
+        }
+        .accordion-button:not(.collapsed) {
+            background-color: #ff5e62;
+        }
+        .accordion-item {
+            margin-bottom: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .accordion-body {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+    </style>
+</head>
+<body>
+<div layout:fragment="content" class="content">
+    <div class="container mt-5">
+        <h1 class="custom-title"><i class="fas fa-question-circle"></i> Foire Aux Questions (FAQ)</h1>
+        <div class="accordion" id="faqAccordion">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        Comment passer une commande ?
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+                     data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Pour passer une commande, ajoutez les produits souhaités à votre panier, puis suivez les étapes
+                        de paiement. Vous recevrez un email de confirmation une fois la commande validée.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingTwo">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                        Quels sont les délais de livraison ?
+                    </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+                     data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Les délais de livraison varient en fonction de votre localisation. En général, les commandes
+                        sont livrées sous 3 à 5 jours ouvrés.
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingThree">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                        Comment retourner un produit ?
+                    </button>
+                </h2>
+                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
+                     data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        Pour retourner un produit, veuillez contacter notre service client pour obtenir un numéro de
+                        retour. Les retours doivent être effectués dans les 14 jours suivant la réception.
+                    </div>
+                </div>
+            </div>
+            <!-- Ajouter d'autres questions ici -->
+        </div>
+    </div>
+</div>
+</body>
+</html>
