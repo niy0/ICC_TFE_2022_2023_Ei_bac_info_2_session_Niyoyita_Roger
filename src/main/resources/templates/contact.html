@@ -5,7 +5,7 @@
       layout:decorate="~{layouts/main}">
 <head>
     <meta charset="UTF-8">
-    <title>Contactez-nous - L'épicerie de l'Houmeau</title>
+    <title th:text="#{page.title}">Contactez-nous - L'épicerie de l'Houmeau</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -15,16 +15,16 @@
     <!-- Bootstrap Bundle JS (inclut Popper) -->
     <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <style>
-        .custom-title {
+        .titre-personnalise {
             text-align: center;
             margin-bottom: 40px;
             color: #ff5e62;
         }
-        .form-label {
+        .etiquette-formulaire {
             color: #333;
             font-weight: bold;
         }
-        .btn-custom {
+        .btn-personnalise {
             background-color: #ff9966;
             color: white;
             border-radius: 50px;
@@ -32,56 +32,64 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: background-color 0.3s, transform 0.3s;
         }
-        .btn-custom:hover {
+        .btn-personnalise:hover {
             background-color: #ff5e62;
             transform: translateY(-2px);
         }
-        .contact-info h3 {
+        .info-contact h3 {
             color: #ff5e62;
             margin-bottom: 20px;
         }
-        .contact-info p {
+        .info-contact p {
             font-size: 1.1em;
             color: #555;
         }
-        .contact-info i {
+        .info-contact i {
             margin-right: 10px;
             color: #ff9966;
         }
+
+
 
     </style>
 </head>
 <body>
 <div layout:fragment="content" class="content">
     <div class="container mt-5">
-        <h1 class="custom-title"><i class="fas fa-envelope"></i> Contactez-nous</h1>
+        <h1 class="titre-personnalise"><i class="fas fa-envelope"></i> <span
+                th:text="#{contact.titre}">Contactez-nous</span></h1>
         <div class="row">
             <div class="col-md-6">
                 <form>
                     <div class="mb-3">
-                        <label for="name" class="form-label">Nom</label>
-                        <input type="text" class="form-control" id="name" placeholder="Votre nom">
+                        <label for="nom" class="etiquette-formulaire" th:text="#{contact.nom}">Nom</label>
+                        <input type="text" class="form-control" id="nom" th:placeholder="#{contact.nom.placeholder}">
                     </div>
                     <div class="mb-3">
-                        <label for="email" class="form-label">Adresse email</label>
-                        <input type="email" class="form-control" id="email" placeholder="Votre email">
+                        <label for="email" class="etiquette-formulaire" th:text="#{contact.email}">Adresse email</label>
+                        <input type="email" class="form-control" id="email"
+                               th:placeholder="#{contact.email.placeholder}">
                     </div>
                     <div class="mb-3">
-                        <label for="subject" class="form-label">Sujet</label>
-                        <input type="text" class="form-control" id="subject" placeholder="Sujet de votre message">
+                        <label for="sujet" class="etiquette-formulaire" th:text="#{contact.sujet}">Sujet</label>
+                        <input type="text" class="form-control" id="sujet"
+                               th:placeholder="#{contact.sujet.placeholder}">
                     </div>
                     <div class="mb-3">
-                        <label for="message" class="form-label">Message</label>
-                        <textarea class="form-control" id="message" rows="5" placeholder="Votre message"></textarea>
+                        <label for="message" class="etiquette-formulaire" th:text="#{contact.message}">Message</label>
+                        <textarea class="form-control" id="message" rows="5"
+                                  th:placeholder="#{contact.message.placeholder}"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-custom">Envoyer</button>
+                    <button type="submit" class="btn btn-personnalise" th:text="#{contact.envoyer}">Envoyer</button>
                 </form>
             </div>
-            <div class="col-md-6 contact-info">
-                <h3>Coordonnées</h3>
-                <p><i class="fas fa-map-marker-alt"></i> Adresse : 123 Rue de l'Épicerie, 17000 La Rochelle, France</p>
-                <p><i class="fas fa-phone"></i> Téléphone : +33 1 23 45 67 89</p>
-                <p><i class="fas fa-envelope"></i> Email : contact@epiceriedelhoumeau.fr</p>
+            <div class="col-md-6 info-contact">
+                <h3 th:text="#{contact.coordonnees}">Coordonnées</h3>
+                <p><i class="fas fa-map-marker-alt"></i> <span th:text="#{contact.adresse}">Adresse</span> : 117 Rue de
+                    Paris, 16000 Angoulême, France</p>
+                <p><i class="fas fa-phone"></i> <span th:text="#{contact.telephone}">Téléphone</span> : 0516094273</p>
+                <p><i class="fas fa-envelope"></i> <span th:text="#{contact.email.label}">Email</span> :
+                    epicerielhoumeau16@gmail.com</p>
             </div>
         </div>
     </div>

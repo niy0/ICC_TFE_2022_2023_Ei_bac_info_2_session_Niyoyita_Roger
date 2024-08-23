@@ -1,66 +1,115 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
-      layout:decorate="~{layouts/main}">>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
 <head>
     <meta charset="UTF-8">
-    <title>New Location</title>
-    <!-- Bootstrap 5 CSS depuis unpkg CDN -->
+    <title th:text="#{signup.page.title}">Inscription</title>
+    <!-- Bootstrap 5 CSS -->
     <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
     <!-- jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <!-- Bootstrap Bundle JS (inclut Popper) depuis unpkg CDN -->
+    <!-- Bootstrap Bundle JS (inclut Popper) -->
     <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        .title-custom {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #ff5e62;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        .form-label-custom {
+            color: #333;
+            font-weight: bold;
+        }
+        .btn-custom {
+            background-color: #ff9966;
+            color: white;
+            border-radius: 50px;
+            padding: 10px 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .btn-custom:hover {
+            background-color: #ff5e62;
+            transform: translateY(-2px);
+        }
+        .form-container {
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 40px;
+        }
+        .form-container h2 {
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+
+    </style>
 </head>
 <body>
 <div class="container">
     <div layout:fragment="content">
-        <h2>Inscription</h2>
-        <div th:if="${message}" class="alert alert-danger text-center">
-            [[${message}]]
-        </div>
-        <form th:action="@{/user/signup}" method="post" th:object="${user}" style="max-width: 700px; margin: 0 auto;">
+        <form th:action="@{/user/signup}" method="post" th:object="${user}" class="form-container"
+              style="max-width: 700px; margin: 0 auto;">
             <input type="hidden" th:field="*{id}">
+            <h2 class="title-custom"><i class="fas fa-user-plus"></i> <span
+                    th:text="#{signup.page.title}">Inscription</span></h2>
+            <div th:if="${message}" class="alert alert-danger text-center">
+                [[${message}]]
+            </div>
             <div class="border border-secondary rounded p-3">
                 <div class="form-group row">
-                    <label class="col-sm-4 col-form-label">Nom :</label>
+                    <label class="col-sm-4 col-form-label form-label-custom" th:text="#{signup.page.nom}">Nom :</label>
                     <div class="col-sm-8">
-                        <input type="text" th:field="*{nom}" class="form-control" required minlength="2" maxlength="60" />
+                        <input type="text" th:field="*{nom}" class="form-control" required minlength="2"
+                               maxlength="60"/>
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label class="col-sm-4 col-form-label">Prénom :</label>
+                    <label class="col-sm-4 col-form-label form-label-custom" th:text="#{signup.page.prenom}">Prénom
+                        :</label>
                     <div class="col-sm-8">
-                        <input type="text" th:field="*{prenom}" class="form-control" required minlength="4" maxlength="60" />
+                        <input type="text" th:field="*{prenom}" class="form-control" required minlength="4"
+                               maxlength="60"/>
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label class="col-sm-4 col-form-label">Email :</label>
+                    <label class="col-sm-4 col-form-label form-label-custom" th:text="#{signup.page.email}">Email
+                        :</label>
                     <div class="col-sm-8">
-                        <input type="email" th:field="*{email}" class="form-control" required minlength="2" maxlength="100" />
+                        <input type="email" th:field="*{email}" class="form-control" required minlength="2"
+                               maxlength="100"/>
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label class="col-sm-4 col-form-label">Password :</label>
+                    <label class="col-sm-4 col-form-label form-label-custom" th:text="#{signup.page.password}">Mot de
+                        passe :</label>
                     <div class="col-sm-8">
-                        <input type="password" class="form-control" required minlength="2" maxlength="255" id="password" name="password" autocomplete="current-password">
+                        <input type="password" class="form-control" required minlength="2" maxlength="255" id="password"
+                               name="password" autocomplete="current-password">
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label for="sexe" class="col-sm-4 col-form-label">Sexe :</label>
+                    <label for="sexe" class="col-sm-4 col-form-label form-label-custom" th:text="#{signup.page.sexe}">Sexe
+                        :</label>
                     <div class="col-sm-8">
-                        <select  class="form-control selectpicker" th:field="*{sexe}" id="sexe" required  multiple style="width:auto;">
+                        <select class="form-control selectpicker" th:field="*{sexe}" id="sexe" required multiple
+                                style="width:auto;">
                             <option th:each="sexe : ${T(be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.Sexe).values()}"
                                     th:value="${sexe}"
-                                    th:text="${sexe}">Sexe :
-                            </option>
+                                    th:text="${sexe}"></option>
                         </select>
                     </div>
                 </div>
-                <div class="text-center ">
-                    <button type="submit" class="btn btn-primary m-2">Sign Up</button>
-                    <button type="button" class="btn btn-secondary m2" onclick="cancelForm();">Cancel</button>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-custom m-2" th:text="#{signup.page.submit}"></button>
+                    <button type="button" class="btn btn-secondary m-2" onclick="cancelForm();"
+                            th:text="#{signup.page.cancel}"></button>
                 </div>
             </div>
         </form>
@@ -70,6 +119,7 @@
     function cancelForm(){
         window.location = "[[@{/}]]";
     }
+
 </script>
 </body>
 </html>

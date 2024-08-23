@@ -5,7 +5,7 @@
       layout:decorate="~{layouts/main}">
 <head>
     <meta charset="UTF-8">
-    <title>Page index</title>
+    <title th:text="#{indexProduit.page.title.index}">Page index produit</title>
     <!-- Bootstrap 5 CSS depuis unpkg CDN -->
     <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -15,11 +15,11 @@
     <!-- Bootstrap Bundle JS (inclut Popper) depuis unpkg CDN -->
     <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Votre script personnalisé -->
-    <link rel="icon"  href="src/main/resources/static/js/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="src/main/resources/static/js/favicon.ico" type="image/x-icon">
     <script src="/js/script.js"></script>
     <!-- Balises meta pour le jeton CSRF -->
-    <meta name="_csrf.parameterName" th:content="${_csrf.parameterName}" />
-    <meta name="_csrf.token" th:content="${_csrf.token}" />
+    <meta name="_csrf.parameterName" th:content="${_csrf.parameterName}"/>
+    <meta name="_csrf.token" th:content="${_csrf.token}"/>
     <style>
         .fieldError, .rating label { color: red; }
         .product-card {
@@ -249,6 +249,56 @@
             margin-bottom: 20px;
         }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     </style>
 </head>
 <body>
@@ -266,7 +316,8 @@
                             <!-- Champ de recherche aligné à gauche -->
                             <div class="col-md-4 d-flex align-items-center" style="width: 400px;">
                                 <i class="fas fa-search me-2" style="color: #ff5e62;"></i>
-                                <input type="text" id="searchQuery" class="form-control rounded-pill shadow-sm" placeholder="Rechercher par ID, mot-clé, ou nom" style="width: 100%;">
+                                <input type="text" id="searchQuery" class="form-control rounded-pill shadow-sm"
+                                       th:placeholder="#{indexProduit.search.placeholder}" style="width: 100%;">
                             </div>
 
                             <!-- Espace vide pour centrer les éléments suivants -->
@@ -277,18 +328,29 @@
                                 <div class="row gy-2">
                                     <div class="col-md-12 d-flex justify-content-end">
                                         <select id="sortPrice" class="form-select rounded-pill shadow-sm me-2">
-                                            <option value="">Trier par prix</option>
-                                            <option value="priceAsc">Prix croissant</option>
-                                            <option value="priceDesc">Prix décroissant</option>
+                                            <option th:text="#{indexProduit.sort.price}">Trier par prix</option>
+                                            <option value="priceAsc" th:text="#{indexProduit.sort.price.asc}">Prix
+                                                croissant
+                                            </option>
+                                            <option value="priceDesc" th:text="#{indexProduit.sort.price.desc}">Prix
+                                                décroissant
+                                            </option>
                                         </select>
                                         <select id="sortDate" class="form-select rounded-pill shadow-sm me-2">
-                                            <option value="">Trier par date</option>
-                                            <option value="dateAsc">Date croissante</option>
-                                            <option value="dateDesc">Date décroissante</option>
+                                            <option th:text="#{indexProduit.sort.date}">Trier par date</option>
+                                            <option value="dateAsc" th:text="#{indexProduit.sort.date.asc}">Date
+                                                croissante
+                                            </option>
+                                            <option value="dateDesc" th:text="#{indexProduit.sort.date.desc}">
+                                                Date décroissante
+                                            </option>
                                         </select>
                                         <select id="filterCategorie" class="form-select rounded-pill shadow-sm">
-                                            <option value="">Filtrer par catégorie</option>
-                                            <option th:each="categorie : ${catList}" th:value="${categorie.id}" th:text="${categorie.nom}"></option>
+                                            <option value="" th:text="#{indexProduit.filter.categorie}">
+                                                Filtrer par catégorie
+                                            </option>
+                                            <option th:each="categorie : ${catList}" th:value="${categorie.id}"
+                                                    th:text="${categorie.nom}"></option>
                                         </select>
                                     </div>
                                 </div>
@@ -297,11 +359,14 @@
 
                         <input type="hidden" th:value="${panier.id}" name="panierId" id="panierId">
                         <div class="row justify-content-center g-3" id="liste-produits">
-                            <div th:each="produit : ${listProducts}" class="col-12 col-sm-6 col-md-6 col-lg-4"> <!-- Augmente la largeur des cartes -->
+                            <div th:each="produit : ${listProducts}" class="col-12 col-sm-6 col-md-6 col-lg-4">
+                                <!-- Augmente la largeur des cartes -->
                                 <div class="card product-card">
-                                    <input type="hidden" th:value="${produit.id}" th:id="'produitId-' + ${produit.id}" name="produitId">
+                                    <input type="hidden" th:value="${produit.id}" th:id="'produitId-' + ${produit.id}"
+                                           name="produitId">
 
-                                    <img class="card-img-top product-image" th:src="@{${'/display?id=' + produit.id}}" alt="Image du produit">
+                                    <img class="card-img-top product-image" th:src="@{${'/display?id=' + produit.id}}"
+                                         alt="Image du produit">
                                     <div class="card-body product-details" style="padding-bottom:0;padding-top:0;">
                                         <h2 class="product-title" th:text="${produit.nom}"></h2>
                                         <div class="rating-container">
@@ -326,19 +391,29 @@
                                             <div class="input-group input-spinner">
                                                 <div style="display: flex;">
                                                     <input type="hidden" th:value="${produit.quantite}">
-                                                    <input style="width: 80px; margin: 0;" type="number" step="1" min="1" th:max="${produit.quantite}" value="1"
-                                                           th:id="'quantite-' + ${produit.id}" name="quantite" th:attr="data-productId=${produit.id}"
-                                                           class="form-control form-control-sm form-input text-center" >
+                                                    <input style="width: 80px; margin: 0;" type="number" step="1"
+                                                           min="1" th:max="${produit.quantite}" value="1"
+                                                           th:id="'quantite-' + ${produit.id}" name="quantite"
+                                                           th:attr="data-productId=${produit.id}"
+                                                           class="form-control form-control-sm form-input text-center">
                                                 </div>
                                             </div>
                                             <div>
-                                                <button id="favorite-btn-${produit.id}" class="favorite-btn btn btn-outline-danger" title="Ajouter aux favoris" data-product-id="${produit.id}" style="border-radius: 50%;">
+                                                <button id="favorite-btn-${produit.id}"
+                                                        class="favorite-btn btn btn-outline-danger"
+                                                        th:title="#{indexProduit.button.addToFavorites}"
+                                                        data-product-id="${produit.id}"
+                                                        style="border-radius: 50%;">
+
                                                     <i class="far fa-heart"></i>
                                                     <i class="fas fa-heart" style="display: none;"></i>
                                                 </button>
                                             </div>
                                         </div>
-                                        <button class="btn btn-success" th:onclick="'addToCart(' + ${produit.id} + ')'" ><i class="bi bi-cart-plus"></i> Ajouter au panier</button>
+                                        <button class="btn btn-success" th:onclick="'addToCart(' + ${produit.id} + ')'">
+                                            <span th:text="#{indexProduit.button.addToCart}"
+                                                  style="color: #fff;"><i class="bi bi-cart-plus"></i> Ajouter au panier</span>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -349,15 +424,19 @@
                             <nav aria-label="Page navigation" class="mx-auto">
                                 <ul class="pagination">
                                     <li class="page-item" th:class="${currentPage == 0 ? 'disabled' : ''}">
-                                        <a class="page-link" th:href="@{/api/all/produits?page=${currentPage - 1}}" aria-label="Previous">
+                                        <a class="page-link" th:href="@{/api/all/produits?page=${currentPage - 1}}"
+                                           aria-label="Previous">
                                             <span aria-hidden="true">&laquo;</span>
                                         </a>
                                     </li>
-                                    <li th:each="pageNumber : ${#numbers.sequence(0, totalPages - 1)}" class="page-item" th:class="${pageNumber == currentPage ? 'active' : ''}">
-                                        <a class="page-link" th:href="@{/api/all/produits?page=${pageNumber}}">[[${pageNumber + 1}]]</a>
+                                    <li th:each="pageNumber : ${#numbers.sequence(0, totalPages - 1)}" class="page-item"
+                                        th:class="${pageNumber == currentPage ? 'active' : ''}">
+                                        <a class="page-link" th:href="@{/api/all/produits?page=${pageNumber}}">[[${pageNumber
+                                            + 1}]]</a>
                                     </li>
                                     <li class="page-item" th:class="${currentPage + 1 == totalPages ? 'disabled' : ''}">
-                                        <a class="page-link" th:href="@{/api/all/produits/?page=${currentPage + 1}}" aria-label="Next">
+                                        <a class="page-link" th:href="@{/api/all/produits/?page=${currentPage + 1}}"
+                                           aria-label="Next">
                                             <span aria-hidden="true">&raquo;</span>
                                         </a>
                                     </li>
@@ -369,13 +448,18 @@
                         <div layout:fragment="panier">
                             <!-- Panier -->
                             <div class="mt-5 p-4 bg-light shadow-sm rounded">
-                                <h2 class="bg-gradient p-3 rounded"><i class="fas fa-shopping-cart"></i> Mon panier</h2>
+                                <input hidden th:value="${panier.id}" name="idPanier">
+                                <h2 class="bg-gradient p-3 rounded">
+                                    <i class="fas fa-shopping-cart"></i>
+                                    <span th:text="#{panier.title}"></span>
+                                </h2>
                                 <!-- Bloc conditionnel si le panier contient des lignes de commande -->
                                 <div th:if="${not #lists.isEmpty(panier.lignesDeCommande)}">
                                     <!-- Formulaire pour vider le panier -->
                                     <form th:action="@{/viderPanier}" method="post" class="mb-3">
                                         <input type="hidden" th:value="${panier.id}" name="idPanier">
-                                        <button type="submit" class="btn btn-danger btn-sm btn-custom">
+                                        <button type="submit" class="btn btn-danger btn-sm btn-custom"
+                                                th:text="#{indexProduit.cart.clear}">
                                             <i class="fas fa-trash-alt"></i> Vider Panier
                                         </button>
                                     </form>
@@ -386,10 +470,14 @@
                                             <h4 hidden th:text="${panier.id}" class="title text-center mb-4"></h4>
                                             <thead class="thead-light">
                                             <tr>
-                                                <th>Nom <i class="fas fa-tag"></i></th>
-                                                <th>Prix <i class="fas fa-euro-sign"></i></th>
-                                                <th>Quantité <i class="fas fa-boxes"></i></th>
-                                                <th>Total <i class="fas fa-equals"></i></th>
+                                                <th th:text="#{indexProduit.cart.name}">Nom <i class="fas fa-tag"></i>
+                                                </th>
+                                                <th th:text="#{indexProduit.cart.price}">Prix <i
+                                                        class="fas fa-euro-sign"></i></th>
+                                                <th th:text="#{indexProduit.cart.quantity}">Quantité <i
+                                                        class="fas fa-boxes"></i></th>
+                                                <th th:text="#{indexProduit.cart.total}">Total <i
+                                                        class="fas fa-equals"></i></th>
                                             </tr>
                                             </thead>
                                             <tbody id="cart-items">
@@ -403,26 +491,28 @@
                                             <tfoot>
                                             <tr class="total text-center">
                                                 <td colspan="4">
-                                                    <strong>Total du panier : <span id="panier-total" th:text="${montantTotalPanier}"></span> €</strong>
+                                                    <strong>Total du panier : <span id="panier-total"
+                                                                                    th:text="${montantTotalPanier}"></span>
+                                                        €</strong>
                                                 </td>
                                             </tr>
                                             </tfoot>
                                         </table>
                                         <button type="submit" class="btn btn-primary btn-block btn-custom">
-                                            <i class="fas fa-check"></i> Confirmer Panier
+                                            <i class="fas fa-check"></i> <span th:text="#{indexProduit.cart.confirm}">Confirmer Panier</span>
                                         </button>
                                     </form>
 
                                     <!-- Lien pour voir le panier -->
                                     <a th:href="@{/panier}" class="btn btn-secondary btn-block btn-custom mt-3">
-                                        <i class="fas fa-eye"></i> Voir/Modifier Panier
+                                        <i class="fas fa-eye"></i> <span th:text="#{indexProduit.cart.view}">Voir/Modifier Panier</span>
                                     </a>
                                 </div>
 
                                 <!-- Bloc conditionnel si le panier est vide -->
-                                <div th:if="${panier.lignesDeCommande.size() == 0}">
-                                    <h4 th:text="${panier.id}" class="title text-center mb-4"></h4>
-                                    <p>Votre panier est vide.</p>
+                                <div th:if="${panier.lignesDeCommande.size() == 0}"
+                                     style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                                    <p th:text="#{indexProduit.cart.empty}">Votre panier est vide.</p>
                                 </div>
                             </div>
                         </div>
@@ -449,7 +539,7 @@
                                     produitsContainer.append(`
                                         <div class="col-12 col-sm-6 col-md-6 col-lg-4">
                                             <div class="card product-card">
-                                                <input type="hidden" th:value="${produit.id}" th:id="'produitId-' + ${produit.id}" name="produitId">
+                                                <input type="hidden" value="${produit.id}" id="produitId-${produit.id}" name="produitId">
                                                 <img class="card-img-top product-image" src="/display?id=${produit.id}" alt="Image du produit">
                                                 <div class="card-body product-details">
                                                     <h2 class="product-title">${produit.nom}</h2>
@@ -465,20 +555,26 @@
                                                     <div class="form-group mb-3" style="display: flex;">
                                                         <div class="input-group input-spinner">
                                                             <div style="display: flex;">
-                                                                <input type="hidden" th:value="${produit.quantite}">
-                                                                <input style="width: 80px; margin: 0;" type="number" step="1" min="1" th:max="${produit.quantite}" value="1"
-                                                                       id="quantite-${produit.id}" name="quantite" th:attr="data-productId=${produit.id}"
-                                                                       class="form-control form-control-sm form-input text-center" >
+                                                                <input type="hidden" value="${produit.quantite}">
+                                                                <input style="width: 80px; margin: 0;" type="number" step="1" min="1" max="${produit.quantite}" value="1"
+                                                                       id="quantite-${produit.id}" name="quantite" data-productId="${produit.id}"
+                                                                       class="form-control form-control-sm form-input text-center">
                                                             </div>
                                                         </div>
-                                                        <!-- Ajoutez un attribut data-product-id au bouton -->
-                                                        <button id="favorite-btn-${produit.id}" class="favorite-btn btn btn-outline-danger" title="Ajouter aux favoris" data-product-id="${produit.id}" style="border-radius: 50%;">
+                                                        <button id="favorite-btn-${produit.id}" class="favorite-btn btn btn-outline-danger"
+                                                                th:title="#{indexProduit.button.addToFavorites}"
+                                                                data-product-id="${produit.id}" style="border-radius: 50%;">
                                                             <i class="far fa-heart"></i>
                                                             <i class="fas fa-heart" style="display: none;"></i>
                                                         </button>
 
                                                     </div>
-                                                    <button class="btn btn-success" onclick="addToCart(${produit.id})"><i class="bi bi-cart-plus"></i> Ajouter au panier</button>
+                                                    <button class="btn btn-success"  onclick="addToCart(${produit.id})">
+                                                        <span th:text="#{indexProduit.button.addToCart}"
+                                                            style="color: #fff;">
+                                                            <i class="bi bi-cart-plus"></i>Ajouter au panier
+                                                        </span>
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -527,6 +623,12 @@
                             $(this).toggleClass('active');
                         });
                     });
+
+
+
+
+
+
                 </script>
             </div>
         </div>

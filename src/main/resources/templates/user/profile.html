@@ -3,17 +3,17 @@
       xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
       layout:decorate="~{layouts/main}">
 <head>
-  <meta charset="UTF-8">
-  <title>Page Membre</title>
-  <!-- Bootstrap 5 CSS depuis unpkg CDN -->
-  <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
-  <!-- jQuery -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <!-- Bootstrap Bundle JS (inclut Popper) depuis unpkg CDN -->
-  <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <style>
+    <meta charset="UTF-8">
+    <title>Page Membre</title>
+    <!-- Bootstrap 5 CSS depuis unpkg CDN -->
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Bootstrap Bundle JS (inclut Popper) depuis unpkg CDN -->
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
     body {
        padding: 20px;
         transition: margin-left 0.3s;
@@ -172,110 +172,153 @@
     .btn-refresh:hover {
         color: rgb(255, 193, 7);
     }
-  </style>
+
+
+
+
+
+    </style>
 </head>
 <body>
 <div class="container-fluid">
-  <div layout:fragment="content" class="row content">
-    <div class="col-12 col-md-4 col-lg-3 sidenav">
-      <a href="javascript:location.reload()" class="btn-refresh">
-        <span class="refresh-text marginL">Replier les sous-menus</span> <i class="fas fa-sync-alt" style="color: rgb(255, 193, 7);"></i>
-      </a>
-      <a class="collapsed" data-bs-toggle="collapse" href="#profileSubmenu" role="button" aria-expanded="false" aria-controls="profileSubmenu">
-        <i class="fas fa-user-circle"></i> Profile : <span th:text="${user.nom} + ' ' + ${user.prenom}"></span>
-        <span class="submenu-icon fas fa-caret-right"></span>
-      </a>
-      <div class="collapse marginR" id="profileSubmenu">
-        <a th:href="@{'/user/' + ${user.id} + '/profile/edit'}" style="font-size: 16px;"><i class="fas fa-user-edit"></i> Modifier profil</a>
-        <a th:href="@{'/user/' + ${user.id} + '/adresse/edit'}" style="font-size: 16px;"><i class="fas fa-address-card"></i> Modifier adresse</a>
-      </div>
-
-      <a th:href="@{/commandes}"><i class="fas fa-shopping-cart"></i> Mes commandes</a>
-      <a th:href="@{/user/favoris}"><i class="fas fa-heart"></i> Mes produits favoris</a>
-
-      <a class="collapsed" data-bs-toggle="collapse" href="#employeeSubmenu" role="button" aria-expanded="false" aria-controls="employeeSubmenu">
-        <i class="fas fa-briefcase"></i> Employé <span class="submenu-icon fas fa-caret-right"></span>
-      </a>
-      <div class="collapse marginR" id="employeeSubmenu">
-        <a th:href="@{/employe/commandes}"style="font-size: 16px;"><i class="fas fa-list"></i> Liste des commandes</a>
-        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#statSubmenu" role="button" aria-expanded="false" aria-controls="statSubmenu">
-          <i class="fas fa-chart-line"></i> Statistiques <span class="submenu-icon fas fa-caret-right"></span>
-        </a>
-        <div class="collapse marginR" id="statSubmenu">
-          <a href="#" style="font-size: 14px;"><i class="fas fa-chart-bar"></i> Ventes</a>
-          <a href="#" style="font-size: 14px;"><i class="fas fa-chart-pie"></i> Répartition des produits</a>
-        </div>
-      </div>
-
-      <a class="collapsed" data-bs-toggle="collapse" href="#adminSubmenu" role="button" aria-expanded="false" aria-controls="adminSubmenu">
-        <i class="fas fa-cog"></i> Admin <span class="submenu-icon fas fa-caret-right"></span>
-      </a>
-      <div class="collapse marginR" id="adminSubmenu">
-        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#stockSubmenu" role="button" aria-expanded="false" aria-controls="stockSubmenu">
-          <i class="fas fa-box"></i> Gestion stock <span class="submenu-icon fas fa-caret-right"></span>
-        </a>
-        <div class="collapse marginR" id="stockSubmenu">
-          <a th:href="@{/admin/produits}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des produits</a>
-          <a th:href="@{/produit/create}" style="font-size: 14px;"><i class="fas fa-plus-square"></i> Ajouter un produit</a>
-        </div>
-        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#userManagementSubmenu" role="button" aria-expanded="false" aria-controls="userManagementSubmenu">
-          <i class="fas fa-users"></i> Gestion utilisateurs <span class="submenu-icon fas fa-caret-right"></span>
-        </a>
-        <div class="collapse marginR" id="userManagementSubmenu">
-          <a th:href="@{/admin/users}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des utilisateurs</a>
-          <a th:href="@{/admin/add_new_user}"  style="font-size: 14px;"><i class="fas fa-user-plus"></i> Ajouter un utilisateur</a>
-        </div>
-      </div>
-    </div>
-    <div class="col-12 col-md-8 col-lg-9 main-content">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Page profil</h5>
-          <h6 class="card-subtitle mb-2 text-muted" th:text="${user.nom} + ' ' + ${user.prenom}"></h6>
-          <p class="card-text"><strong>Nom:</strong> <span th:text="${user.nom}"></span></p>
-          <p class="card-text"><strong>Prénom:</strong> <span th:text="${user.prenom}"></span></p>
-          <p class="card-text"><strong>Email:</strong> <span th:text="${user.email}"></span></p>
-          <p class="card-text"><strong>Sexe:</strong> <span th:text="${user.sexe}"></span></p>
-          <p class="card-text"><strong>Téléphone:</strong>
-            <span th:if="${user.telephone != null}" th:text="${user.telephone}"></span>
-            <span th:if="${user.telephone == null}">Pas de numéro enregistré</span>
-          </p>
-          <p class="card-text"><strong>Date inscription:</strong> <span th:text="${formattedDateCreation}"></span></p>
-          <p class="card-text"><strong>Rôles:</strong>
-            <span th:each="role : ${user.roles}" th:text="${role.nom} + ' '"></span>
-          </p>
-          <div class="address-section">
-            <h6><strong>Adresse:</strong></h6>
-            <span th:if="${adresse == null}">Aucune adresse enregistrée</span>
-            <div th:if="${adresse != null}">
-              <div class="card address-card">
-                <div class="card-body">
-                  <div class="address-detail">
-                    <p><strong>Rue:</strong> <span th:text="${adresse.rue}" th:if="${adresse.rue != null}"></span></p>
-                    <p><strong>Numéro:</strong> <span th:text="${adresse.numero}" th:if="${adresse.numero != null}"></span></p>
-                    <p><strong>Localité:</strong> <span th:text="${adresse.localite}" th:if="${adresse.localite != null}"></span></p>
-                    <p><strong>Code Postal:</strong> <span th:text="${adresse.codePostal}" th:if="${adresse.codePostal != null}"></span></p>
-                    <p><strong>Ville:</strong> <span th:text="${adresse.ville}" th:if="${adresse.ville != null}"></span></p>
-                    <p><strong>Pays:</strong> <span th:text="${adresse.pays}" th:if="${adresse.pays != null}"></span></p>
-                    <p th:if="${adresse.departement != null}"><strong>Département:</strong> <span th:text="${adresse.departement}"></span></p>
-                  </div>
-                </div>
-              </div>
+    <div layout:fragment="content" class="row content">
+        <div class="col-12 col-md-4 col-lg-3 sidenav">
+            <a href="javascript:location.reload()" class="btn-refresh">
+                <span class="refresh-text marginL">Replier les sous-menus</span> <i class="fas fa-sync-alt"
+                                                                                    style="color: rgb(255, 193, 7);"></i>
+            </a>
+            <a class="collapsed" data-bs-toggle="collapse" href="#profileSubmenu" role="button" aria-expanded="false"
+               aria-controls="profileSubmenu">
+                <i class="fas fa-user-circle"></i> Profile : <span th:text="${user.nom} + ' ' + ${user.prenom}"></span>
+                <span class="submenu-icon fas fa-caret-right"></span>
+            </a>
+            <div class="collapse marginR" id="profileSubmenu">
+                <a th:href="@{'/user/' + ${user.id} + '/profile/edit'}" style="font-size: 16px;"><i
+                        class="fas fa-user-edit"></i> Modifier profil</a>
+                <a th:href="@{'/user/' + ${user.id} + '/adresse/edit'}" style="font-size: 16px;"><i
+                        class="fas fa-address-card"></i> Modifier adresse</a>
             </div>
-          </div>
-          <div>
-            <a class="btn btn-outline-warning" th:href="@{'/user/' + ${user.id} + '/profile/edit'}">Modifier profil</a>
-            <a class="btn btn-outline-primary" th:href="@{'/user/' + ${user.id} + '/adresse/edit'}">Modifier adresse</a>
-          </div>
+
+            <a th:href="@{/commandes}"><i class="fas fa-shopping-cart"></i> Mes commandes</a>
+            <a th:href="@{/user/favoris}"><i class="fas fa-heart"></i> Mes produits favoris</a>
+
+            <a class="collapsed" data-bs-toggle="collapse" href="#employeeSubmenu" role="button" aria-expanded="false"
+               aria-controls="employeeSubmenu">
+                <i class="fas fa-briefcase"></i> Employé <span class="submenu-icon fas fa-caret-right"></span>
+            </a>
+            <div class="collapse marginR" id="employeeSubmenu">
+                <a th:href="@{/employe/commandes}" style="font-size: 16px;"><i class="fas fa-list"></i> Liste des
+                    commandes</a>
+                <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#statSubmenu"
+                   role="button" aria-expanded="false" aria-controls="statSubmenu">
+                    <i class="fas fa-chart-line"></i> Statistiques <span class="submenu-icon fas fa-caret-right"></span>
+                </a>
+                <div class="collapse marginR" id="statSubmenu">
+                    <a href="#" style="font-size: 14px;"><i class="fas fa-chart-bar"></i> Ventes</a>
+                    <a href="#" style="font-size: 14px;"><i class="fas fa-chart-pie"></i> Répartition des produits</a>
+                </div>
+            </div>
+
+            <a class="collapsed" data-bs-toggle="collapse" href="#adminSubmenu" role="button" aria-expanded="false"
+               aria-controls="adminSubmenu">
+                <i class="fas fa-cog"></i> Admin <span class="submenu-icon fas fa-caret-right"></span>
+            </a>
+            <div class="collapse marginR" id="adminSubmenu">
+                <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#stockSubmenu"
+                   role="button" aria-expanded="false" aria-controls="stockSubmenu">
+                    <i class="fas fa-box"></i> Gestion stock <span class="submenu-icon fas fa-caret-right"></span>
+                </a>
+                <div class="collapse marginR" id="stockSubmenu">
+                    <a th:href="@{/admin/produits}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des
+                        produits</a>
+                    <a th:href="@{/produit/create}" style="font-size: 14px;"><i class="fas fa-plus-square"></i> Ajouter
+                        un produit</a>
+                </div>
+                <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#userManagementSubmenu"
+                   role="button" aria-expanded="false" aria-controls="userManagementSubmenu">
+                    <i class="fas fa-users"></i> Gestion utilisateurs <span
+                        class="submenu-icon fas fa-caret-right"></span>
+                </a>
+                <div class="collapse marginR" id="userManagementSubmenu">
+                    <a th:href="@{/admin/users}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des
+                        utilisateurs</a>
+                    <a th:href="@{/admin/add_new_user}" style="font-size: 14px;"><i class="fas fa-user-plus"></i>
+                        Ajouter un utilisateur</a>
+                </div>
+            </div>
         </div>
-      </div>
+        <div class="col-12 col-md-8 col-lg-9 main-content">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="#{profil.page.titre}">Page profil</h5>
+                    <h6 class="card-subtitle mb-2 text-muted" th:text="${user.nom} + ' ' + ${user.prenom}"></h6>
+                    <p class="card-text"><strong th:text="#{profil.nom}">Nom:</strong> <span
+                            th:text="${user.nom}"></span></p>
+                    <p class="card-text"><strong th:text="#{profil.prenom}">Prénom:</strong> <span
+                            th:text="${user.prenom}"></span></p>
+                    <p class="card-text"><strong th:text="#{profil.email}">Email:</strong> <span
+                            th:text="${user.email}"></span></p>
+                    <p class="card-text"><strong th:text="#{profil.sexe}">Sexe:</strong> <span
+                            th:text="${user.sexe}"></span></p>
+                    <p class="card-text"><strong th:text="#{profil.telephone}">Téléphone:</strong>
+                        <span th:if="${user.telephone != null}" th:text="${user.telephone}"></span>
+                        <span th:if="${user.telephone == null}" th:text="#{profil.pasDeTelephone}">Pas de numéro enregistré</span>
+                    </p>
+                    <p class="card-text"><strong th:text="#{profil.dateInscription}">Date d'inscription:</strong> <span
+                            th:text="${formattedDateCreation}"></span></p>
+                    <p class="card-text"><strong th:text="#{profil.roles}">Rôles:</strong>
+                        <span th:each="role : ${user.roles}" th:text="${role.nom} + ' '"></span>
+                    </p>
+                    <div class="address-section">
+                        <h6><strong th:text="#{profil.adresse}">Adresse:</strong></h6>
+                        <span th:if="${adresse == null}"
+                              th:text="#{profil.aucuneAdresse}">Aucune adresse enregistrée</span>
+                        <div th:if="${adresse != null}">
+                            <div class="card address-card">
+                                <div class="card-body">
+                                    <div class="address-detail">
+                                        <p><strong th:text="#{profil.rue}">Rue:</strong> <span th:text="${adresse.rue}"
+                                                                                               th:if="${adresse.rue != null}"></span>
+                                        </p>
+                                        <p><strong th:text="#{profil.numero}">Numéro:</strong> <span
+                                                th:text="${adresse.numero}" th:if="${adresse.numero != null}"></span>
+                                        </p>
+                                        <p><strong th:text="#{profil.localite}">Localité:</strong> <span
+                                                th:text="${adresse.localite}"
+                                                th:if="${adresse.localite != null}"></span></p>
+                                        <p><strong th:text="#{profil.codePostal}">Code Postal:</strong> <span
+                                                th:text="${adresse.codePostal}"
+                                                th:if="${adresse.codePostal != null}"></span></p>
+                                        <p><strong th:text="#{profil.ville}">Ville:</strong> <span
+                                                th:text="${adresse.ville}" th:if="${adresse.ville != null}"></span></p>
+                                        <p><strong th:text="#{profil.pays}">Pays:</strong> <span
+                                                th:text="${adresse.pays}" th:if="${adresse.pays != null}"></span></p>
+                                        <p th:if="${adresse.departement != ''}"><strong
+                                                th:text="#{profil.departement}">Département:</strong> <span
+                                                th:text="${adresse.departement}"></span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <a class="btn btn-outline-warning" th:href="@{'/user/' + ${user.id} + '/profile/edit'}">
+                            <i class="fas fa-user-edit"></i>
+                            <span th:text="#{profil.modifierProfil}">Modifier profil</span>
+                        </a>
+                        <a class="btn btn-outline-primary" th:href="@{'/user/' + ${user.id} + '/adresse/edit'}">
+                            <i class="fas fa-address-card"></i> <span th:text="#{profil.modifierAdresse}">Modifier adresse</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 <!-- Footer -->
 <div class="page-footer">
-  <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/footer :: footer}"></div>
 </div>
 <!-- jQuery (Nécessaire avant les scripts Bootstrap) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>

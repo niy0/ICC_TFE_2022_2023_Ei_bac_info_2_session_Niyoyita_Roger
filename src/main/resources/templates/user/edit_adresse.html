@@ -3,17 +3,17 @@
       xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
       layout:decorate="~{layouts/main}">
 <head>
-  <meta charset="UTF-8">
-  <title>Modifier l'adresse</title>
-  <!-- Bootstrap 5 CSS depuis unpkg CDN -->
-  <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
-  <!-- jQuery -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <!-- Bootstrap Bundle JS (inclut Popper) depuis unpkg CDN -->
-  <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <style>
+    <meta charset="UTF-8">
+    <title>Modifier l'adresse</title>
+    <!-- Bootstrap 5 CSS depuis unpkg CDN -->
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Bootstrap Bundle JS (inclut Popper) depuis unpkg CDN -->
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
     body {
         background-color: #f0f2f5;
     }
@@ -154,110 +154,140 @@
       color: #343a40;
     }
 
-  </style>
+
+
+
+    </style>
 </head>
 <body>
 <div class="container-fluid">
-  <div layout:fragment="content" class="row content">
-    <div class="col-12 col-md-4 col-lg-3 sidenav">
-      <a href="javascript:location.reload()" class="btn-refresh">
-        <span class="refresh-text marginL">Replier les sous-menus</span> <i class="fas fa-sync-alt" style="color: rgb(255, 193, 7);"></i>
-      </a>
-      <a class="collapsed" data-bs-toggle="collapse" href="#profileSubmenu" role="button" aria-expanded="false" aria-controls="profileSubmenu">
-        <i class="fas fa-user-circle"></i> Profile : <span th:text="${user.nom} + ' ' + ${user.prenom}"></span>
-        <span class="submenu-icon fas fa-caret-right"></span>
-      </a>
-      <div class="collapse marginR" id="profileSubmenu">
-        <a th:href="@{'/user/' + ${user.id} + '/profile/edit'}" style="font-size: 16px;"><i class="fas fa-user-edit"></i> Modifier profil</a>
-        <a th:href="@{'/user/' + ${user.id} + '/adresse/edit'}" style="font-size: 16px;"><i class="fas fa-address-card"></i> Modifier adresse</a>
-      </div>
+    <div layout:fragment="content" class="row content">
+        <div class="col-12 col-md-4 col-lg-3 sidenav">
+            <a href="javascript:location.reload()" class="btn-refresh">
+                <span class="refresh-text marginL">Replier les sous-menus</span> <i class="fas fa-sync-alt"
+                                                                                    style="color: rgb(255, 193, 7);"></i>
+            </a>
+            <a class="collapsed" data-bs-toggle="collapse" href="#profileSubmenu" role="button" aria-expanded="false"
+               aria-controls="profileSubmenu">
+                <i class="fas fa-user-circle"></i> Profile : <span th:text="${user.nom} + ' ' + ${user.prenom}"></span>
+                <span class="submenu-icon fas fa-caret-right"></span>
+            </a>
+            <div class="collapse marginR" id="profileSubmenu">
+                <a th:href="@{'/user/' + ${user.id} + '/profile/edit'}" style="font-size: 16px;"><i
+                        class="fas fa-user-edit"></i> Modifier profil</a>
+                <a th:href="@{'/user/' + ${user.id} + '/adresse/edit'}" style="font-size: 16px;"><i
+                        class="fas fa-address-card"></i> Modifier adresse</a>
+            </div>
 
-      <a th:href="@{/commandes}"><i class="fas fa-shopping-cart"></i> Mes commandes</a>
-      <a th:href="@{/user/favoris}"><i class="fas fa-heart"></i> Mes produits favoris</a>
+            <a th:href="@{/commandes}"><i class="fas fa-shopping-cart"></i> Mes commandes</a>
+            <a th:href="@{/user/favoris}"><i class="fas fa-heart"></i> Mes produits favoris</a>
 
-      <a class="collapsed" data-bs-toggle="collapse" href="#employeeSubmenu" role="button" aria-expanded="false" aria-controls="employeeSubmenu">
-        <i class="fas fa-briefcase"></i> Employé <span class="submenu-icon fas fa-caret-right"></span>
-      </a>
-      <div class="collapse marginR" id="employeeSubmenu">
-        <a href="#" style="font-size: 16px;"><i class="fas fa-list"></i> Liste des commandes</a>
-        <a href="#" style="font-size: 16px;"><i class="fas fa-chart-bar"></i> Commandes à traiter</a>
-        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#statSubmenu" role="button" aria-expanded="false" aria-controls="statSubmenu">
-          <i class="fas fa-chart-line"></i> Statistiques <span class="submenu-icon fas fa-caret-right"></span>
-        </a>
-        <div class="collapse marginR" id="statSubmenu">
-          <a href="#" style="font-size: 14px;"><i class="fas fa-chart-bar"></i> Ventes</a>
-          <a href="#" style="font-size: 14px;"><i class="fas fa-chart-pie"></i> Répartition des produits</a>
-        </div>
-      </div>
+            <a class="collapsed" data-bs-toggle="collapse" href="#employeeSubmenu" role="button" aria-expanded="false"
+               aria-controls="employeeSubmenu">
+                <i class="fas fa-briefcase"></i> Employé <span class="submenu-icon fas fa-caret-right"></span>
+            </a>
+            <div class="collapse marginR" id="employeeSubmenu">
+                <a href="#" style="font-size: 16px;"><i class="fas fa-list"></i> Liste des commandes</a>
+                <a href="#" style="font-size: 16px;"><i class="fas fa-chart-bar"></i> Commandes à traiter</a>
+                <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#statSubmenu"
+                   role="button" aria-expanded="false" aria-controls="statSubmenu">
+                    <i class="fas fa-chart-line"></i> Statistiques <span class="submenu-icon fas fa-caret-right"></span>
+                </a>
+                <div class="collapse marginR" id="statSubmenu">
+                    <a href="#" style="font-size: 14px;"><i class="fas fa-chart-bar"></i> Ventes</a>
+                    <a href="#" style="font-size: 14px;"><i class="fas fa-chart-pie"></i> Répartition des produits</a>
+                </div>
+            </div>
 
-      <a class="collapsed" data-bs-toggle="collapse" href="#adminSubmenu" role="button" aria-expanded="false" aria-controls="adminSubmenu">
-        <i class="fas fa-cog"></i> Admin <span class="submenu-icon fas fa-caret-right"></span>
-      </a>
-      <div class="collapse marginR" id="adminSubmenu">
-        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#stockSubmenu" role="button" aria-expanded="false" aria-controls="stockSubmenu">
-          <i class="fas fa-box"></i> Gestion stock <span class="submenu-icon fas fa-caret-right"></span>
-        </a>
-        <div class="collapse marginR" id="stockSubmenu">
-          <a th:href="@{/admin/produits}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des produits</a>
-          <a th:href="@{/produit/create}" style="font-size: 14px;"><i class="fas fa-plus-square"></i> Ajouter un produit</a>
+            <a class="collapsed" data-bs-toggle="collapse" href="#adminSubmenu" role="button" aria-expanded="false"
+               aria-controls="adminSubmenu">
+                <i class="fas fa-cog"></i> Admin <span class="submenu-icon fas fa-caret-right"></span>
+            </a>
+            <div class="collapse marginR" id="adminSubmenu">
+                <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#stockSubmenu"
+                   role="button" aria-expanded="false" aria-controls="stockSubmenu">
+                    <i class="fas fa-box"></i> Gestion stock <span class="submenu-icon fas fa-caret-right"></span>
+                </a>
+                <div class="collapse marginR" id="stockSubmenu">
+                    <a th:href="@{/admin/produits}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des
+                        produits</a>
+                    <a th:href="@{/produit/create}" style="font-size: 14px;"><i class="fas fa-plus-square"></i> Ajouter
+                        un produit</a>
+                </div>
+                <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#userManagementSubmenu"
+                   role="button" aria-expanded="false" aria-controls="userManagementSubmenu">
+                    <i class="fas fa-users"></i> Gestion utilisateurs <span
+                        class="submenu-icon fas fa-caret-right"></span>
+                </a>
+                <div class="collapse marginR" id="userManagementSubmenu">
+                    <a th:href="@{/admin/users}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des
+                        utilisateurs</a>
+                    <a th:href="@{/admin/add_new_user}" style="font-size: 14px;"><i class="fas fa-user-plus"></i>
+                        Ajouter un utilisateur</a>
+                </div>
+            </div>
         </div>
-        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#userManagementSubmenu" role="button" aria-expanded="false" aria-controls="userManagementSubmenu">
-          <i class="fas fa-users"></i> Gestion utilisateurs <span class="submenu-icon fas fa-caret-right"></span>
-        </a>
-        <div class="collapse marginR" id="userManagementSubmenu">
-          <a th:href="@{/admin/users}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des utilisateurs</a>
-          <a th:href="@{/admin/add_new_user}"   style="font-size: 14px;"><i class="fas fa-user-plus"></i> Ajouter un utilisateur</a>
+        <div class="col-12 col-md-8 col-lg-9 main-content">
+            <h1 class="title" th:text="#{edit.page.adresse.title}">Modifier l'adresse</h1>
+            <div class="card mt-5">
+                <div class="card-body">
+                    <h5 class="card-title" hidden th:text="#{edit.page.adresse.title}">Modifier l'adresse</h5>
+                    <form th:action="@{'/user/' + ${user.id} + '/adresse/save'}" method="post">
+                        <div class="form-group">
+                            <label for="rue" th:text="#{edit.page.adresse.rue}">Rue :</label>
+                            <input type="text" class="form-control" id="rue" name="rue"
+                                   th:value="${adresse != null ? adresse.rue : ''}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="numero" th:text="#{edit.page.adresse.numero}">Numéro :</label>
+                            <input type="text" class="form-control" id="numero" name="numero"
+                                   th:value="${adresse != null ? adresse.numero : ''}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="localite" th:text="#{edit.page.adresse.localite}">Localité :</label>
+                            <input type="text" class="form-control" id="localite" name="localite"
+                                   th:value="${adresse != null ? adresse.localite : ''}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="codePostal" th:text="#{edit.page.adresse.codePostal}">Code Postal :</label>
+                            <input type="text" class="form-control" id="codePostal" name="codePostal"
+                                   th:value="${adresse != null ? adresse.codePostal : ''}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="ville" th:text="#{edit.page.adresse.ville}">Ville :</label>
+                            <input type="text" class="form-control" id="ville" name="ville"
+                                   th:value="${adresse != null ? adresse.ville : ''}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="pays" th:text="#{edit.page.adresse.pays}">Pays :</label>
+                            <input type="text" class="form-control" id="pays" name="pays"
+                                   th:value="${adresse != null ? adresse.pays : ''}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="departement" th:text="#{edit.page.adresse.departement}">Département :</label>
+                            <input type="text" class="form-control" id="departement" name="departement"
+                                   th:value="${adresse != null ? adresse.departement : ''}">
+                        </div>
+
+                        <div>
+                            <button type="submit" class="btn btn-primary mt-3">
+                                <i class="fas fa-save"></i> <span
+                                    th:text="#{edit.page.adresse.enregistrer}">Enregistrer</span>
+                            </button>
+                            <a class="btn btn-outline-warning mt-3" th:href="@{'/user/' + ${user.id}+'/profile'}">
+                                <i class="fas fa-times"></i> <span th:text="#{edit.page.adresse.annuler}">Annuler</span>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-    <div class="col-12 col-md-8 col-lg-9  main-content">
-      <h1 class="title" >Modifier l'adresse</h1>
-      <div class="card mt-5">
-        <div class="card-body">
-          <h5 class="card-title" hidden>Modifier l'adresse</h5>
-          <form th:action="@{'/user/' + ${user.id} + '/adresse/save'}" method="post">
-            <div class="form-group">
-              <label for="rue">Rue :</label>
-              <input type="text" class="form-control" id="rue" name="rue" th:value="${adresse != null ? adresse.rue : ''}" required>
-            </div>
-            <div class="form-group">
-              <label for="numero">Numéro :</label>
-              <input type="text" class="form-control" id="numero" name="numero" th:value="${adresse != null ? adresse.numero : ''}" required>
-            </div>
-            <div class="form-group">
-              <label for="localite">Localité :</label>
-              <input type="text" class="form-control" id="localite" name="localite" th:value="${adresse != null ? adresse.localite : ''}" required>
-            </div>
-            <div class="form-group">
-              <label for="codePostal">Code Postal :</label>
-              <input type="text" class="form-control" id="codePostal" name="codePostal" th:value="${adresse != null ? adresse.codePostal : ''}" required>
-            </div>
-            <div class="form-group">
-              <label for="ville">Ville :</label>
-              <input type="text" class="form-control" id="ville" name="ville" th:value="${adresse != null ? adresse.ville : ''}" required>
-            </div>
-            <div class="form-group">
-              <label for="pays">Pays :</label>
-              <input type="text" class="form-control" id="pays" name="pays" th:value="${adresse != null ? adresse.pays : ''}" required>
-            </div>
-            <div class="form-group">
-              <label for="departement">Département :</label>
-              <input type="text" class="form-control" id="departement" name="departement" th:value="${adresse != null ? adresse.departement : ''}">
-            </div>
-            <button type="submit" class="btn btn-primary mt-3" th:disabled="${adresse == null}"><i class="fas fa-save"></i> Enregistrer</button>
-          </form>
-          <a class="btn btn-outline-warning" th:href="@{'/user/' + ${user.id}+'/profile'}">
-            <i class="fas fa-times"></i> Annuler
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
 
 <!-- Footer -->
 <div class="page-footer">
-  <div th:replace="~{fragments/footer :: footer}"></div>
+    <div th:replace="~{fragments/footer :: footer}"></div>
 </div>
 <!-- jQuery (Nécessaire avant les scripts Bootstrap) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>

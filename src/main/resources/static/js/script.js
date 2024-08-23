@@ -114,7 +114,12 @@ function getProduitActif() {
                                             </button>
                                         </div>
                                     </div>
-                                    <button class="btn btn-success add-to-cart-button" onclick="addToCart(${produit.id})" data-productId="${produit.id}" >Ajouter au panier</button>
+                                    <button class="btn btn-success" onclick="addToCart(${produit.id})">
+                                        <span th:text="#{indexProduit.button.addToCart}" style="color: #fff;">
+                                            <i class="bi bi-cart-plus"></i>
+                                        </span>
+                                    </button>
+
                                 </div>
                             </div>
                             </div>

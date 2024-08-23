@@ -1,17 +1,18 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
 <head>
-  <meta charset="UTF-8">
-  <title>Mes Commandes</title>
-  <!-- Bootstrap 5 CSS depuis unpkg CDN -->
-  <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
-  <!-- jQuery -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <!-- Bootstrap Bundle JS (inclut Popper) depuis unpkg CDN -->
-  <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <style>
+    <meta charset="UTF-8">
+    <title>Mes Commandes</title>
+    <!-- Bootstrap 5 CSS depuis unpkg CDN -->
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Bootstrap Bundle JS (inclut Popper) depuis unpkg CDN -->
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
     body {
       background-color: #f0f2f5;
     }
@@ -167,73 +168,97 @@
         padding-left: 15px;
       }
     }
-  </style>
+
+
+    </style>
 </head>
 <body>
 <div class="container-fluid">
-  <div layout:fragment="content" class="row content">
-    <div class="col-12 col-md-4 col-lg-3  sidenav">
-      <a href="javascript:location.reload()" class="btn-refresh">
-        <span class="refresh-text marginL">Replier les sous-menus</span> <i class="fas fa-sync-alt" style="color: rgb(255, 193, 7);"></i>
-      </a>
-      <a class="collapsed" data-bs-toggle="collapse" href="#profileSubmenu" role="button" aria-expanded="false" aria-controls="profileSubmenu">
-        <i class="fas fa-user-circle"></i> Profile : <span th:text="${user.nom} + ' ' + ${user.prenom}"></span>
-        <span class="submenu-icon fas fa-caret-right"></span>
-      </a>
-      <div class="collapse marginR" id="profileSubmenu">
-        <a th:href="@{'/user/' + ${user.id} + '/profile'}" style="font-size: 16px;"><i class="fas fa-user-circle"></i>Voir profil</a>
-        <a th:href="@{'/user/' + ${user.id} + '/profile/edit'}" style="font-size: 16px;"><i class="fas fa-user-edit"></i> Modifier profil</a>
-        <a th:href="@{'/user/' + ${user.id} + '/adresse/edit'}" style="font-size: 16px;"><i class="fas fa-address-card"></i> Modifier adresse</a>
-      </div>
+    <div layout:fragment="content" class="row content">
+        <div class="col-12 col-md-4 col-lg-3  sidenav">
+            <a href="javascript:location.reload()" class="btn-refresh">
+                <span class="refresh-text marginL">Replier les sous-menus</span> <i class="fas fa-sync-alt"
+                                                                                    style="color: rgb(255, 193, 7);"></i>
+            </a>
+            <a class="collapsed" data-bs-toggle="collapse" href="#profileSubmenu" role="button" aria-expanded="false"
+               aria-controls="profileSubmenu">
+                <i class="fas fa-user-circle"></i> Profile : <span th:text="${user.nom} + ' ' + ${user.prenom}"></span>
+                <span class="submenu-icon fas fa-caret-right"></span>
+            </a>
+            <div class="collapse marginR" id="profileSubmenu">
+                <a th:href="@{'/user/' + ${user.id} + '/profile'}" style="font-size: 16px;"><i
+                        class="fas fa-user-circle"></i>Voir
+                    profil</a>
+                <a th:href="@{'/user/' + ${user.id} + '/profile/edit'}" style="font-size: 16px;"><i
+                        class="fas fa-user-edit"></i> Modifier profil</a>
+                <a th:href="@{'/user/' + ${user.id} + '/adresse/edit'}" style="font-size: 16px;"><i
+                        class="fas fa-address-card"></i> Modifier adresse</a>
+            </div>
 
-      <a th:href="@{/commandes}"><i class="fas fa-shopping-cart"></i> Mes commandes</a>
-      <a th:href="@{/user/favoris}"><i class="fas fa-heart"></i> Mes produits favoris</a>
+            <a th:href="@{/commandes}"><i class="fas fa-shopping-cart"></i> Mes commandes</a>
+            <a th:href="@{/user/favoris}"><i class="fas fa-heart"></i> Mes produits favoris</a>
 
-      <a class="collapsed" data-bs-toggle="collapse" href="#employeeSubmenu" role="button" aria-expanded="false" aria-controls="employeeSubmenu">
-        <i class="fas fa-briefcase"></i> Employé <span class="submenu-icon fas fa-caret-right"></span>
-      </a>
-      <div class="collapse marginR" id="employeeSubmenu">
-        <a th:href="@{/employe/commandes}" style="font-size: 16px;"><i class="fas fa-list"></i> Liste des commandes</a>
-        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#statSubmenu" role="button" aria-expanded="false" aria-controls="statSubmenu">
-          <i class="fas fa-chart-line"></i> Statistiques <span class="submenu-icon fas fa-caret-right"></span>
-        </a>
-        <div class="collapse marginR" id="statSubmenu">
-          <a href="#" style="font-size: 14px;"><i class="fas fa-chart-bar"></i> Ventes</a>
-          <a href="#" style="font-size: 14px;"><i class="fas fa-chart-pie"></i> Répartition des produits</a>
-        </div>
-      </div>
+            <a class="collapsed" data-bs-toggle="collapse" href="#employeeSubmenu" role="button" aria-expanded="false"
+               aria-controls="employeeSubmenu">
+                <i class="fas fa-briefcase"></i> Employé <span class="submenu-icon fas fa-caret-right"></span>
+            </a>
+            <div class="collapse marginR" id="employeeSubmenu">
+                <a th:href="@{/employe/commandes}" style="font-size: 16px;"><i class="fas fa-list"></i> Liste des
+                    commandes</a>
+                <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#statSubmenu"
+                   role="button"
+                   aria-expanded="false" aria-controls="statSubmenu">
+                    <i class="fas fa-chart-line"></i> Statistiques <span class="submenu-icon fas fa-caret-right"></span>
+                </a>
+                <div class="collapse marginR" id="statSubmenu">
+                    <a href="#" style="font-size: 14px;"><i class="fas fa-chart-bar"></i> Ventes</a>
+                    <a href="#" style="font-size: 14px;"><i class="fas fa-chart-pie"></i> Répartition des produits</a>
+                </div>
+            </div>
 
-      <a class="collapsed" data-bs-toggle="collapse" href="#adminSubmenu" role="button" aria-expanded="false" aria-controls="adminSubmenu">
-        <i class="fas fa-cog"></i> Admin <span class="submenu-icon fas fa-caret-right"></span>
-      </a>
-      <div class="collapse marginR" id="adminSubmenu">
-        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#stockSubmenu" role="button" aria-expanded="false" aria-controls="stockSubmenu">
-          <i class="fas fa-box"></i> Gestion stock <span class="submenu-icon fas fa-caret-right"></span>
-        </a>
-        <div class="collapse marginR" id="stockSubmenu">
-          <a th:href="@{/admin/produits}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des produits</a>
-          <a th:href="@{/produit/create}" style="font-size: 14px;"><i class="fas fa-plus-square"></i> Ajouter un produit</a>
+            <a class="collapsed" data-bs-toggle="collapse" href="#adminSubmenu" role="button" aria-expanded="false"
+               aria-controls="adminSubmenu">
+                <i class="fas fa-cog"></i> Admin <span class="submenu-icon fas fa-caret-right"></span>
+            </a>
+            <div class="collapse marginR" id="adminSubmenu">
+                <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#stockSubmenu"
+                   role="button"
+                   aria-expanded="false" aria-controls="stockSubmenu">
+                    <i class="fas fa-box"></i> Gestion stock <span class="submenu-icon fas fa-caret-right"></span>
+                </a>
+                <div class="collapse marginR" id="stockSubmenu">
+                    <a th:href="@{/admin/produits}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des
+                        produits</a>
+                    <a th:href="@{/produit/create}" style="font-size: 14px;"><i class="fas fa-plus-square"></i> Ajouter
+                        un produit</a>
+                </div>
+                <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#userManagementSubmenu"
+                   role="button" aria-expanded="false" aria-controls="userManagementSubmenu">
+                    <i class="fas fa-users"></i> Gestion utilisateurs <span
+                        class="submenu-icon fas fa-caret-right"></span>
+                </a>
+                <div class="collapse marginR" id="userManagementSubmenu">
+                    <a th:href="@{/admin/users}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des
+                        utilisateurs</a>
+                    <a th:href="@{/admin/add_new_user}" style="font-size: 14px;"><i class="fas fa-user-plus"></i>
+                        Ajouter un
+                        utilisateur</a>
+                </div>
+            </div>
         </div>
-        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#userManagementSubmenu" role="button" aria-expanded="false" aria-controls="userManagementSubmenu">
-          <i class="fas fa-users"></i> Gestion utilisateurs <span class="submenu-icon fas fa-caret-right"></span>
-        </a>
-        <div class="collapse marginR" id="userManagementSubmenu">
-          <a th:href="@{/admin/users}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des utilisateurs</a>
-          <a th:href="@{/admin/add_new_user}"   style="font-size: 14px;"><i class="fas fa-user-plus"></i> Ajouter un utilisateur</a>
-        </div>
-      </div>
-    </div>
-    <div class="col-12 col-md-8 col-lg-9 main-content">
-      <div>
-        <h2 class="title"> Mes Commandes</h2>
-        <div th:if="${#lists.isEmpty(commandes.content)}">
-          <p>Vous n'avez pas encore passé de commande.</p>
-        </div>
-        <div th:each="commande : ${commandes.content}" class="order-card">
-          <div class="order-card">
-            <div class="order-header">
-              <div class="order-id">Commande #<span th:text="${commande.id}"></span></div>
-              <div class="order-status" th:classappend="${'status-' + commande.statut.toString().toLowerCase()}">
+        <div class="col-12 col-md-8 col-lg-9 main-content">
+            <div>
+                <h2 class="title" th:text="#{user.command.title}">Mes Commandes</h2>
+                <div th:if="${#lists.isEmpty(commandes.content)}">
+                    <p th:text="#{user.command.noOrders}">Vous n'avez pas encore passé de commande.</p>
+                </div>
+                <div th:each="commande : ${commandes.content}" class="order-card">
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div class="order-id"><span th:text="#{user.command.commande}"></span><span
+                                    th:text="${commande.id}"></span></div>
+                            <div class="order-status"
+                                 th:classappend="${'status-' + commande.statut.toString().toLowerCase()}">
                 <span th:text="${
                   (commande.statut.name() == 'EN_ATTENTE') ? 'En attente' :
                   (commande.statut.name() == 'EN_COURS') ? 'En cours' :
@@ -242,39 +267,31 @@
                   (commande.statut.name() == 'LIVREE') ? 'Livrée' :
                   (commande.statut.name() == 'ANNULEE') ? 'Annulée' :
                   '' }"></span>
-              </div>
+                            </div>
+                        </div>
+                        <div class="order-info">
+                            <div>Date: <span
+                                    th:text="${#dates.format(commande.dateCommande, 'dd/MM/yyyy HH:mm')}"></span></div>
+                            <div>
+                                <span th:text="#{user.command.deliveryMethod}"> </span>
+                                <span th:if="${commande.methodCommande == 'PICKUP'}"
+                                      th:text="#{user.command.method.pickup}"></span>
+                                <span th:if="${commande.methodCommande != 'PICKUP'}"
+                                      th:text="#{user.command.method.delivery}"></span>
+                            </div>
+                            <div class="order-total">Total: <span th:text="${commande.montantCommande} + ' €'"></span>
+                            </div>
+                        </div>
+                        <div class="order-actions">
+                            <a th:href="@{/commande/detail/{id}(id=${commande.id})}" class="btn btn-info">
+                                <i class="fas fa-eye"></i> <span th:text="#{user.command.viewDetails}"></span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="order-info">
-              <div>Date: <span th:text="${#dates.format(commande.dateCommande, 'dd/MM/yyyy HH:mm')}"></span></div>
-              <div>Méthode de livraison : <span th:text="${commande.methodCommande == 'PICKUP' ? 'Récupérer au magasin' : 'Livraison'}"></span></div>
-              <div class="order-total">Total: <span th:text="${commande.montantCommande} + ' €'"></span></div>
-            </div>
-            <div class="order-actions">
-              <a th:href="@{/commande/detail/{id}(id=${commande.id})}" class="btn btn-info">
-                <i class="fas fa-eye"></i> Voir Détails
-              </a>
-            </div>
-          </div>
         </div>
-        <div th:if="${commandes.totalPages > 1}" class="d-flex justify-content-center">
-          <nav aria-label="Page navigation">
-            <ul class="pagination">
-              <li class="page-item" th:classappend="${commandes.hasPrevious() ? '' : 'disabled'}">
-                <a class="page-link" th:href="@{/mes-commandes(page=${commandes.number - 1}, size=${commandes.size})}">Précédent</a>
-              </li>
-              <li class="page-item" th:each="i : ${#numbers.sequence(1, commandes.totalPages)}"
-                  th:classappend="${i == commandes.number + 1 ? 'active' : ''}">
-                <a class="page-link" th:href="@{/mes-commandes(page=${i - 1}, size=${commandes.size})}" th:text="${i}">1</a>
-              </li>
-              <li class="page-item" th:classappend="${commandes.hasNext() ? '' : 'disabled'}">
-                <a class="page-link" th:href="@{/mes-commandes(page=${commandes.number + 1}, size=${commandes.size})}">Suivant</a>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      </div>
     </div>
-  </div>
 </div>
 </body>
 </html>

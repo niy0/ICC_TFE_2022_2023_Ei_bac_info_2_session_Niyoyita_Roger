@@ -1,131 +1,170 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
 <head>
-  <meta charset="UTF-8">
-  <title>Panier</title>
-  <!-- Bootstrap 5 CSS depuis unpkg CDN -->
-  <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
-  <!-- jQuery -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <!-- Bootstrap Bundle JS (inclut Popper) depuis unpkg CDN -->
-  <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- Votre script personnalisé -->
-  <link rel="icon"  href="src/main/resources/static/js/favicon.ico" type="image/x-icon">
-  <meta name="_csrf" th:content="${_csrf.token}"/>
-  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <meta charset="UTF-8">
+    <title th:text="#{panier.title}">Panier</title>
+    <!-- Bootstrap 5 CSS depuis unpkg CDN -->
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Bootstrap Bundle JS (inclut Popper) depuis unpkg CDN -->
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Votre script personnalisé -->
+    <link rel="icon" href="src/main/resources/static/js/favicon.ico" type="image/x-icon">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <body>
 <div class="container mt-4">
-  <div layout:fragment="content">
-    <div class="mt-5">
-      <h2><i class="bi bi-cart-fill"></i><input hidden   th:value="${panier.id}" name="idPanier"> Mon panier</h2>
-      <div th:if="${not #lists.isEmpty(panier.lignesDeCommande)}">
-        <form id="viderPanier" th:action="@{/viderPanier}" method="post">
-          <input type="hidden"  th:value="${panier.id}" name="idPanier">
-          <button type="submit" form="viderPanier" class="btn btn-primary"><i class="fas fa-trash-alt"></i> Vider Panier</button>
-        </form>
-        <form id="confirmerPanier" th:action="@{/checkout/infos_de_commande(idPanierStripe=${panier.id})}" method="get">
-          <input type="hidden" th:value="${panier.id}" name="idPanierStripe">
-          <table class="table">
-            <thead>
-            <tr>
-              <th hidden>Id Ligne de Commande</th>
-              <th hidden>Id Panier</th>
-              <th>Numéro Article</th>
-              <th>Image</th>
-              <th>Nom Article</th>
-              <th>Prix Unitaire</th>
-              <th>Quantité</th>
-              <th>Total Quantité</th>
-              <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody id="cart-items">
-            <tr th:each="ligne, iterStat : ${panier.lignesDeCommande}" th:data-ligne-commande-id="${ligne.id}">
-              <td th:text="${ligne.id}" name="id_ligneDeCommande" hidden></td>
-              <td th:text="${ligne.panier.id}" name="ligneDeCommandePanierId" hidden></td>
-              <td th:text="${ligne.produit.id}" name="id_produit"></td>
-              <td scope="row">
-                <img th:src="@{/display(id=${ligne.produit.id})}" alt="Image du produit" height="100px"/>
-              </td>
-              <td th:text="${ligne.produit.nom}" name="nom_produit">Nom du produit</td>
-              <td th:text="${ligne.produit.prix}" id="prix-produit">Prix</td>
-              <td>
-                <input type="number" th:value="${ligne.quantite}" min="1" class="form-control quantity-input"
-                       th:data-product-id="${ligne.produit.id}" th:id="'quantite_' + ${ligne.produit.id}" style="width:85px;"/>
-                <div th:id="'error_' + ${ligne.produit.id}" class="text-danger" style="display: none;">
-                  Quantité demandée non disponible en stock. Maximum : <span th:text="${ligne.produit.quantite}"></span>
-                </div>
-              </td>
-              <td id="total-produit" class="product-total" th:text="${ligne.produit.prix * ligne.quantite}">Total</td>
-              <td>
-                <button type="button" class="btn btn-outline-danger launch-modal" data-bs-toggle="modal"
-                        th:attr="data-bs-target='#exampleModalCenter'+${ligne.id}"
-                        th:data-id="${ligne.produit.id}" th:data-nom="${ligne.produit.nom}"
-                        th:data-prix="${ligne.produit.prix}" th:data-quantite="${ligne.quantite}"
-                        th:data-image-url="@{'/display?id=' + ${ligne.produit.id}}">
-                  <i class="fas fa-trash-alt"></i> Supprimer du panier
-                </button>
-                <div class="modal fade" th:id="'exampleModalCenter'+${ligne.id}" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                  <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLongTitle">Êtes-vous sûr ?</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <div class="modal-body text-center">
-                        <img th:src="@{/display(id=${ligne.produit.id})}" alt="Image du produit" class="img-fluid mb-3" style="max-height: 200px;"/>
-                        <h6 th:text="${ligne.produit.nom}">Nom du produit</h6>
-                        <p class="mb-1" th:text="'Prix : '+ ${ligne.produit.prix} + ' €'">Prix</p>
-                        <p class="mb-2 quantite-text" data-product-id="${ligne.produit.id}" th:text=" 'Quantité : '+ ${ligne.quantite} ">Quantité :</p>
-                        <h5 class="mt-3">Total : <span class="product-total" th:text="${ligne.produit.prix * ligne.quantite} + ' €'">Total</span></h5>
-                      </div>
-                      <div class="modal-footer justify-content-between">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
-                        <form th:if="${iterStat.first}" th:action="@{/deleteFirstElemPanier}" method="post" th:id="'deleteFirstForm'+${ligne.id}">
-                          <input type="hidden" th:value="${ligne.panier.id}" name="idPanier"/>
-                          <input type="hidden" th:value="${ligne.id}" name="idLigneDeCommande"/>
-                          <button type="submit" th:attr="form='deleteFirstForm'+${ligne.id}" class="btn btn-danger delete-first-line"><i class="fas fa-trash-alt"></i> Confirmer la suppression</button>
-                        </form>
-                        <form th:if="${!iterStat.first}" th:action="@{/lignedecommande/delete/{id}(id=${ligne.id})}" method="post" th:id="'deleteForm'+${ligne.id}">
-                          <button type="submit" th:attr="form='deleteForm'+${ligne.id}" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Confirmer la suppression</button>
-                        </form>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <a class="btn btn-outline-warning" th:href="@{/produit/{id}(id=${ligne.produit.id})}"><i class="fas fa-eye"></i> Voir produit</a>
-              </td>
-            </tr>
-            </tbody>
-            <tfoot>
-            <tr class="total" style="text-align: center;">
-              <td colspan="4">
-                <strong>Total du panier : <span id="panier-total" th:text="${montantTotalPanier}"></span> €</strong>
-              </td>
-            </tr>
-            </tfoot>
-          </table>
-          <button type="submit" class="btn btn-primary" id="confirmerPanier'">
-            <i class="fas fa-check"></i> Confirmer Panier
-          </button>
-        </form>
-      </div>
-      <div th:unless="${not #lists.isEmpty(panier.lignesDeCommande)}">
-        <p>Votre panier est vide.</p>
-        <h4 th:text="${errorMessage}" class="title text-center mb-4"></h4>
-        <h4 th:text="${panier.id}" class="title text-center mb-4">Ajout nouveau produit</h4>
-      </div>
+    <div layout:fragment="content">
+        <div class="mt-5">
+            <h2><i class="bi bi-cart-fill"></i><input hidden th:value="${panier.id}" name="idPanier"> <span
+                    th:text="#{panier.title}">Mon panier</span></h2>
+
+            <div th:if="${not #lists.isEmpty(panier.lignesDeCommande)}">
+                <form id="viderPanier" th:action="@{/viderPanier}" method="post">
+                    <input type="hidden" th:value="${panier.id}" name="idPanier">
+                    <button type="submit" form="viderPanier" class="btn btn-primary">
+                        <i class="fas fa-trash-alt"></i> <span th:text="#{panier.button.emptyCart}">Vider Panier</span>
+                    </button>
+                </form>
+                <form id="confirmerPanier" th:action="@{/checkout/infos_de_commande(idPanierStripe=${panier.id})}"
+                      method="get">
+                    <input type="hidden" th:value="${panier.id}" name="idPanierStripe">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th hidden th:text="#{panier.table.idLigneCommande}">Order Line Id</th>
+                            <th hidden th:text="#{panier.table.idPanier}">Cart Id</th>
+                            <th th:text="#{panier.table.numeroArticle}">Item Number</th>
+                            <th th:text="#{panier.table.image}">Image</th>
+                            <th th:text="#{panier.table.nomArticle}">Item Name</th>
+                            <th th:text="#{panier.table.prixUnitaire}">Unit Price</th>
+                            <th th:text="#{panier.table.quantite}">Quantity</th>
+                            <th th:text="#{panier.table.totalQuantite}">Total Quantity</th>
+                            <th th:text="#{panier.table.actions}">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="cart-items">
+                        <tr th:each="ligne, iterStat : ${panier.lignesDeCommande}"
+                            th:data-ligne-commande-id="${ligne.id}">
+                            <td th:text="${ligne.id}" name="id_ligneDeCommande" hidden></td>
+                            <td th:text="${ligne.panier.id}" name="ligneDeCommandePanierId" hidden></td>
+                            <td th:text="${ligne.produit.id}" name="id_produit"></td>
+                            <td scope="row">
+                                <img th:src="@{/display(id=${ligne.produit.id})}" alt="Image du produit"
+                                     height="100px"/>
+                            </td>
+                            <td th:text="${ligne.produit.nom}" name="nom_produit">Nom du produit</td>
+                            <td th:text="${ligne.produit.prix}" id="prix-produit">Prix</td>
+                            <td>
+                                <input type="number" th:value="${ligne.quantite}" min="1"
+                                       class="form-control quantity-input"
+                                       th:data-product-id="${ligne.produit.id}"
+                                       th:id="'quantite_' + ${ligne.produit.id}" style="width:85px;"/>
+                                <div th:id="'error_' + ${ligne.produit.id}" class="text-danger" style="display: none;">
+                                    Quantité demandée non disponible en stock. Maximum : <span
+                                        th:text="${ligne.produit.quantite}"></span>
+                                </div>
+                            </td>
+                            <td id="total-produit" class="product-total"
+                                th:text="${ligne.produit.prix * ligne.quantite}">Total
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-outline-danger launch-modal" data-bs-toggle="modal"
+                                        th:attr="data-bs-target='#exampleModalCenter'+${ligne.id}"
+                                        th:data-id="${ligne.produit.id}" th:data-nom="${ligne.produit.nom}"
+                                        th:data-prix="${ligne.produit.prix}" th:data-quantite="${ligne.quantite}"
+                                        th:data-image-url="@{'/display?id=' + ${ligne.produit.id}}">
+                                    <i class="fas fa-trash-alt"></i> <span th:text="#{panier.button.removeFromCart}">Remove from Cart</span>
+                                </button>
+                                <div class="modal fade" th:id="'exampleModalCenter'+${ligne.id}" tabindex="-1"
+                                     aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" th:text="#{panier.modal.title}">Are you
+                                                    sure?</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body text-center">
+                                                <img th:src="@{/display(id=${ligne.produit.id})}" alt="Product image"
+                                                     class="img-fluid mb-3" style="max-height: 200px;"/>
+                                                <h6 th:text="${ligne.produit.nom}">Product Name</h6>
+                                                <p class="mb-1" th:text="'Price: '+ ${ligne.produit.prix} + ' €'">
+                                                    Price</p>
+                                                <p class="mb-2 quantite-text" data-product-id="${ligne.produit.id}"
+                                                   th:text="'Quantity: '+ ${ligne.quantite}">Quantity:</p>
+                                                <h5 class="mt-3">Total: <span class="product-total"
+                                                                              th:text="${ligne.produit.prix * ligne.quantite} + ' €'">Total</span>
+                                                </h5>
+                                            </div>
+                                            <div class="modal-footer justify-content-between">
+                                                <button type="button" class="btn btn-light" data-bs-dismiss="modal"
+                                                        th:text="#{panier.modal.cancelButton}">Cancel
+                                                </button>
+                                                <form th:if="${iterStat.first}" th:action="@{/deleteFirstElemPanier}"
+                                                      method="post" th:id="'deleteFirstForm'+${ligne.id}">
+                                                    <input type="hidden" th:value="${ligne.panier.id}" name="idPanier"/>
+                                                    <input type="hidden" th:value="${ligne.id}"
+                                                           name="idLigneDeCommande"/>
+                                                    <button type="submit" th:attr="form='deleteFirstForm'+${ligne.id}"
+                                                            class="btn btn-danger delete-first-line">
+                                                        <i class="fas fa-trash-alt"></i> <span
+                                                            th:text="#{panier.modal.confirmButton}">Confirm Deletion</span>
+                                                    </button>
+                                                </form>
+                                                <form th:if="${!iterStat.first}"
+                                                      th:action="@{/lignedecommande/delete/{id}(id=${ligne.id})}"
+                                                      method="post" th:id="'deleteForm'+${ligne.id}">
+                                                    <button type="submit" th:attr="form='deleteForm'+${ligne.id}"
+                                                            class="btn btn-danger">
+                                                        <i class="fas fa-trash-alt"></i> <span
+                                                            th:text="#{panier.modal.confirmButton}">Confirm Deletion</span>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a class="btn btn-outline-warning" th:href="@{/produit/{id}(id=${ligne.produit.id})}">
+                                    <i class="fas fa-eye"></i> <span
+                                        th:text="#{panier.button.viewProduct}">View Product</span>
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                        <tfoot>
+                        <tr class="total" style="text-align: center;">
+                            <td colspan="4">
+                                <strong>
+                                    <span th:text="#{panier.table.total}">Total du panier :</span>
+                                    <span id="panier-total" th:text="${montantTotalPanier}"></span> €
+                                </strong>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                    <button type="submit" class="btn btn-primary" id="confirmerPanier'">
+                        <i class="fas fa-check"></i> <span
+                            th:text="#{panier.button.confirmCart}">Confirmer Panier</span>
+                    </button>
+                </form>
+            </div>
+            <div th:unless="${not #lists.isEmpty(panier.lignesDeCommande)}">
+                <p th:text="#{panier.emptyMessage}">Votre panier est vide.</p>
+                <h4 th:text="${errorMessage}" class="title text-center mb-4"></h4>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 <!-- Inclure Stripe.js uniquement si nécessaire -->
 <script th:if="${not #lists.isEmpty(panier.lignesDeCommande)}" src="https://js.stripe.com/v3/"></script>
-<!-- Votre script <script src="js/script6.js"></script> -->
-
 
 </body>
 </html>

@@ -145,6 +145,19 @@
         }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
     </style>
 </head>
 <body>
@@ -217,45 +230,50 @@
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-8 col-lg-9  main-content">
-            <h1 class="title">Mes Produits Favoris</h1>
+        <div class="col-12 col-md-8 col-lg-9 main-content">
+            <h1 class="title" th:text="#{user.favoris.page.title}">Mes Produits Favoris</h1>
             <div class="filters mb-3">
                 <div class="row">
                     <div class="col-12 col-md-4 mb-2 mb-md-0">
-                        <input type="text" id="searchNom" class="form-control" placeholder="Rechercher par nom">
+                        <input type="text" id="searchNom" class="form-control"
+                               th:placeholder="#{user.favoris.page.searchNom}">
                     </div>
                     <div class="col-12 col-md-4 mb-2 mb-md-0">
                         <select id="sortPrice" class="form-control">
-                            <option value="">Trier par prix</option>
-                            <option value="priceAsc">Prix croissant</option>
-                            <option value="priceDesc">Prix décroissant</option>
+                            <option value="" th:text="#{user.favoris.page.sortPrice}">Trier par prix</option>
+                            <option value="priceAsc" th:text="#{user.favoris.page.sortPriceAsc}">Prix croissant</option>
+                            <option value="priceDesc" th:text="#{user.favoris.page.sortPriceDesc}">Prix décroissant
+                            </option>
                         </select>
                     </div>
                     <div class="col-12 col-md-4 mb-2 mb-md-0">
                         <select id="sortDate" class="form-control">
-                            <option value="">Trier par date d'ajout</option>
-                            <option value="dateAsc">Date croissante</option>
-                            <option value="dateDesc">Date décroissante</option>
+                            <option value="" th:text="#{user.favoris.page.sortDate}">Trier par date d'ajout</option>
+                            <option value="dateAsc" th:text="#{user.favoris.page.sortDateAsc}">Date croissante</option>
+                            <option value="dateDesc" th:text="#{user.favoris.page.sortDateDesc}">Date décroissante
+                            </option>
                         </select>
                     </div>
                     <div class="row mt-3">
                         <div class="col-12 col-md-4 mb-2 mb-md-0">
                             <select id="filterCategorie" class="form-control">
-                                <option value="">Filtrer par catégorie</option>
+                                <option value="" th:text="#{user.favoris.page.filterCategorie}">Filtrer par catégorie
+                                </option>
                                 <option th:each="categorie : ${catList}" th:value="${categorie.id}"
                                         th:text="${categorie.nom}"></option>
                             </select>
                         </div>
                         <div class="col-12 col-md-4 mb-2 mb-md-0">
                             <select id="filterMarque" class="form-control">
-                                <option value="">Filtrer par marque</option>
+                                <option value="" th:text="#{user.favoris.page.filterMarque}">Filtrer par marque</option>
                                 <option th:each="marque : ${marqueList}" th:value="${marque.id}"
                                         th:text="${marque.nom}"></option>
                             </select>
                         </div>
                         <div class="col-12 col-md-4 mb-2 mb-md-0">
                             <select id="filterMotCle" class="form-control">
-                                <option value="">Filtrer par mot-clé</option>
+                                <option value="" th:text="#{user.favoris.page.filterMotCle}">Filtrer par mot-clé
+                                </option>
                                 <option th:each="motCle : ${motCleList}" th:value="${motCle.id}"
                                         th:text="${motCle.nom}"></option>
                             </select>
@@ -269,12 +287,18 @@
                         <table class="table table-hover">
                             <thead class="table-info">
                             <tr>
-                                <th scope="col">Image</th>
-                                <th scope="col" class="sortable" data-sort="nom">Nom</th>
-                                <th scope="col">Description</th>
-                                <th scope="col" class="sortable" data-sort="prix">Prix</th>
-                                <th scope="col" class="sortable" data-sort="dateAjout">Date d'ajout</th>
-                                <th scope="col">Actions</th>
+                                <th scope="col" th:text="#{user.favoris.page.image}">Image</th>
+                                <th scope="col" class="sortable" data-sort="nom" th:text="#{user.favoris.page.nom}">
+                                    Nom
+                                </th>
+                                <th scope="col" th:text="#{user.favoris.page.description}">Description</th>
+                                <th scope="col" class="sortable" data-sort="prix" th:text="#{user.favoris.page.prix}">
+                                    Prix
+                                </th>
+                                <th scope="col" class="sortable" data-sort="dateAjout"
+                                    th:text="#{user.favoris.page.dateAjout}">Date d'ajout
+                                </th>
+                                <th scope="col" th:text="#{user.favoris.page.actions}">Actions</th>
                             </tr>
                             </thead>
                             <tbody id="favorisTableBody">
@@ -282,10 +306,9 @@
                         </table>
                     </div>
                     <div style="display:flex;align-items:center;">
-                        <!-- Pagination -->
                         <nav aria-label="Page navigation" class="mx-auto">
                             <ul class="pagination">
-                                <!-- La pagination injectée ici via Ajax -->
+                                <!-- Pagination injectée ici via Ajax -->
                             </ul>
                         </nav>
                     </div>
@@ -297,8 +320,14 @@
         <!-- Bootstrap 5 Bundle JS (inclut Popper) -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
         <script>
+            // Récupération des traductions via Thymeleaf
+            const removeText = /*[[#{user.favoris.page.button.remove}]]*/ 'Retirer';
+            const removeConfirmText = /*[[${'user.favoris.page.confirm.remove'}]]*/ 'Êtes-vous sûr de vouloir retirer ce produit des favoris?';
+            const removeSuccessText = /*[[${'user.favoris.page.remove.success'}]]*/ 'Produit retiré des favoris avec succès';
+            const removeErrorText = /*[[${'user.favoris.page.remove.error'}]]*/ 'Une erreur est survenue lors du retrait du produit des favoris.';
+
             function removeFromFavoris(produitId) {
-                if (confirm('Êtes-vous sûr de vouloir retirer ce produit des favoris?')) {
+                if (confirm(removeConfirmText)) {
                     const csrfToken = $('meta[name="_csrf"]').attr('content');
                     const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
 
@@ -310,12 +339,12 @@
                             xhr.setRequestHeader(csrfHeader, csrfToken);
                         },
                         success: function(response) {
-                            alert('Produit retiré des favoris avec succès');
+                            alert(removeSuccessText);
                             loadFavoris(0, 'dateCreation');
                         },
                         error: function(error) {
                             console.error('Erreur lors du retrait des favoris:', error);
-                            alert('Une erreur est survenue lors du retrait du produit des favoris.');
+                            alert(removeErrorText);
                         }
                     });
                 }
@@ -347,14 +376,14 @@
                                     <td>${new Date(produit.dateCreation).toLocaleDateString()}</td>
                                     <td>
                                         <button class="btn btn-outline-danger" onclick="removeFromFavoris(${produit.id})">
-                                            <i class="fas fa-trash-alt"></i> Retirer
+                                            <i class="fas fa-trash-alt"></i> ${removeText}
                                         </button>
                                     </td>
                                 </tr>
                             `);
                         });
 
-                        // Gestion de la pagination (à ajuster en fonction de votre API)
+                        // Gestion de la pagination
                         var pagination = $('.pagination');
                         pagination.empty();
                         pagination.append(`
@@ -383,25 +412,15 @@
                     },
                     error: function(error) {
                         console.error('Erreur lors du chargement des favoris:', error);
-                        // Ajoutez du code ici pour gérer l'erreur, par exemple, afficher un message à l'utilisateur.
                     }
                 });
             }
 
             $(document).ready(function() {
-                loadFavoris(0, 'dateCreation'); // Utiliser 'dateCreation' ou une autre valeur valide
+                loadFavoris(0, 'dateCreation');
 
                 $('#searchNom, #sortPrice, #sortDate, #filterCategorie, #filterMarque, #filterMotCle').on('change input', function() {
                     loadFavoris(0, 'dateCreation');
-                });
-
-                // Événements pour les filtres et le tri
-                $('#searchNom').on('input', function() {
-                    loadFavoris(0, 'id');
-                });
-
-                $('#sortPrice, #sortDate, #filterCategorie, #filterMarque, #filterMotCle').on('change', function() {
-                    loadFavoris(0, 'id');
                 });
 
                 $('.sortable').on('click', function() {
@@ -409,10 +428,6 @@
                     loadFavoris(0, sortBy);
                 });
             });
-
-
-
-
 
         </script>
     </div>

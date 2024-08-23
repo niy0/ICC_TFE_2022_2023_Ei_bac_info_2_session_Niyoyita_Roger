@@ -3,7 +3,7 @@
       layout:decorate="~{layouts/main}" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>Ajout d'un produit</title>
+    <title th:text="#{nav.page.title}">Ajout d'un produit</title>
     <!-- Bootstrap 5 CSS depuis unpkg CDN -->
     <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -113,7 +113,6 @@
 
 
 
-
     </style>
 </head>
 <body>
@@ -132,66 +131,65 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto me-auto mb-2 mb-lg-0">
                     <li class="nav-item active">
-                        <a class="nav-link" th:href="@{/}" href="#">Accueil</a>
+                        <a class="nav-link" th:href="@{/}" th:text="#{nav.accueil}">Accueil</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/produit}" href="#">Produits</a>
+                        <a class="nav-link" th:href="@{/produit}" th:text="#{nav.produits}">Produits</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link"
-                           th:href="${user != null} ? @{/user/{id}/profile(id=${user.id})} : @{/profile}">
-                            Profile
-                        </a>
+                           th:href="${user != null} ? @{/user/{id}/profile(id=${user.id})} : @{/profile}"
+                           th:text="#{nav.profile}">Profil</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/info-contact}">Contact</a>
+                        <a class="nav-link" th:href="@{/info-contact}" th:text="#{nav.contact}">Contact</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Plus
+                            <span th:text="#{nav.plus}">Plus</span>
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" th:href="@{/a-propos}" href="#">À Propos</a></li>
-                            <li><a class="dropdown-item" th:href="@{/faq}" href="#">FAQ</a></li>
-                            <li><a class="dropdown-item" th:href="@{/livraison}" href="#">Politique de Livraison</a>
+                            <li><a class="dropdown-item" th:href="@{/a-propos}" th:text="#{nav.apropos}">À Propos</a>
                             </li>
-                            <li><a class="dropdown-item" th:href="@{/retour}" href="#">Politique de Retour</a></li>
-                            <li><a class="dropdown-item" th:href="@{/conditions}" href="#">Conditions d'Utilisation</a>
-                            </li>
-                            <li><a class="dropdown-item" th:href="@{/politique-de-confidentialite}" href="#">Politique
-                                de Confidentialité</a></li>
+                            <li><a class="dropdown-item" th:href="@{/faq}" th:text="#{nav.faq}">FAQ</a></li>
+                            <li><a class="dropdown-item" th:href="@{/livraison}" th:text="#{nav.livraison}">Politique de
+                                Livraison</a></li>
+                            <li><a class="dropdown-item" th:href="@{/retour}" th:text="#{nav.retour}">Politique de
+                                Retour</a></li>
+                            <li><a class="dropdown-item" th:href="@{/conditions}" th:text="#{nav.conditions}">Conditions
+                                d'Utilisation</a></li>
+                            <li><a class="dropdown-item" th:href="@{/politique-de-confidentialite}"
+                                   th:text="#{nav.confidentialite}">Politique de Confidentialité</a></li>
                         </ul>
                     </li>
-
                 </ul>
                 <div style="display:flex; gap: 10px;">
                     <a class="btn btn-warning" th:href="@{/panier}"
-                       style="background-color: #ff9966; border-color: #ffc107; ">
+                       style="background-color: #ff9966; border-color: #ffc107;">
                         <i class="fa fa-shopping-cart"></i>
                     </a>
-
-                    <!-- Affichez ces boutons si l'utilisateur est un utilisateur anonyme -->
                     <div th:if="${isAnonymousUser}" style="display:flex; gap: 10px;">
                         <a class="btn btn-success" th:href="@{/user/signup}"
                            style="background-color: #ff5e62; border-color: #fff; color: #fff;">
-                            <i class="fas fa-user-plus"></i> S'inscrire
+                            <i class="fas fa-user-plus"></i> <span th:text="#{nav.signup}">S'inscrire</span>
                         </a>
                         <a class="btn btn-success" th:href="@{/login}"
                            style="background-color: #ff5e62; border-color: #fff; color: #fff;">
-                            <i class="fas fa-sign-in-alt"></i> Se connecter
+                            <i class="fas fa-sign-in-alt"></i> <span th:text="#{nav.login}">Se connecter</span>
                         </a>
                     </div>
-
-                    <!-- Affichez ce bouton si l'utilisateur n'est PAS un utilisateur anonyme -->
                     <form th:if="${!isAnonymousUser}" th:action="@{/logout}" method="post">
                         <button type="submit" class="btn btn-danger"
                                 style="background-color: #ff5e62; border-color: #ff5e62; color: #fff;">
-                            <i class="fas fa-sign-out-alt"></i> Se déconnecter
+                            <i class="fas fa-sign-out-alt"></i> <span th:text="#{nav.logout}">Se déconnecter</span>
                         </button>
                     </form>
-                </div>
 
+                    <div>
+                        <a href="?lang=fr">Français</a> | <a href="?lang=en">English</a>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
