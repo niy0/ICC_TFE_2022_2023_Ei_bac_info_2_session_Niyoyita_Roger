@@ -51,6 +51,8 @@
 
 
 
+
+
     </style>
 </head>
 <body>
@@ -60,28 +62,30 @@
                 th:text="#{contact.titre}">Contactez-nous</span></h1>
         <div class="row">
             <div class="col-md-6">
-                <form>
+                <form th:action="@{/info-contact}" method="post">
                     <div class="mb-3">
                         <label for="nom" class="etiquette-formulaire" th:text="#{contact.nom}">Nom</label>
-                        <input type="text" class="form-control" id="nom" th:placeholder="#{contact.nom.placeholder}">
+                        <input type="text" class="form-control" id="nom" name="nom"
+                               th:placeholder="#{contact.nom.placeholder}" required>
                     </div>
                     <div class="mb-3">
                         <label for="email" class="etiquette-formulaire" th:text="#{contact.email}">Adresse email</label>
-                        <input type="email" class="form-control" id="email"
-                               th:placeholder="#{contact.email.placeholder}">
+                        <input type="email" class="form-control" id="email" name="email"
+                               th:placeholder="#{contact.email.placeholder}" required>
                     </div>
                     <div class="mb-3">
                         <label for="sujet" class="etiquette-formulaire" th:text="#{contact.sujet}">Sujet</label>
-                        <input type="text" class="form-control" id="sujet"
-                               th:placeholder="#{contact.sujet.placeholder}">
+                        <input type="text" class="form-control" id="sujet" name="sujet"
+                               th:placeholder="#{contact.sujet.placeholder}" required>
                     </div>
                     <div class="mb-3">
                         <label for="message" class="etiquette-formulaire" th:text="#{contact.message}">Message</label>
-                        <textarea class="form-control" id="message" rows="5"
-                                  th:placeholder="#{contact.message.placeholder}"></textarea>
+                        <textarea class="form-control" id="message" name="message" rows="5"
+                                  th:placeholder="#{contact.message.placeholder}" required></textarea>
                     </div>
                     <button type="submit" class="btn btn-personnalise" th:text="#{contact.envoyer}">Envoyer</button>
                 </form>
+
             </div>
             <div class="col-md-6 info-contact">
                 <h3 th:text="#{contact.coordonnees}">Coordonnées</h3>
@@ -89,7 +93,7 @@
                     Paris, 16000 Angoulême, France</p>
                 <p><i class="fas fa-phone"></i> <span th:text="#{contact.telephone}">Téléphone</span> : 0516094273</p>
                 <p><i class="fas fa-envelope"></i> <span th:text="#{contact.email.label}">Email</span> :
-                    epicerielhoumeau16@gmail.com</p>
+                    contactepicerielhoumeau@gmail.com</p>
             </div>
         </div>
     </div>
