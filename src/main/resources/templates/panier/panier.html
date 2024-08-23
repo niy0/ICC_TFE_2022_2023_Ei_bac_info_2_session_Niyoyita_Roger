@@ -16,6 +16,42 @@
     <link rel="icon" href="src/main/resources/static/js/favicon.ico" type="image/x-icon">
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <style>
+        .btn-custom {
+            background-color: #ff9966;
+            color: white;
+            border-radius: 0.5rem;
+            padding: 10px 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, transform 0.3s;
+            display: block;
+            width: auto;
+        }
+
+        .btn-custom:hover {
+            background-color: #ff5e62;
+            transform: translateY(-2px);
+        }
+
+        .btn-custom2 {
+            background-color: #007bff;
+            color: white;
+            border-radius: 0.5rem;
+            padding: 10px 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, transform 0.3s;
+            display: block;
+            width: auto;
+        }
+
+        .btn-custom2:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+
+
+    </style>
 </head>
 <body>
 <div class="container mt-4">
@@ -27,7 +63,7 @@
             <div th:if="${not #lists.isEmpty(panier.lignesDeCommande)}">
                 <form id="viderPanier" th:action="@{/viderPanier}" method="post">
                     <input type="hidden" th:value="${panier.id}" name="idPanier">
-                    <button type="submit" form="viderPanier" class="btn btn-primary">
+                    <button type="submit" form="viderPanier" class="btn-custom">
                         <i class="fas fa-trash-alt"></i> <span th:text="#{panier.button.emptyCart}">Vider Panier</span>
                     </button>
                 </form>
@@ -149,7 +185,7 @@
                         </tr>
                         </tfoot>
                     </table>
-                    <button type="submit" class="btn btn-primary" id="confirmerPanier'">
+                    <button type="submit" class="btn-custom2" id="confirmerPanier'">
                         <i class="fas fa-check"></i> <span
                             th:text="#{panier.button.confirmCart}">Confirmer Panier</span>
                     </button>
