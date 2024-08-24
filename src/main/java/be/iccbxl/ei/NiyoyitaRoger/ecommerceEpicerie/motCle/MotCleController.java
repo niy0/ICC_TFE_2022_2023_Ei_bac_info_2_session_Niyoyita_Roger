@@ -1,9 +1,12 @@
 package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.motCle;
 
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.categorie.Categorie;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.marque.Marque;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,72 +21,47 @@ public class MotCleController {
     private MotCleRepository motCleRepository;
 
     @Autowired
-    private  MotCleService motCleService;
+    private MotCleService motCleService;
 
-    @GetMapping("/motCle/all")
-    public String allMotCle(Model model){
-        List<MotCle> motCleList = motCleService.getAllMotCle();
-        model.addAttribute("motCleList", motCleList);
-        return "/motCle/index";
+
+    @GetMapping("/admin/motCle/list")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String listMotCle(Model model) {
+        try {
+            List<MotCle> motCleList = motCleService.getAllMotCle();
+            model.addAttribute("motCleList", motCleList);
+            return "/motCle/index";
+        } catch (AccessDeniedException e) {
+            return "redirect:/";
+        }
     }
 
-    @GetMapping("/motCle/{id}")
-    public String show(Model model, @PathVariable("id")Long id){
-
-        MotCle motCle = motCleService.getMotCle(id);
-        return "motCle/show";
-    }
-
-    @GetMapping("/motCle/create")
-    public String createShow(Model model){
-        MotCle motCle = new MotCle(null);
-        model.addAttribute("motCle", motCle);
-        return "motCle/create";
-    }
-
-    @PostMapping("/motCle/create")
+    @PostMapping("/admin/motCle/create")
     public String create(@RequestParam("nom") String nom,
                          @RequestParam("env") String env,
-                         RedirectAttributes redirectAttrs){
+                         RedirectAttributes redirectAttrs) {
         String message = "";
-        if (nom.length() < 2 ) {
-            message = "Erreur le nom dois contenr minimum 2 caractères" ;
+        if (nom.length() < 2) {
+            message = "Erreur le nom dois contenr minimum 2 caractères";
         }
 
-        if(!motCleService.motCleExist(nom)){
+        if (!motCleService.motCleExist(nom)) {
             MotCle motCleToSave = new MotCle(nom);
             motCleService.save(motCleToSave);
-        }else {
-            message = "Erreur le nom [ " + nom.toUpperCase() + " ] existe déjà, veuillez réssayé un autre." ;
+        } else {
+            message = "Erreur le nom [ " + nom.toUpperCase() + " ] existe déjà, veuillez réssayé un autre.";
         }
         redirectAttrs.addFlashAttribute("messageMotCle", message);
-        return "redirect:"+env;
+        return "redirect:" + env;
     }
 
-    @GetMapping("/motCle/{id}/edit")
-    public String edit(Model model, @PathVariable("id")long id, HttpServletRequest request){
-
-        MotCle motCle = motCleService.getMotCle(id);
-        model.addAttribute("motCle",motCle);
-
-        //Générer le lien retour pour l'annulation
-        String referrer = request.getHeader("Referer");
-        if(referrer!=null && !referrer.equals("")) {
-            model.addAttribute("back", referrer);
-        } else {
-            model.addAttribute("back", "/motCle/"+motCle.getId());
-        }
-
-        return "/motCle/edit";
-    }
-
-    @PutMapping("/motCle/{id}/edit")
+    @PutMapping("/admin/motCle/{id}/edit")
     public String update(@Valid @ModelAttribute("motCle") MotCle motCle,
                          BindingResult bindingResult,
-                         @PathVariable("id")long id,
-                         Model model){
+                         @PathVariable("id") long id,
+                         Model model) {
 
-        if(bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             return "/motCle/edit";
         }
 
@@ -93,6 +71,21 @@ public class MotCleController {
         }
 
         motCleService.save(motCle);
-        return "redirect:/motCle/"+motCle.getId();
+        return "redirect:/motCle/" + motCle.getId();
     }
+
+    @DeleteMapping("/admin/motCle/{id}/delete")
+    public String delete(@PathVariable("id") Long id, RedirectAttributes redirectAttrs) throws MotCleNotFoundException {
+        MotCle motCle = motCleService.getMotCle(id);
+
+        if (motCle != null) {
+            motCleService.deleteMotCleById(id);
+            redirectAttrs.addFlashAttribute("messageMotCle", "Le mot-clé a été supprimé avec succès.");
+        } else {
+            redirectAttrs.addFlashAttribute("messageMotCle", "Erreur : Le mot-clé avec l'ID " + id + " n'existe pas.");
+        }
+
+        return "redirect:/admin/marque/list";
+    }
+
 }

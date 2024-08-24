@@ -33,7 +33,7 @@ public class CommandeController {
     }
 
     @GetMapping("/commandes")
-    public String getUserCommandes(@PageableDefault(size = 5) Pageable pageable,
+    public String getUserCommandes(@PageableDefault(size = 3) Pageable pageable,
                                    Model model,
                                    Authentication authentication) {
 

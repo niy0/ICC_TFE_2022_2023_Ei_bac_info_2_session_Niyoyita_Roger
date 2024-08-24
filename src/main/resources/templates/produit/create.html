@@ -157,6 +157,7 @@
                 padding-left: 15px;
             }
         }
+
     </style>
 </head>
 <body>
@@ -164,26 +165,33 @@
     <div layout:fragment="content" class="row content">
         <div class="col-12 col-md-4 col-lg-3 sidenav">
             <a href="javascript:location.reload()" class="btn-refresh">
-                <span class="refresh-text marginL">Replier les sous-menus</span> <i class="fas fa-sync-alt" style="color: rgb(255, 193, 7);"></i>
+                <span class="refresh-text marginL">Replier les sous-menus</span> <i class="fas fa-sync-alt"
+                                                                                    style="color: rgb(255, 193, 7);"></i>
             </a>
-            <a class="collapsed" data-bs-toggle="collapse" href="#profileSubmenu" role="button" aria-expanded="false" aria-controls="profileSubmenu">
+            <a class="collapsed" data-bs-toggle="collapse" href="#profileSubmenu" role="button" aria-expanded="false"
+               aria-controls="profileSubmenu">
                 <i class="fas fa-user-circle"></i> Profile : <span th:text="${user.nom} + ' ' + ${user.prenom}"></span>
                 <span class="submenu-icon fas fa-caret-right"></span>
             </a>
             <div class="collapse marginR" id="profileSubmenu">
-                <a th:href="@{'/user/' + ${user.id} + '/profile/edit'}" style="font-size: 16px;"><i class="fas fa-user-edit"></i> Modifier profil</a>
-                <a th:href="@{'/user/' + ${user.id} + '/adresse/edit'}" style="font-size: 16px;"><i class="fas fa-address-card"></i> Modifier adresse</a>
+                <a th:href="@{'/user/' + ${user.id} + '/profile/edit'}" style="font-size: 16px;"><i
+                        class="fas fa-user-edit"></i> Modifier profil</a>
+                <a th:href="@{'/user/' + ${user.id} + '/adresse/edit'}" style="font-size: 16px;"><i
+                        class="fas fa-address-card"></i> Modifier adresse</a>
             </div>
 
             <a th:href="@{/commandes}"><i class="fas fa-shopping-cart"></i> Mes commandes</a>
             <a th:href="@{/user/favoris}"><i class="fas fa-heart"></i> Mes produits favoris</a>
 
-            <a class="collapsed" data-bs-toggle="collapse" href="#employeeSubmenu" role="button" aria-expanded="false" aria-controls="employeeSubmenu">
+            <a class="collapsed" data-bs-toggle="collapse" href="#employeeSubmenu" role="button" aria-expanded="false"
+               aria-controls="employeeSubmenu">
                 <i class="fas fa-briefcase"></i> Employé <span class="submenu-icon fas fa-caret-right"></span>
             </a>
             <div class="collapse marginR" id="employeeSubmenu">
-                <a th:href="@{/employe/commandes}"style="font-size: 16px;"><i class="fas fa-list"></i> Liste des commandes</a>
-                <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#statSubmenu" role="button" aria-expanded="false" aria-controls="statSubmenu">
+                <a th:href="@{/employe/commandes}" style="font-size: 16px;"><i class="fas fa-list"></i> Liste des
+                    commandes</a>
+                <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#statSubmenu"
+                   role="button" aria-expanded="false" aria-controls="statSubmenu">
                     <i class="fas fa-chart-line"></i> Statistiques <span class="submenu-icon fas fa-caret-right"></span>
                 </a>
                 <div class="collapse marginR" id="statSubmenu">
@@ -192,36 +200,45 @@
                 </div>
             </div>
 
-            <a class="collapsed" data-bs-toggle="collapse" href="#adminSubmenu" role="button" aria-expanded="false" aria-controls="adminSubmenu">
+            <a class="collapsed" data-bs-toggle="collapse" href="#adminSubmenu" role="button" aria-expanded="false"
+               aria-controls="adminSubmenu">
                 <i class="fas fa-cog"></i> Admin <span class="submenu-icon fas fa-caret-right"></span>
             </a>
             <div class="collapse marginR" id="adminSubmenu">
-                <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#stockSubmenu" role="button" aria-expanded="false" aria-controls="stockSubmenu">
+                <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#stockSubmenu"
+                   role="button" aria-expanded="false" aria-controls="stockSubmenu">
                     <i class="fas fa-box"></i> Gestion stock <span class="submenu-icon fas fa-caret-right"></span>
                 </a>
                 <div class="collapse marginR" id="stockSubmenu">
-                    <a th:href="@{/admin/produits}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des produits</a>
-                    <a th:href="@{/produit/create}" style="font-size: 14px;"><i class="fas fa-plus-square"></i> Ajouter un produit</a>
+                    <a th:href="@{/admin/produits}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des
+                        produits</a>
+                    <a th:href="@{/produit/create}" style="font-size: 14px;"><i class="fas fa-plus-square"></i> Ajouter
+                        un produit</a>
                 </div>
-                <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#userManagementSubmenu" role="button" aria-expanded="false" aria-controls="userManagementSubmenu">
-                    <i class="fas fa-users"></i> Gestion utilisateurs <span class="submenu-icon fas fa-caret-right"></span>
+                <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#userManagementSubmenu"
+                   role="button" aria-expanded="false" aria-controls="userManagementSubmenu">
+                    <i class="fas fa-users"></i> Gestion utilisateurs <span
+                        class="submenu-icon fas fa-caret-right"></span>
                 </a>
                 <div class="collapse marginR" id="userManagementSubmenu">
-                    <a th:href="@{/admin/users}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des utilisateurs</a>
-                    <a th:href="@{/admin/add_new_user}"  style="font-size: 14px;"><i class="fas fa-user-plus"></i> Ajouter un utilisateur</a>
+                    <a th:href="@{/admin/users}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des
+                        utilisateurs</a>
+                    <a th:href="@{/admin/add_new_user}" style="font-size: 14px;"><i class="fas fa-user-plus"></i>
+                        Ajouter un utilisateur</a>
                 </div>
             </div>
         </div>
         <div class="col-12 col-md-8 col-lg-9  main-content">
-            <h1 th:text="${title}"  class="title"></h1>
+            <h1 th:text="${title}" class="title"></h1>
             <div class="row">
                 <div class="col-md-6 col-lg-4 mb-3">
                     <div class="border border-info rounded p-3">
-                        <form th:action="@{/cat/newCat}" method="post">
+                        <form th:action="@{/admin/cat/newCat}" method="post">
                             <div class="form-group text-left">
                                 <label for="newNom">Nom</label>
-                                <input type="text" class="form-control" minlength="2" name="nom" placeholder="Nouvelle catégorie" id="newNom" required/>
-                                <input type="text" class="form-control" value="/produit/create" hidden name="env" />
+                                <input type="text" class="form-control" minlength="2" name="nom"
+                                       placeholder="Nouvelle catégorie" id="newNom" required/>
+                                <input type="text" class="form-control" value="/produit/create" hidden name="env"/>
                             </div>
                             <p th:if="${messageCat != null && !messageCat.isEmpty()}" class="text-danger">
                                 <i class="fa-solid fa-triangle-exclamation" style="color: #ea4848;"></i>
@@ -235,11 +252,12 @@
                 </div>
                 <div class="col-md-6 col-lg-4 mb-3">
                     <div class="border border-info rounded p-3">
-                        <form th:action="@{/marque/create}" method="post">
+                        <form th:action="@{/admin/marque/create}" method="post">
                             <div class="form-group text-left">
                                 <label for="newMarque">Nom</label>
-                                <input type="text" class="form-control" minlength="2" name="nom" placeholder="Nouvelle marque " id="newMarque" required/>
-                                <input type="text" class="form-control" value="/produit/create" hidden name="env" />
+                                <input type="text" class="form-control" minlength="2" name="nom"
+                                       placeholder="Nouvelle marque " id="newMarque" required/>
+                                <input type="text" class="form-control" value="/produit/create" hidden name="env"/>
                             </div>
                             <p th:if="${messageMarque != null && !messageMarque.isEmpty()}" class="text-danger">
                                 [[${messageMarque}]]
@@ -252,11 +270,12 @@
                 </div>
                 <div class="col-md-12 col-lg-4 mb-3">
                     <div class="border border-info rounded p-3">
-                        <form th:action="@{/motCle/create}" method="post">
+                        <form th:action="@{/admin/motCle/create}" method="post">
                             <div class="form-group text-left">
                                 <label for="newMotCle">Nom</label>
-                                <input type="text" class="form-control" minlength="2" name="nom" placeholder="Nouveau mot clé " id="newMotCle" required/>
-                                <input type="text" class="form-control" value="/produit/create" hidden name="env" />
+                                <input type="text" class="form-control" minlength="2" name="nom"
+                                       placeholder="Nouveau mot clé " id="newMotCle" required/>
+                                <input type="text" class="form-control" value="/produit/create" hidden name="env"/>
                             </div>
                             <p th:if="${messageMotCle != null && !messageMotCle.isEmpty()}" class="text-danger">
                                 <i class="fa-solid fa-triangle-exclamation" style="color: #ea4848;"></i>
@@ -270,7 +289,8 @@
                 </div>
                 <div class="col-md-12 col-lg-8">
                     <div class="border border-info rounded p-3">
-                        <form th:action="@{/product/save}" th:object="${produit}" method="post" enctype="multipart/form-data">
+                        <form th:action="@{/product/save}" th:object="${produit}" method="post"
+                              enctype="multipart/form-data">
 
                             <input type="hidden" name="id" th:value="${produit.id}"/>
 
@@ -281,29 +301,32 @@
 
                             <div class="form-group text-left">
                                 <label for="description">Description</label>
-                                <textarea id="description" class="form-control" name="description" th:field="*{description}" required></textarea>
+                                <textarea id="description" class="form-control" name="description"
+                                          th:field="*{description}" required></textarea>
                             </div>
 
                             <div class="form-group row text-left">
                                 <label for="cat" class="col-sm-4 col-form-label">Categorie</label>
                                 <div class="col-sm-8">
-                                    <select class="form-control selectpicker"  id="cat" style="width:auto;" required
+                                    <select class="form-control selectpicker" id="cat" style="width:auto;" required
                                             onchange="var selectElement = document.getElementById('cat'); var selectedOption = selectElement.options[selectElement.selectedIndex];
                                                       if (selectedOption.value === '') {
                                                           document.getElementById('catId').value = '${catList[0].id}'; // Prend le premier ID
                                                       } else {
                                                           document.getElementById('catId').value = selectedOption.value;
                                                       }">
-                                        <option value="" selected  >Inséré une catégorie</option> <!-- Option vide -->
-                                        <option  th:each="cat: ${catList}"  th:value="${cat.id}" th:data-id="${cat.id}" th:text="${cat.nom}"></option>
+                                        <option value="" selected>Inséré une catégorie</option> <!-- Option vide -->
+                                        <option th:each="cat: ${catList}" th:value="${cat.id}" th:data-id="${cat.id}"
+                                                th:text="${cat.nom}"></option>
                                     </select>
-                                    <input class="form-group" hidden  name="catId" id="catId"/>
+                                    <input class="form-group" hidden name="catId" id="catId"/>
                                 </div>
                             </div>
 
                             <div class="form-group text-left">
                                 <label for="typePrix">Type de Prix</label>
-                                <select class="form-control" id="typePrix" name="typePrix" th:field="*{typePrix}" required>
+                                <select class="form-control" id="typePrix" name="typePrix" th:field="*{typePrix}"
+                                        required>
                                     <option value="piece" selected>Prix à la pièce</option>
                                     <option value="kilo">Prix au kilo</option>
                                     <option value="litre">Prix au litre</option>
@@ -314,19 +337,23 @@
 
                             <div class="form-group text-left">
                                 <label for="prix">Prix</label>
-                                <input type="number" class="form-control" name="prix" min="0.01" id="prix" step="0.01" th:field="*{prix}" required/>
+                                <input type="number" class="form-control" name="prix" min="0.01" id="prix" step="0.01"
+                                       th:field="*{prix}" required/>
                             </div>
 
                             <div class="form-group row">
                                 <div class="col-md-6 text-left">
                                     <label for="quantite">Quantité</label>
-                                    <input type="number" class="form-control" min="1" name="quantite" id="quantite" th:field="*{quantite}" required/>
+                                    <input type="number" class="form-control" min="1" name="quantite" id="quantite"
+                                           th:field="*{quantite}" required/>
                                 </div>
                                 <div class="col-md-3">
-                                    <input type="number" class="form-control" min="1" name="minStock" placeholder="min : stock"/>
+                                    <input type="number" class="form-control" min="1" name="minStock"
+                                           placeholder="min : stock"/>
                                 </div>
                                 <div class="col-md-3">
-                                    <input type="number" class="form-control" name="maxStock" th:field="*{maxStock}" placeholder="max : stock"
+                                    <input type="number" class="form-control" name="maxStock" th:field="*{maxStock}"
+                                           placeholder="max : stock"
                                            onchange="var maxStockValue = this.value;
                                            var quantiteValue = document.getElementById('quantite').value;
                                            var maxStockError = document.getElementById('maxStockError');
@@ -352,24 +379,29 @@
                             <div class="form-group row text-left">
                                 <label for="marque" class="col-sm-4 col-form-label">Marque</label>
                                 <div class="col-sm-8">
-                                    <select class="form-control selectpicker" id="marque" style="width:auto;" onchange="var selectElement = document.getElementById('marque'); var selectedOption = selectElement.options[selectElement.selectedIndex]; document.getElementById('marqueId').value = selectedOption.value;">
-                                        <option th:each="marque: ${marqueList}" th:value="${marque.id}" th:data-id="${marque.id}" th:text="${marque.nom}"></option>
+                                    <select class="form-control selectpicker" id="marque" style="width:auto;"
+                                            onchange="var selectElement = document.getElementById('marque'); var selectedOption = selectElement.options[selectElement.selectedIndex]; document.getElementById('marqueId').value = selectedOption.value;">
+                                        <option th:each="marque: ${marqueList}" th:value="${marque.id}"
+                                                th:data-id="${marque.id}" th:text="${marque.nom}"></option>
                                     </select>
-                                    <input class="form-group" hidden name="marqueId" id="marqueId" />
+                                    <input class="form-group" hidden name="marqueId" id="marqueId"/>
                                 </div>
                             </div>
                             <div class="form-group row text-left">
                                 <label for="actif" class="col-sm-4 col-form-label">Actif (dans le site)</label>
                                 <div class="col-sm-8 d-flex align-items-center">
-                                    <input type="checkbox" class="form-check-input custom-checkbox ml-2" id="actif" name="actif" th:checked="${produit.actif}"/>
+                                    <input type="checkbox" class="form-check-input custom-checkbox ml-2" id="actif"
+                                           name="actif" th:checked="${produit.actif}"/>
                                 </div>
                             </div>
 
                             <div class="form-group text-left">
                                 <label>Mots clés</label>
                                 <div>
-                                    <div th:each="motcle: ${motCleList}" style="display: inline-block; margin-right: 10px;">
-                                        <input type="checkbox" th:value="${motcle.id}" name="motCleIds" th:id="${'motCle'+motcle.id}"/>
+                                    <div th:each="motcle: ${motCleList}"
+                                         style="display: inline-block; margin-right: 10px;">
+                                        <input type="checkbox" th:value="${motcle.id}" name="motCleIds"
+                                               th:id="${'motCle'+motcle.id}"/>
                                         <label th:for="${'motCle'+motcle.id}" th:text="${motcle.nom}"></label>
                                     </div>
                                 </div>

@@ -38,6 +38,7 @@ import java.security.Principal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+
 import org.apache.commons.lang3.math.NumberUtils;
 
 @Controller
@@ -69,22 +70,19 @@ public class PanierController {
     }
 
     @PostMapping("/viderPanier")
-    public String viderPanier(@RequestParam("idPanier") String panierId){
+    public String viderPanier(@RequestParam("idPanier") String panierId) {
         Long idPanier = Long.parseLong(panierId);
         panierService.deleteAllLigneDeCommande(idPanier);
         return "redirect:/produit";
     }
 
-
     //A tester pour user non connecter
     @GetMapping("/panier")
     public String showPanier(Model model, Principal principal, HttpSession session) {
-       // Panier panier = getOrCreatePanier(principal, session);
+        // Panier panier = getOrCreatePanier(principal, session);
         Panier panierTest = panierService.getOrCreatePanier(principal, session);
         Panier panier = panierService.getPanierById(panierTest.getId());
         System.out.println(panier);
-
-        System.out.println(principal+" pppppprincipal");
 
         BigDecimal montantTotal = panier.getLignesDeCommande().stream()
                 .map(ligne -> ligne.getProduit().getPrix().multiply(new BigDecimal(ligne.getQuantite())))
@@ -97,7 +95,7 @@ public class PanierController {
     }
 
     @GetMapping("/panier/api/{id}")
-    public ResponseEntity<Panier> getPanierById(Model model,@PathVariable("id") Long id) {
+    public ResponseEntity<Panier> getPanierById(Model model, @PathVariable("id") Long id) {
         // Remplacez "panierRepository" par le nom de votre repository de panier
         Optional<Panier> panier = panierRepository.findById(id);
 
@@ -107,31 +105,11 @@ public class PanierController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Panier non trouvé");
         }
     }
-
-
-    @PostMapping("/deleteElemPanier")
-    public String deleteElementInPanier(@RequestParam("idPanier") String idPanier,
-                                        @RequestParam("idLigneDeCommande") String idLigneDeCommande) {
-
-        System.out.println("idPanier : "+idPanier+ " :: ligne co:"+ idLigneDeCommande);
-
-        if (NumberUtils.isDigits(idPanier) && NumberUtils.isDigits(idLigneDeCommande)) {
-            Long panierId = Long.parseLong(idPanier);
-            Long ligneDeCommandeId = Long.parseLong(idLigneDeCommande);
-
-            panierService.deleteLigneDeCommandePanier(panierId, ligneDeCommandeId);
-            return "redirect:/panier";
-        } else {
-            // Gérer les erreurs de paramètres invalides ici
-            return "redirect:/errorPage"; // Rediriger vers une page d'erreur spécifique
-        }
-    }
+    
 
     @PostMapping("/deleteFirstElemPanier")
     public String deleteFirstElementInPanier(@RequestParam("idPanier") String idPanier,
-                                        @RequestParam("idLigneDeCommande") String idLigneDeCommande) {
-
-        System.out.println("idPanier : "+idPanier+ " :: ligne co:"+ idLigneDeCommande);
+                                             @RequestParam("idLigneDeCommande") String idLigneDeCommande) {
 
         if (NumberUtils.isDigits(idPanier) && NumberUtils.isDigits(idLigneDeCommande)) {
             Long panierId = Long.parseLong(idPanier);
@@ -140,11 +118,9 @@ public class PanierController {
             panierService.deleteFirstElemLigneDeCommandePanier(panierId, ligneDeCommandeId);
             return "redirect:/panier";
         } else {
-            // Gérer les erreurs de paramètres invalides ici
             return "redirect:/errorPage"; // Rediriger vers une page d'erreur spécifique
         }
     }
-
 
     @GetMapping("/panier/lignedecommande/api/{id}")
     public ResponseEntity<LigneDeCommande> getProduitInPanierById(@PathVariable Long id) {
@@ -154,7 +130,7 @@ public class PanierController {
         if (ligneDeCommande.isPresent()) {
             return ResponseEntity.ok(ligneDeCommande.get());
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Produit non trouvé dans le panier");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ligne de commande non trouvé dans le panier");
         }
     }
 
@@ -164,10 +140,8 @@ public class PanierController {
             List<LigneDeCommandeDTO> lignesDeCommandeDataList = panierService.getLignesDeCommande(panierId);
             return ResponseEntity.ok(lignesDeCommandeDataList);
         } catch (PanierNotFoundException e) {
-            // Gérer l'exception si le panier n'est pas trouvé
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
-            // Gérer d'autres exceptions génériques
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -182,7 +156,6 @@ public class PanierController {
             int quantiteDemandee = ligneDeCommandeDTO.getQuantite();
 
             Panier panier = panierService.getPanierById(ligneDeCommandeDTO.getPanierId());
-            System.out.println(panier.getId() + "je suis laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" + quantiteDemandee + ligneDeCommandeDTO.getPanierId());
 
             // Vérifiez si la quantité demandée est inférieure à la quantité en stock du produit
             if (produit != null && quantiteDemandee <= produit.getQuantite() && quantiteDemandee > 0) {
@@ -203,22 +176,13 @@ public class PanierController {
                     System.out.println("Aucun jeton CSRF trouvé dans les en-têtes de la requête.");
                 }
 
-                // Utilisez votre service pour ajouter la ligne de commande au panier
-
                 panierService.addLigneDeCommandeToPanier(
                         ligneDeCommandeDTO.getPanierId(),
                         ligneDeCommandeDTO.getProduitId(),
                         quantiteDemandee
                 );
 
-                System.out.println(panier.getLignesDeCommande().size() + "siiiiiiiiizzzzzzzzzzzeee");
-
-                int testQ1 = produit.getQuantite();
-
                 produitService.updateProduit(produit);
-                int testQ2 = produit.getQuantite();
-
-                System.out.println("test 1 qty : "+ testQ1 + "q dem::"+quantiteDemandee+ "*****/////******/////******////** test qty 2 : "+ testQ2);
 
                 // La ligne de commande a été ajoutée avec succès
                 return ResponseEntity.ok("Ligne de commande ajoutée avec succès.");
@@ -231,5 +195,4 @@ public class PanierController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de l'ajout de la ligne de commande: " + e.getMessage());
         }
     }
-
 }

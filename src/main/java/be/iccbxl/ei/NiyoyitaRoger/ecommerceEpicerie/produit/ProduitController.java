@@ -498,7 +498,7 @@ public class ProduitController {
         produit.setActif(actif != null && actif);
 
         if (marque != null && !marque.trim().isEmpty()) {
-            Optional<Marque> marqueRes = Optional.ofNullable(marqueRepository.findById(Long.parseLong(marque)));
+            Optional<Marque> marqueRes = marqueRepository.findById(Long.parseLong(marque));
             if (marqueRes.isPresent()) {
                 Marque marque1 = marqueRes.get();
                 produit.setMarque(marque1);
@@ -596,7 +596,7 @@ public class ProduitController {
         }
 
         if (marque != null && !marque.trim().isEmpty()) {
-            Optional<Marque> marqueRes = Optional.ofNullable(marqueRepository.findById(Long.parseLong(marque)));
+            Optional<Marque> marqueRes = marqueRepository.findById(Long.parseLong(marque));
             if (marqueRes.isPresent()) {
                 Marque marque1 = marqueRes.get();
                 produit.setMarque(marque1);
@@ -699,7 +699,7 @@ public class ProduitController {
         produit.setActif(actif != null && actif);
 
         if (marque != null && !marque.trim().isEmpty()) {
-            Optional<Marque> marqueRes = Optional.ofNullable(marqueRepository.findById(Long.parseLong(marque)));
+            Optional<Marque> marqueRes = marqueRepository.findById(Long.parseLong(marque));
             if (marqueRes.isPresent()) {
                 produit.setMarque(marqueRes.get());
             }
@@ -780,7 +780,7 @@ public class ProduitController {
         produit.setActif(actif != null && actif);
 
         if (marque != null && !marque.trim().isEmpty()) {
-            Optional<Marque> marqueRes = Optional.ofNullable(marqueRepository.findById(Long.parseLong(marque)));
+            Optional<Marque> marqueRes = marqueRepository.findById(Long.parseLong(marque));
             if (marqueRes.isPresent()) {
                 produit.setMarque(marqueRes.get());
             }

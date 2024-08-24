@@ -170,6 +170,7 @@
     }
 
 
+
     </style>
 </head>
 <body>
@@ -253,20 +254,20 @@
                     <p th:text="#{user.command.noOrders}">Vous n'avez pas encore passé de commande.</p>
                 </div>
                 <div th:each="commande : ${commandes.content}" class="order-card">
+                    <!-- Affichage des commandes -->
                     <div class="order-card">
                         <div class="order-header">
                             <div class="order-id"><span th:text="#{user.command.commande}"></span><span
                                     th:text="${commande.id}"></span></div>
                             <div class="order-status"
                                  th:classappend="${'status-' + commande.statut.toString().toLowerCase()}">
-                <span th:text="${
-                  (commande.statut.name() == 'EN_ATTENTE') ? 'En attente' :
-                  (commande.statut.name() == 'EN_COURS') ? 'En cours' :
-                  (commande.statut.name() == 'EN_PREPARATION') ? 'En préparation' :
-                  (commande.statut.name() == 'COMMANDE_PRETE') ? 'Commande prête' :
-                  (commande.statut.name() == 'LIVREE') ? 'Livrée' :
-                  (commande.statut.name() == 'ANNULEE') ? 'Annulée' :
-                  '' }"></span>
+                        <span th:text="${ (commande.statut.name() == 'EN_ATTENTE') ? 'En attente' :
+                          (commande.statut.name() == 'EN_COURS') ? 'En cours' :
+                          (commande.statut.name() == 'EN_PREPARATION') ? 'En préparation' :
+                          (commande.statut.name() == 'COMMANDE_PRETE') ? 'Commande prête' :
+                          (commande.statut.name() == 'LIVREE') ? 'Livrée' :
+                          (commande.statut.name() == 'ANNULEE') ? 'Annulée' :
+                          '' }"></span>
                             </div>
                         </div>
                         <div class="order-info">
@@ -290,6 +291,27 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Pagination -->
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:class="${commandes.hasPrevious()} ? '' : 'disabled'">
+                        <a class="page-link" th:href="@{/commandes(page=${commandes.number - 1})}"
+                           aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li th:each="pageNum : ${#numbers.sequence(1, commandes.totalPages)}" class="page-item"
+                        th:class="${pageNum == commandes.number + 1} ? 'active'">
+                        <a class="page-link" th:href="@{/commandes(page=${pageNum - 1})}" th:text="${pageNum}"></a>
+                    </li>
+                    <li class="page-item" th:class="${commandes.hasNext()} ? '' : 'disabled'">
+                        <a class="page-link" th:href="@{/commandes(page=${commandes.number + 1})}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 </div>
