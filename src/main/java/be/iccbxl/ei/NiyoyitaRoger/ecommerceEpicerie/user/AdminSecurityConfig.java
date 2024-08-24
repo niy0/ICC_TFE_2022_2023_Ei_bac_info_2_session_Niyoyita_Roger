@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -66,6 +67,13 @@ public class AdminSecurityConfig {
         return authenticationProvider;
     }
 
+    @Bean
+    public AuthenticationManager authenticationManagerBean(HttpSecurity http) throws Exception {
+        return http.getSharedObject(AuthenticationManagerBuilder.class)
+                .authenticationProvider(authenticationProvider())
+                .build();
+    }
+
 
     @Bean
     public SecurityFilterChain filterChain1(HttpSecurity httpSecurity) throws Exception {
@@ -76,14 +84,14 @@ public class AdminSecurityConfig {
                         .ignoringRequestMatchers("/addToCart", "/api/checkout/**", "/user/add/favoris", "/produit",
                                 "https://bf9a-2a02-2788-2b8-3ad-61a6-2f05-76f9-f26f.ngrok-free.app/**"))
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/images/**", "/js/**", "/webjars/**", "/api/**", "/panier/api/**", "/favicon.ico/**", "/js/manifest.json").permitAll();
-                    auth.requestMatchers("/favicon.ico", "/panier/**", "/viderPanier/**", "/deleteElemPanier", "/commandes", "/commande/**").permitAll();
+                    auth.requestMatchers("/images/**", "/js/**", "/webjars/**", "/api/products", "/api/**", "/panier/api/**", "/favicon.ico/**", "/js/manifest.json").permitAll();
+                    auth.requestMatchers("/favicon.ico", "/panier/**", "/auth/logout", "/auth/login", "/users/**", "/viderPanier/**", "/deleteElemPanier", "/commandes", "/commande/**").permitAll();
                     auth.requestMatchers("/", "/display/**", "/produit", "/user/signup", "/lignedecommande/**", "/deleteFirstElemPanier", "/auth/debug").permitAll() //changer nouveau produit
                             .requestMatchers("/a-propos", "/info-contact", "/faq", "/livraison", "/retour", "/conditions", "/politique-de-confidentialite", "/addToCart").permitAll()
                             .requestMatchers("/checkout/infos_de_commande/**", "/checkout/success", "/checkout/cancel").permitAll()
                             .requestMatchers("/admin/**", "/produit/create").hasAuthority("Admin")
                             .requestMatchers("/user/**").hasAnyAuthority("User", "Employee", "Admin")
-                            .requestMatchers("/employee/**").hasAnyAuthority("Employee", "Admin")
+                            .requestMatchers("/employe/**").hasAnyAuthority("Employee", "Admin")
                             .requestMatchers("/user/add/favoris").hasAnyAuthority("User", "Employee", "Admin") // Ajout de l'autorisation pour cette URL
                             .anyRequest().authenticated();
                 })

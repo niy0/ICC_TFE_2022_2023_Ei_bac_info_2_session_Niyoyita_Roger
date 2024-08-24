@@ -9,16 +9,36 @@ import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.PanierService;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.User;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.UserService;
 import com.stripe.exception.StripeException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpSession;
+import org.thymeleaf.TemplateEngine;
+
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+
+import java.util.Locale;
 
 @Controller
 public class SuccessCancelController {
@@ -28,6 +48,12 @@ public class SuccessCancelController {
 
     @Autowired
     private CommandeService commandeService;
+
+    @Autowired
+    private JavaMailSender mailSender;
+
+    @Autowired
+    private TemplateEngine templateEngine;
 
     @Autowired
     private UserService userService;
@@ -48,16 +74,15 @@ public class SuccessCancelController {
             @RequestParam("pays") String pays,
             @RequestParam("montantCommande") BigDecimal montantCommande,  // Montant de la commande
             @RequestParam("idPanierStripe") String idPanierStripe, // Ajout
-            Principal principal,
-            HttpSession session) throws StripeException {
+            HttpSession session) throws StripeException, MessagingException {
 
         Panier panier = panierService.getPanierById(Long.valueOf(idPanierStripe));
         Long idUser = null;
-        List<LigneDeCommande> list =  panier.getLignesDeCommande();
+        List<LigneDeCommande> list = panier.getLignesDeCommande();
         User utilisateur = null;
 
         //récupere l'id de l'utilisateur grace au panier
-        if(panier.getUtilisateur() != null) {
+        if (panier.getUtilisateur() != null) {
             idUser = panier.getUtilisateur().getId();
         }
 
@@ -90,16 +115,18 @@ public class SuccessCancelController {
         commandeService.createCommande(nouvelleCommande);
 
         //Ajouter id de commande dans les lignes de commande
-        nouvelleCommande.getLignesDeCommande().forEach( ligne -> ligne.setCommande(nouvelleCommande));
+        nouvelleCommande.getLignesDeCommande().forEach(ligne -> ligne.setCommande(nouvelleCommande));
         commandeService.createCommande(nouvelleCommande);
 
         System.out.println("Nouvelle commande créée : " + nouvelleCommande);
 
+        //envoyer mail facture
+        sendInvoiceEmail(nouvelleCommande, email);
+
         //vider le panier
 
-        return "redirect:/commande/detail/" + nouvelleCommande.getId(); // la transformer en user/commande/detail
+        return "redirect:/commande/detail/" + nouvelleCommande.getId();
     }
-
 
     @GetMapping("/checkout/cancel")
     public String handleStripeCancel() {
@@ -139,5 +166,28 @@ public class SuccessCancelController {
             // page d'erreur personnalisée
             return "error";
         }
+    }
+
+    private void sendInvoiceEmail(Commande commande, String toEmail) throws MessagingException {
+        // Créez un objet MimeMessage
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+        // Définir les destinataires, le sujet, etc.
+        helper.setTo(toEmail);
+        helper.setSubject("Votre facture pour la commande #" + commande.getId());
+
+        // Créez le contexte pour Thymeleaf
+        Context context = new Context(Locale.FRENCH);
+        context.setVariable("commande", commande);
+
+        // Générez le contenu de l'e-mail en utilisant Thymeleaf
+        String htmlContent = templateEngine.process("commande/emailFacture", context);
+
+        // Ajoutez le contenu de l'e-mail au MimeMessage
+        helper.setText(htmlContent, true);  // true pour HTML
+
+        // Envoyer l'e-mail
+        mailSender.send(message);
     }
 }

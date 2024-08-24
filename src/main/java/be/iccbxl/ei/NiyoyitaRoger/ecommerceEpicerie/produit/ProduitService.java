@@ -56,8 +56,8 @@ public class ProduitService {
     public void deleteProductById(Long id) {
         produitRepository.deleteById(id);
     }
-
-
+    
+    //page admin tous les produits actif et non actif
     public Page<Produit> getAllProduits(Pageable pageable, String sortBy, String searchId, String searchNom, String sortPrice, String sortDate, String filterCategorie, String filterMarque, String filterMotCle) {
         Specification<Produit> spec = Specification.where(null);
 
@@ -87,9 +87,12 @@ public class ProduitService {
         return produitRepository.findAll(spec, pageable);
     }
 
-    //api de recherche page /produit
+    //page produit produit actif=true pour tout user
     public Page<Produit> getApiAllProduits(Pageable pageable, String searchQuery, String sortPrice, String sortDate, String filterCategorie, String filterMarque, String filterMotCle) {
         Specification<Produit> spec = Specification.where(null);
+
+        // Filtre pour les produits actifs avec quantité minimale
+        spec = spec.and(ProduitSpecifications.isActiveAndHasMinQuantity());
 
         // Recherche par ID, nom, ou mot-clé
         if (searchQuery != null && !searchQuery.isEmpty()) {

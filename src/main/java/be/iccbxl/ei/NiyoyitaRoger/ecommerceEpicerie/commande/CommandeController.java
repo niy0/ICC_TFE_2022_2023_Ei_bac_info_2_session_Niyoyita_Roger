@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,6 +52,7 @@ public class CommandeController {
         return "commande/myList";
     }
 
+    @PreAuthorize("hasAuthority('Admin') or hasAuthority('Employee')")
     @GetMapping("/employe/commandes")
     public String getAllCommandes(@RequestParam(defaultValue = "dateCommande") String sortBy,
                                   @RequestParam(defaultValue = "0") int page,
@@ -93,32 +95,47 @@ public class CommandeController {
         return commandeService.getAllCommandes(pageable, sortBy, searchId, searchVille, searchCodePostal, filterStatut, filterMethodCommande);
     }
 
-    @PreAuthorize("hasRole('Admin') or principal.username == @commandeService.getCommandeById(#id).get().getUtilisateur().getEmail()")
     @GetMapping("/commande/detail/{id}")
     public String getCommandeById(@PathVariable Long id,
                                   Model model,
                                   Authentication authentication) {
-        Optional<Commande> commande = commandeService.getCommandeById(id);
+        Optional<Commande> commandeOptional = commandeService.getCommandeById(id);
 
-        // Récupération de l'utilisateur connecté
-        Object principal = authentication.getPrincipal();
-        if (principal instanceof UserDetails) {
-            UserDetails userDetails = (UserDetails) principal;
-            String username = userDetails.getUsername();
-            User user = userService.getUserByEmail(username);
-            model.addAttribute("user", user);
-        } else {
-            // Optionally log or handle the case where principal is not a UserDetails instance
-            throw new IllegalStateException("L'utilisateur connecté n'est pas une instance de UserDetails");
-        }
-
-        if (commande.isPresent()) {
-            model.addAttribute("commande", commande.get());
-            return "commande/show";
-        } else {
+        if (commandeOptional.isEmpty()) {
             return "redirect:/commandes";
         }
+        Commande commande = commandeOptional.get();
+
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+
+            System.out.println(authentication.getAuthorities() + "*****************************noyoyoyoyoyoyyo");
+            System.out.println(commande.getId());
+
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            String username = userDetails.getUsername();
+
+            User userAuth = userService.getUserByEmail(username);
+            Long idUserCommande = commande.getUserId();
+
+            // Vérifier si l'utilisateur connecté est le propriétaire de la commande ou un administrateur
+            if ((userAuth.getId() == idUserCommande) ||
+                    authentication.getAuthorities().stream().anyMatch(a ->
+                            a.getAuthority().equals("Admin") || a.getAuthority().equals("Employee"))) {
+
+                model.addAttribute("user", userService.getUserByEmail(username));
+                model.addAttribute("commande", commande);
+                return "commande/show";
+            } else {
+                // Rediriger si l'utilisateur n'est ni le propriétaire, ni un admin, ni un employé
+                return "redirect:/";
+            }
+
+        } else {
+            // Rediriger vers la page de connexion ou une autre page si l'utilisateur n'est pas authentifié
+            return "redirect:/produit";
+        }
     }
+
 
     //methode traiter une commande
     @PostMapping("/employe/commande/updateStatut")
@@ -127,29 +144,34 @@ public class CommandeController {
                                        Authentication authentication,
                                        Model model) {
 
+        System.out.println(commandeId + "::" + statut + "::");
+
         Optional<Commande> commande = commandeService.getCommandeById(commandeId);
 
         // Récupération de l'utilisateur connecté
         Object principal = authentication.getPrincipal();
         if (principal instanceof UserDetails && commande.isPresent()) {
+            Commande updatedCommande = commande.get();
             UserDetails userDetails = (UserDetails) principal;
             String username = userDetails.getUsername();
             User user = userService.getUserByEmail(username);
 
             // Vérification des rôles et user non null
-            if (user != null){
-                if(user.hasRole("Employee") || user.hasRole("Admin"))  {
+            if (user != null) {
+                if (user.hasRole("Employee") || user.hasRole("Admin")) {
                     try {
                         // Mise à jour du statut de la commande
-                        commandeService.updateStatutCommande(commandeId, statut);
-                        model.addAttribute("user",user);
-                        model.addAttribute("commande",commande);
+                        commandeService.updateStatutCommande(updatedCommande.getId(), statut);
+                        updatedCommande.setDateDerniereMajStatut(new Date());
+                        commandeService.save(updatedCommande);
+                        model.addAttribute("user", user);
+                        model.addAttribute("commande", updatedCommande);
                         model.addAttribute("successMessage", "Le statut de la commande a été mis à jour avec succès.");
-                        return "redirect:/employe/commande/detail/"+ commandeId;
+                        return "redirect:/employe/commande/detail/" + commandeId;
                     } catch (Exception e) {
                         model.addAttribute("errorMessage", "Une erreur est survenue lors de la mise à jour du statut de la commande.");
                     }
-                }else {
+                } else {
                     return "redirect:/employe/commandes";
                 }
             } else {
@@ -178,14 +200,14 @@ public class CommandeController {
             User user = userService.getUserByEmail(username);
             model.addAttribute("user", user);
 
-            if(user.hasRole("Employee") || user.hasRole("Admin")) {
+            if (user.hasRole("Employee") || user.hasRole("Admin")) {
                 if (commande.isPresent()) {
                     model.addAttribute("commande", commande.get());
                     return "commande/show";
                 } else {
                     return "redirect:/employe/commandes";
                 }
-            }else {
+            } else {
                 return "redirect:/";
             }
         } else {

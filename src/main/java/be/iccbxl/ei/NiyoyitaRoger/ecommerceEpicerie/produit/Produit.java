@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -288,4 +289,29 @@ public class Produit implements Serializable {
     public String getTypePrix() {
         return typePrix;
     }
+
+    @Override
+    public String toString() {
+        return "Produit{" +
+                "id=" + id +
+                ", nom='" + nom + '\'' +
+                ", description='" + description + '\'' +
+                ", prix=" + prix +
+                ", quantite=" + quantite +
+                ", marque=" + (marque != null ? marque.getNom() : "null") +  // Utiliser un attribut simple ou afficher null
+                ", minStock=" + minStock +
+                ", middleStock=" + middleStock +
+                ", maxStock=" + maxStock +
+                ", cote=" + cote +
+                ", actif=" + actif +
+                ", typePrix='" + typePrix + '\'' +
+                ", categorie=" + (categorie != null ? categorie.getNom() : "null") + // Pareil ici
+                ", disponibilite=" + disponibilite +
+                ", dateCreation=" + dateCreation +
+                ", dateModification=" + dateModification +
+                ", motsCles=" + (motsCles != null ? motsCles.size() + " mots clés" : "null") + // Afficher la taille au lieu des détails
+                ", utilisateursFavoris=" + (utilisateursFavoris != null ? utilisateursFavoris.size() + " utilisateurs favoris" : "null") + // Afficher la taille
+                '}';
+    }
+
 }

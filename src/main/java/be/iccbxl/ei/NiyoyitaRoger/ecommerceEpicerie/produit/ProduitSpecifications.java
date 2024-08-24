@@ -19,6 +19,12 @@ public class ProduitSpecifications {
         return (produit, query, builder) -> builder.equal(produit.get("categorie").get("id"), Long.valueOf(categorieId));
     }
 
+    public static Specification<Produit> isActiveAndHasMinQuantity() {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.and(
+                criteriaBuilder.equal(root.get("actif"), true),
+                criteriaBuilder.greaterThanOrEqualTo(root.get("quantite"), 1)
+        );
+    }
 
     public static Specification<Produit> hasMarque(String marque) {
         return (produit, query, builder) -> builder.equal(produit.get("marque").get("nom"), marque);

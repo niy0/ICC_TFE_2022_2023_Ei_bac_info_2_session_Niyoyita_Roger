@@ -3,6 +3,8 @@ package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.categorie.Categorie;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.role.Role;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.role.RoleRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,9 +14,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -37,19 +42,22 @@ public class UserController {
     private final UserSessionService userSessionService;
     private final RoleRepository roleRepository;
     private final AdresseRepository adresseRepository;
+    private final AuthenticationManager authenticationManager;
 
     @Autowired
     public UserController(UserService userService,
                           CustomUserDetailsService customUserDetailsService,
                           UserSessionService userSessionService,
                           RoleRepository roleRepository,
-                          AdresseRepository adresseRepository) {
+                          AdresseRepository adresseRepository,
+                          AuthenticationManager authenticationManager) {
 
         this.userService = userService;
         this.customUserDetailsService = customUserDetailsService;
         this.userSessionService = userSessionService;
         this.roleRepository = roleRepository;
         this.adresseRepository = adresseRepository;
+        this.authenticationManager = authenticationManager;
     }
 
     @GetMapping("/auth/debug")
@@ -431,4 +439,41 @@ public class UserController {
     public void deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
     }
+    
+
+    /**
+     * Cette méthode permet de récupérer les informations d'un utilisateur spécifique.
+     * Elle utilise l'ID de l'utilisateur pour rechercher ses informations dans la base de données.
+     *
+     * @param id l'ID de l'utilisateur à récupérer.
+     * @return une réponse HTTP contenant les informations de l'utilisateur ou un statut 404 si non trouvé.
+     */
+    @GetMapping("/users/{id}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<User> obtenirUtilisateurParId(@PathVariable Long id) {
+        User user = userService.getUserById(id);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return ResponseEntity.ok(user);
+    }
+
+
+    /**
+     * Cette méthode permet de récupérer les adresses associées à un utilisateur spécifique.
+     * Elle utilise l'ID de l'utilisateur pour récupérer toutes ses adresses.
+     *
+     * @param id l'ID de l'utilisateur dont on souhaite récupérer les adresses.
+     * @return une réponse HTTP contenant la liste des adresses ou un statut 404 si l'utilisateur n'est pas trouvé.
+     */
+    @GetMapping("/users/{id}/addresses")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<Adresse> obtenirAdresseUtilisateur(@PathVariable Long id) {
+        User user = userService.getUserById(id);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return ResponseEntity.ok(user.getAdresse()); // Suppose que User a une méthode getAdresses()
+    }
+
 }

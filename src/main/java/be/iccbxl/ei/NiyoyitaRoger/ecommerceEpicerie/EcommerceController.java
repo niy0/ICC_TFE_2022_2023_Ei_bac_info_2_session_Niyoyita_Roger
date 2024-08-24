@@ -16,13 +16,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 public class EcommerceController {
 
-
-    private ProduitService produitService;
     private JavaMailSender mailSender;
 
     @Autowired
-    public EcommerceController(ProduitService produitService, JavaMailSender mailSender) {
-        this.produitService = produitService;
+    public EcommerceController(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
 
@@ -99,6 +96,4 @@ public class EcommerceController {
     public String privacyPage() {
         return "politique-de-confidentialite";
     }
-
 }
-

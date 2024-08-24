@@ -4,6 +4,7 @@ import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.commande.Commande;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.Panier;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit.Produit;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.role.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import org.springframework.context.annotation.Scope;
@@ -37,6 +38,7 @@ public class User implements Serializable {
     private String email;
 
     @NotEmpty(message = "Mot de passe obligatoire.")
+    @JsonIgnore
     @NotBlank
     @Size(min = 8, max = 200, message = "La taille du mot de passe doit être entre 8 et 200 caractères maximum.")
     private String password;
@@ -100,7 +102,8 @@ public class User implements Serializable {
     @Enumerated(EnumType.STRING)
     private Sexe sexe;
 
-    protected User() {}
+    protected User() {
+    }
 
     public User(String nom, String prenom, String email, String password, Sexe sexe) {
         this.nom = nom;
@@ -111,8 +114,6 @@ public class User implements Serializable {
         this.dateCreation = LocalDateTime.now();
         this.dateModification = LocalDateTime.now();
     }
-
-
 
     public Long getId() {
         return id;
@@ -246,7 +247,6 @@ public class User implements Serializable {
                 ", nom='" + nom + '\'' +
                 ", prenom='" + prenom + '\'' +
                 ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
                 ", isLoggedIn=" + isLoggedIn +
                 ", telephone='" + telephone + '\'' +
                 ", adresse=" + adresse +

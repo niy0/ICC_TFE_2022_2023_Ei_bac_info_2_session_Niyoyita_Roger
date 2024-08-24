@@ -148,7 +148,7 @@ public class LigneDeCommandeController {
             Produit produit = produitRepository.findById(produitId).orElse(null);
             Panier panier = panierRepository.findById(panierId).orElse(null);
 
-            System.out.println(produit+"******--------**********"+panier+"+++++++++***********");
+            System.out.println(produit + "******--------**********" + panier + "+++++++++***********");
 
             if (produit == null) {
                 return ResponseEntity.badRequest().body("Produit non trouvé.");
@@ -176,13 +176,11 @@ public class LigneDeCommandeController {
     public String viewLigneDeCommande(@PathVariable Long id, Model model) {
         LigneDeCommande ligneDeCommande = ligneDeCommandeService.getLigneDeCommandeById(id);
         if (ligneDeCommande == null) {
-            // Gérer le cas où la ligne de commande n'existe pas
             return "redirect:/lignedecommande/list";
         }
         model.addAttribute("ligneDeCommande", ligneDeCommande);
         return "lignesdecommande/view";
     }
-
 
     @PostMapping("/update")
     public ResponseEntity<?> updateLigneDeCommande(@RequestBody LigneDeCommandeUpdatePayload payload) {
@@ -216,5 +214,4 @@ public class LigneDeCommandeController {
 
         return "redirect:/panier";
     }
-
 }

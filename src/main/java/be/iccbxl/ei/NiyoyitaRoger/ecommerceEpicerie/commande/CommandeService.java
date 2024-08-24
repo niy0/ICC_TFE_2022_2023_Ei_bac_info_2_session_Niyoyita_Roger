@@ -23,7 +23,7 @@ import java.util.Set;
 public class CommandeService {
 
     private final CommandeRepository commandeRepository;
-    private  final PanierRepository panierRepository;
+    private final PanierRepository panierRepository;
     private final UserService userService;
 
     private final Validator validator;
@@ -37,6 +37,10 @@ public class CommandeService {
         this.panierRepository = panierRepository;
         this.userService = userService;
         this.validator = validator;
+    }
+
+    public void save(Commande commande) {
+        commandeRepository.save(commande);
     }
 
     public List<Commande> getCommandesByUser(User user) {
