@@ -14,29 +14,18 @@ import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
 import jakarta.servlet.http.HttpSession;
 import org.thymeleaf.TemplateEngine;
 
 import java.math.BigDecimal;
-import java.security.Principal;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.stereotype.Service;
-import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 
 import java.util.Locale;
 
@@ -103,7 +92,7 @@ public class SuccessCancelController {
         Commande nouvelleCommande;
 
         if (utilisateur != null) {
-            nouvelleCommande = new Commande(utilisateur, methodCommande);
+            nouvelleCommande = new Commande(prenom, nom, email, rue, numero, localite, ville, codePostal, departement, pays, methodCommande);
             nouvelleCommande.setMontantCommande(montantCommande); // ajout montantCommande
             nouvelleCommande.getLignesDeCommande().addAll(list);
             nouvelleCommande.setUserId(idUser);

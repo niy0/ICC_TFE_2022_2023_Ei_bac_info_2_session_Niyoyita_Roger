@@ -110,9 +110,20 @@ public class ProduitController {
     }
 
     @GetMapping("/")//faire un autre pour les non admin gérent/manager
-    public String showIndex(Model model) {
+    public String showIndex(Model model, Authentication authentication) {
         List<Produit> productsList = produitService.getAllProduct();
         List<Categorie> categorieList = categorieService.getAllCategorie();
+
+        // Vérifier si un utilisateur est authentifié
+        if (authentication != null && authentication.isAuthenticated()) {
+            Object principal = authentication.getPrincipal();
+            if (principal instanceof UserDetails) {
+                UserDetails userDetails = (UserDetails) principal;
+                String username = userDetails.getUsername();
+                User user = userService.getUserByEmail(username);
+                model.addAttribute("user", user);
+            }
+        }
 
         model.addAttribute("listProducts", productsList);
         model.addAttribute("catList", categorieList);
