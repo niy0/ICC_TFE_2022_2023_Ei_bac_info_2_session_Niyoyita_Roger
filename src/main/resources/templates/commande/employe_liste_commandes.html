@@ -1,17 +1,18 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout" layout:decorate="~{layouts/main}">
-    <head>
-        <meta charset="UTF-8">
-        <title>Liste des commandes</title>
-        <!-- Bootstrap 5 CSS depuis unpkg CDN -->
-        <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-        <!-- Font Awesome -->
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
-        <!-- jQuery -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <!-- Bootstrap Bundle JS (inclut Popper) depuis unpkg CDN -->
-        <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-        <style>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des commandes</title>
+    <!-- Bootstrap 5 CSS depuis unpkg CDN -->
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Bootstrap Bundle JS (inclut Popper) depuis unpkg CDN -->
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
             body {
                 background-color: #f0f2f5;
             }
@@ -238,133 +239,187 @@
             }
         }
 
-        </style>
-    </head>
-    <body>
-        <div class="container-fluid">
-            <div layout:fragment="content" class="row content">
-                <div class="col-12 col-md-4 col-lg-3 sidenav">
-                    <a href="javascript:location.reload()" class="btn-refresh">
-                        <span class="refresh-text marginL">Replier les sous-menus</span> <i class="fas fa-sync-alt" style="color: rgb(255, 193, 7);"></i>
+
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div layout:fragment="content" class="row content">
+        <div class="col-12 col-md-4 col-lg-3 sidenav">
+            <a href="javascript:location.reload()" class="btn-refresh">
+                <span class="refresh-text marginL" th:text="#{menu.refresh}">Replier les sous-menus</span>
+                <i class="fas fa-sync-alt" style="color: rgb(255, 193, 7);"></i>
+            </a>
+            <a class="collapsed" data-bs-toggle="collapse" href="#profileSubmenu" role="button" aria-expanded="false"
+               aria-controls="profileSubmenu">
+                <i class="fas fa-user-circle"></i>
+                <span th:text="#{menu.profile}">Profil</span> :
+                <span th:text="${user.nom} + ' ' + ${user.prenom}"></span>
+                <span class="submenu-icon fas fa-caret-right"></span>
+            </a>
+            <div class="collapse marginR" id="profileSubmenu">
+                <a th:href="@{'/user/' + ${user.id} + '/profile'}" style="font-size: 16px;">
+                    <i class="fas fa-user-circle"></i>
+                    <span th:text="#{menu.viewProfile}">Voir profil</span>
+                </a>
+                <a th:href="@{'/user/' + ${user.id} + '/profile/edit'}" style="font-size: 16px;">
+                    <i class="fas fa-user-edit"></i>
+                    <span th:text="#{menu.editProfile}">Modifier profil</span>
+                </a>
+                <a th:href="@{'/user/' + ${user.id} + '/adresse/edit'}" style="font-size: 16px;">
+                    <i class="fas fa-address-card"></i>
+                    <span th:text="#{menu.editAddress}">Modifier adresse</span>
+                </a>
+            </div>
+
+            <a th:href="@{/commandes}">
+                <i class="fas fa-shopping-cart"></i>
+                <span th:text="#{menu.orders}">Mes commandes</span>
+            </a>
+            <a th:href="@{/user/favoris}">
+                <i class="fas fa-heart"></i>
+                <span th:text="#{menu.favorites}">Mes produits favoris</span>
+            </a>
+
+            <div th:if="${user.hasRole('Employee') or user.hasRole('Admin')}">
+                <a class="collapsed" data-bs-toggle="collapse" href="#employeeSubmenu" role="button"
+                   aria-expanded="false"
+                   aria-controls="employeeSubmenu">
+                    <i class="fas fa-briefcase"></i> <span th:text="#{menu.employee}">Employé</span>
+                    <span class="submenu-icon fas fa-caret-right"></span>
+                </a>
+                <div class="collapse marginR" id="employeeSubmenu">
+                    <a th:href="@{/employe/commandes}" style="font-size: 16px;">
+                        <i class="fas fa-list"></i> <span th:text="#{menu.employee.orders}">Liste des commandes</span>
                     </a>
-                    <a class="collapsed" data-bs-toggle="collapse" href="#profileSubmenu" role="button" aria-expanded="false" aria-controls="profileSubmenu">
-                        <i class="fas fa-user-circle"></i> Profile : <span th:text="${user.nom} + ' ' + ${user.prenom}"></span>
+                    <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#statSubmenu"
+                       role="button" aria-expanded="false" aria-controls="statSubmenu">
+                        <i class="fas fa-chart-line"></i> <span th:text="#{menu.statistics}">Statistiques</span>
                         <span class="submenu-icon fas fa-caret-right"></span>
                     </a>
-                    <div class="collapse marginR" id="profileSubmenu">
-                        <a th:href="@{'/user/' + ${user.id} + '/profile'}" style="font-size: 16px;"><i class="fas fa-user-circle"></i>Voir profil</a>
-                        <a th:href="@{'/user/' + ${user.id} + '/profile/edit'}" style="font-size: 16px;"><i class="fas fa-user-edit"></i> Modifier profil</a>
-                        <a th:href="@{'/user/' + ${user.id} + '/adresse/edit'}" style="font-size: 16px;"><i class="fas fa-address-card"></i> Modifier adresse</a>
-                    </div>
-
-                    <a th:href="@{/commandes}"><i class="fas fa-shopping-cart"></i> Mes commandes</a>
-                    <a th:href="@{/user/favoris}"><i class="fas fa-heart"></i> Mes produits favoris</a>
-
-                    <a class="collapsed" data-bs-toggle="collapse" href="#employeeSubmenu" role="button" aria-expanded="false" aria-controls="employeeSubmenu">
-                        <i class="fas fa-briefcase"></i> Employé <span class="submenu-icon fas fa-caret-right"></span>
-                    </a>
-                    <div class="collapse marginR" id="employeeSubmenu">
-                        <a th:href="@{/employe/commandes}"style="font-size: 16px;"><i class="fas fa-list"></i> Liste des commandes</a>
-                        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#statSubmenu" role="button" aria-expanded="false" aria-controls="statSubmenu">
-                            <i class="fas fa-chart-line"></i> Statistiques <span class="submenu-icon fas fa-caret-right"></span>
+                    <div class="collapse marginR" id="statSubmenu">
+                        <a href="#" style="font-size: 14px;">
+                            <i class="fas fa-chart-bar"></i> <span th:text="#{menu.sales}">Ventes</span>
                         </a>
-                        <div class="collapse marginR" id="statSubmenu">
-                            <a href="#" style="font-size: 14px;"><i class="fas fa-chart-bar"></i> Ventes</a>
-                            <a href="#" style="font-size: 14px;"><i class="fas fa-chart-pie"></i> Répartition des produits</a>
-                        </div>
-                    </div>
-                    <a class="collapsed" data-bs-toggle="collapse" href="#adminSubmenu" role="button" aria-expanded="false" aria-controls="adminSubmenu">
-                        <i class="fas fa-cog"></i> Admin <span class="submenu-icon fas fa-caret-right"></span>
-                    </a>
-                    <div class="collapse marginR" id="adminSubmenu">
-                        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#stockSubmenu" role="button" aria-expanded="false" aria-controls="stockSubmenu">
-                            <i class="fas fa-box"></i> Gestion stock <span class="submenu-icon fas fa-caret-right"></span>
+                        <a href="#" style="font-size: 14px;">
+                            <i class="fas fa-chart-pie"></i> <span th:text="#{menu.productDistribution}">Répartition des produits</span>
                         </a>
-                        <div class="collapse marginR" id="stockSubmenu">
-                            <a th:href="@{/admin/produits}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des produits</a>
-                            <a th:href="@{/produit/create}" style="font-size: 14px;"><i class="fas fa-plus-square"></i> Ajouter un produit</a>
-                        </div>
-                        <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#userManagementSubmenu" role="button" aria-expanded="false" aria-controls="userManagementSubmenu">
-                            <i class="fas fa-users"></i> Gestion utilisateurs <span class="submenu-icon fas fa-caret-right"></span>
-                        </a>
-                        <div class="collapse marginR" id="userManagementSubmenu">
-                            <a th:href="@{/admin/users}" style="font-size: 14px;"><i class="fas fa-list"></i> Liste des utilisateurs</a>
-                            <a th:href="@{/admin/add_new_user}"   style="font-size: 14px;"><i class="fas fa-user-plus"></i> Ajouter un utilisateur</a>
-                        </div>
                     </div>
                 </div>
-                <div class="col-12 col-md-8 col-lg-9 main-content">
-                    <h1 class="title" >Liste des commandes</h1>
-                    <div class="filters mb-3">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <input type="text" id="searchId" class="form-control" placeholder="Rechercher par ID">
-                            </div>
-                            <div class="col-md-4">
-                                <input type="text" id="searchVille"  class="form-control" placeholder="Rechercher par ville">
-                            </div>
-                            <div class="col-md-4">
-                                <input type="text" id="searchCodePostal" style="width: auto; min-width: 250px;" class="form-control" placeholder="Rechercher par code postal">
-                            </div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-md-4">
-                                <select id="filterStatut" class="form-control">
-                                    <option value="">Filtrer par statut</option>
-                                    <option value="EN_ATTENTE">EN_ATTENTE</option>
-                                    <option value="EN_COURS">EN_COURS</option>
-                                    <option value="EN_PREPARATION">EN_PREPARATION</option>
-                                    <option value="COMMANDE_PRETE">COMMANDE_PRETE</option>
-                                    <option value="LIVREE">LIVREE</option>
-                                    <option value="ANNULEE">ANNULEE</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <select id="filterMethodCommande" class="form-control" style="width: auto; min-width: 250px;">
-                                    <option value="">Filtrer par méthode de commande</option>
-                                    <option value="DELIVERY">DELIVERY</option>
-                                    <option value="PICKUP">PICKUP</option>
-                                </select>
-                            </div>
-                        </div>
+            </div>
+
+            <div th:if="${user.hasRole('Admin')}">
+                <a class="collapsed" data-bs-toggle="collapse" href="#adminSubmenu" role="button" aria-expanded="false"
+                   aria-controls="adminSubmenu">
+                    <i class="fas fa-cog"></i> <span th:text="#{menu.admin}">Admin</span>
+                    <span class="submenu-icon fas fa-caret-right"></span>
+                </a>
+                <div class="collapse marginR" id="adminSubmenu">
+                    <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#stockSubmenu"
+                       role="button" aria-expanded="false" aria-controls="stockSubmenu">
+                        <i class="fas fa-box"></i> <span th:text="#{menu.stockManagement}">Gestion stock</span>
+                        <span class="submenu-icon fas fa-caret-right"></span>
+                    </a>
+                    <div class="collapse marginR" id="stockSubmenu">
+                        <a th:href="@{/admin/produits}" style="font-size: 14px;">
+                            <i class="fas fa-list"></i> <span th:text="#{menu.productList}">Liste des produits</span>
+                        </a>
+                        <a th:href="@{/produit/create}" style="font-size: 14px;">
+                            <i class="fas fa-plus-square"></i> <span
+                                th:text="#{menu.addProduct}">Ajouter un produit</span>
+                        </a>
                     </div>
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead class="table-info">
-                                    <tr>
-                                        <th scope="col" class="sortable" data-sort="id">Id</th>
-                                        <th scope="col">Nom</th>
-                                        <th scope="col" class="sortable" data-sort="dateCommande">Date de commande</th>
-                                        <th scope="col" class="sortable" data-sort="statut">Statut</th>
-                                        <th scope="col" class="sortable" data-sort="ville">Ville</th>
-                                        <th scope="col" class="sortable" data-sort="codePostal">Code Postal</th>
-                                        <th scope="col" class="sortable" data-sort="methodCommande">Méthode de commande</th>
-                                        <th scope="col">Actions</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody id="commandesTableBody">
-                                    <!-- Les commandes seront injectées ici via Ajax -->
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div style="display:flex;align-items:center;">
-                                <!-- Pagination -->
-                                <nav aria-label="Page navigation" class="mx-auto">
-                                    <ul class="pagination">
-                                        <!-- La pagination injectée ici via Ajax -->
-                                    </ul>
-                                </nav>
-                            </div>
-                        </div>
+                    <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse"
+                       href="#userManagementSubmenu"
+                       role="button" aria-expanded="false" aria-controls="userManagementSubmenu">
+                        <i class="fas fa-users"></i> <span th:text="#{menu.userManagement}">Gestion utilisateurs</span>
+                        <span class="submenu-icon fas fa-caret-right"></span>
+                    </a>
+                    <div class="collapse marginR" id="userManagementSubmenu">
+                        <a th:href="@{/admin/users}" style="font-size: 14px;">
+                            <i class="fas fa-list"></i> <span th:text="#{menu.userList}">Liste des utilisateurs</span>
+                        </a>
+                        <a th:href="@{/admin/add_new_user}" style="font-size: 14px;">
+                            <i class="fas fa-user-plus"></i> <span
+                                th:text="#{menu.addUser}">Ajouter un utilisateur</span>
+                        </a>
                     </div>
                 </div>
-                <!-- jQuery (Nécessaire avant les scripts Bootstrap) -->
-                <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-                <!-- Bootstrap 5 Bundle JS (inclut Popper) -->
-                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-                <script>
+            </div>
+        </div>
+        <div class="col-12 col-md-8 col-lg-9 main-content">
+            <h1 class="title">Liste des commandes</h1>
+            <div class="filters mb-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <input type="text" id="searchId" class="form-control" placeholder="Rechercher par ID">
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" id="searchVille" class="form-control" placeholder="Rechercher par ville">
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" id="searchCodePostal" style="width: auto; min-width: 250px;"
+                               class="form-control" placeholder="Rechercher par code postal">
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <select id="filterStatut" class="form-control">
+                            <option value="">Filtrer par statut</option>
+                            <option value="EN_ATTENTE">EN_ATTENTE</option>
+                            <option value="EN_COURS">EN_COURS</option>
+                            <option value="EN_PREPARATION">EN_PREPARATION</option>
+                            <option value="COMMANDE_PRETE">COMMANDE_PRETE</option>
+                            <option value="LIVREE">LIVREE</option>
+                            <option value="ANNULEE">ANNULEE</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select id="filterMethodCommande" class="form-control" style="width: auto; min-width: 250px;">
+                            <option value="">Filtrer par méthode de commande</option>
+                            <option value="DELIVERY">DELIVERY</option>
+                            <option value="PICKUP">PICKUP</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-info">
+                            <tr>
+                                <th scope="col" class="sortable" data-sort="id">Id</th>
+                                <th scope="col">Nom</th>
+                                <th scope="col" class="sortable" data-sort="dateCommande">Date de commande</th>
+                                <th scope="col" class="sortable" data-sort="statut">Statut</th>
+                                <th scope="col" class="sortable" data-sort="ville">Ville</th>
+                                <th scope="col" class="sortable" data-sort="codePostal">Code Postal</th>
+                                <th scope="col" class="sortable" data-sort="methodCommande">Méthode de commande</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody id="commandesTableBody">
+                            <!-- Les commandes seront injectées ici via Ajax -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="display:flex;align-items:center;">
+                        <!-- Pagination -->
+                        <nav aria-label="Page navigation" class="mx-auto">
+                            <ul class="pagination">
+                                <!-- La pagination injectée ici via Ajax -->
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- jQuery (Nécessaire avant les scripts Bootstrap) -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <!-- Bootstrap 5 Bundle JS (inclut Popper) -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
                     // Déclarez la fonction en dehors de $(document).ready pour la rendre accessible globalement
                     function loadCommandes(page, sortBy) {
                         $.ajax({
@@ -449,13 +504,14 @@
                             loadCommandes(0, sortBy);
                         });
                     });
-                </script>
 
-            </div>
-        </div>
-        <!-- Footer -->
-        <div class="page-footer">
-            <div th:replace="~{fragments/footer :: footer}"></div>
-        </div>
-    </body>
+        </script>
+
+    </div>
+</div>
+<!-- Footer -->
+<div class="page-footer">
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</div>
+</body>
 </html>
