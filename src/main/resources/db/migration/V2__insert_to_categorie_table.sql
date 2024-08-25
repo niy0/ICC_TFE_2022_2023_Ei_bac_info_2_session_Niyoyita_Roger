@@ -1,16 +1,12 @@
-INSERT INTO `categorie` (`id`, `cat_nom`) VALUES
-(1, 'Fruits et légumes'),
-(2, 'Viandes et poissons'),
-(3, 'Produits laitiers'),
-(4, 'Boulangerie et pâtisserie'),
-(5, 'Épicerie sèche'),
-(6, 'Boissons'),
-(7, 'Produits surgelés'),
-(8, 'Hygiène personnelle'),
-(9, 'Entretien ménager'),
-(10, 'Produits pour bébés'),
-(11, 'Produits de beauté'),
-(12, 'Articles pour animaux de compagnie'),
-(13, 'Produits bio et santé'),
-(14, 'Électronique et électroménager'),
-(15, 'Articles ménagers');
+insert into `categorie` (`id`, `cat_nom`) VALUES
+(1, 'Viandes et poissons'),
+(2, 'Produits laitiers'),
+(3, 'Épicerie sèche'),
+(4, 'Boissons'),
+(5, 'Produits surgelés'),
+(6, 'Hygiène personnelle'),
+(7, 'Entretien ménager'),
+(8, 'Produits pour bébés'),
+(9, 'Produits de beauté'),
+(10, 'Articles pour animaux de compagnie'),
+(11, 'Articles ménagers');
