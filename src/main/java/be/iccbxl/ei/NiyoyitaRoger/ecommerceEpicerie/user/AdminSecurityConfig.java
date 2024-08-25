@@ -77,16 +77,15 @@ public class AdminSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain1(HttpSecurity httpSecurity) throws Exception {
-
-        // .requestMatchers("/user/**").access("hasAuthority('User') or hasAuthority('Admin')")
-        //AbstractHttpConfigurer::disable
         httpSecurity.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                         .ignoringRequestMatchers("/addToCart", "/api/checkout/**", "/user/add/favoris", "/produit",
                                 "https://bf9a-2a02-2788-2b8-3ad-61a6-2f05-76f9-f26f.ngrok-free.app/**"))
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/images/**", "/js/**", "/webjars/**", "/api/products", "/api/**", "/panier/api/**", "/favicon.ico/**", "/js/manifest.json").permitAll();
-                    auth.requestMatchers("/favicon.ico", "/panier/**", "/auth/logout", "/auth/login", "/users/**", "/viderPanier/**", "/deleteElemPanier", "/commandes", "/commande/**").permitAll();
-                    auth.requestMatchers("/", "/display/**", "/produit", "/produit/**", "/user/signup", "/lignedecommande/**", "/deleteFirstElemPanier", "/auth/debug").permitAll() //changer nouveau produit
+                    auth.requestMatchers("/images/**", "/js/**", "/webjars/**", "/api/products", "/api/**").permitAll();
+                    auth.requestMatchers("/panier/api/**", "/favicon.ico/**", "/js/manifest.json").permitAll();
+                    auth.requestMatchers("/favicon.ico", "/panier/**", "/auth/logout", "/auth/login", "/users/**").permitAll();
+                    auth.requestMatchers("/viderPanier/**", "/deleteElemPanier", "/commandes", "/commande/**").permitAll();
+                    auth.requestMatchers("/", "/display/**", "/produit", "/produit/**", "/user/signup", "/lignedecommande/**", "/deleteFirstElemPanier", "/auth/debug").permitAll()
                             .requestMatchers("/a-propos", "/info-contact", "/faq", "/livraison", "/retour", "/conditions", "/politique-de-confidentialite", "/addToCart").permitAll()
                             .requestMatchers("/checkout/infos_de_commande/**", "/checkout/success", "/checkout/cancel").permitAll()
                             .requestMatchers("/admin/**", "/produit/create").hasAuthority("Admin")
@@ -95,12 +94,8 @@ public class AdminSecurityConfig {
                             .requestMatchers("/user/add/favoris").hasAnyAuthority("User", "Employee", "Admin") // Ajout de l'autorisation pour cette URL
                             .anyRequest().authenticated();
                 })
-                //.sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authenticationProvider(authenticationProvider())
-                //.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                //.ignoringRequestMatchers("/addToCart")
-                // Autres configurations CSRF ici si nécessaire
                 .formLogin(formLogin -> formLogin.loginPage("/login")
                         .usernameParameter("email")
                         .successHandler(successHadeler)

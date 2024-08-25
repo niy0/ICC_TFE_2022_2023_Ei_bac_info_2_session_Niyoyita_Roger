@@ -16,8 +16,8 @@
     <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/js/script.js"></script>
     <!-- Balises meta pour le jeton CSRF -->
-    <meta name="_csrf.parameterName" th:content="${_csrf.parameterName}" />
-    <meta name="_csrf.token" th:content="${_csrf.token}" />
+    <meta name="_csrf.parameterName" th:content="${_csrf.parameterName}"/>
+    <meta name="_csrf.token" th:content="${_csrf.token}"/>
     <style>
         .fieldError { color: red; }
         .content {
@@ -104,6 +104,7 @@
                 width: 100%;
             }
         }
+
     </style>
 </head>
 <body>
@@ -114,77 +115,98 @@
                 <input type="hidden" th:value="${user != null ? user.id : ''}" name="userId" id="userId">
                 <input type="hidden" th:value="${panier.id}" name="panierId" id="panierId">
                 <input type="hidden" th:value="${produit.id}" th:id="'produitId-' + ${produit.id}" name="produitId">
-                <img class="card-img-left product-image" th:src="@{'/display?id=' + ${produit.id}}" alt="Image du produit">
+                <img class="card-img-left product-image" th:src="@{'/display?id=' + ${produit.id}}"
+                     alt="Image du produit">
                 <div class="card-body product-details">
                     <h1 class="product-title">[[${produit.nom}]]</h1>
                     <div class="rating d-flex align-items-center" style="justify-content: flex-start;">
                         <!-- Les étoiles... -->
-                        <input type="radio" id="star5" name="rating" value="5" style="display: none;" th:checked="${produit.cote >= 5}">
-                        <label for="star5" style="margin-right: 5px;"><i class="fas fa-star" style="color: #ffc107;"></i></label>
+                        <input type="radio" id="star5" name="rating" value="5" style="display: none;"
+                               th:checked="${produit.cote >= 5}">
+                        <label for="star5" style="margin-right: 5px;"><i class="fas fa-star"
+                                                                         style="color: #ffc107;"></i></label>
 
-                        <input type="radio" id="star4" name="rating" value="4" style="display: none;" th:checked="${produit.cote >= 4}">
-                        <label for="star4" style="margin-right: 5px;"><i class="fas fa-star" style="color: #ffc107;"></i></label>
+                        <input type="radio" id="star4" name="rating" value="4" style="display: none;"
+                               th:checked="${produit.cote >= 4}">
+                        <label for="star4" style="margin-right: 5px;"><i class="fas fa-star"
+                                                                         style="color: #ffc107;"></i></label>
 
-                        <input type="radio" id="star3" name="rating" value="3" style="display: none;" th:checked="${produit.cote >= 3}">
-                        <label for="star3" style="margin-right: 5px;"><i class="fas fa-star" style="color: #ffc107;"></i></label>
+                        <input type="radio" id="star3" name="rating" value="3" style="display: none;"
+                               th:checked="${produit.cote >= 3}">
+                        <label for="star3" style="margin-right: 5px;"><i class="fas fa-star"
+                                                                         style="color: #ffc107;"></i></label>
 
-                        <input type="radio" id="star2" name="rating" value="2" style="display: none;" th:checked="${produit.cote >= 2}">
-                        <label for="star2" style="margin-right: 5px;"><i class="fas fa-star" style="color: #ffc107;"></i></label>
+                        <input type="radio" id="star2" name="rating" value="2" style="display: none;"
+                               th:checked="${produit.cote >= 2}">
+                        <label for="star2" style="margin-right: 5px;"><i class="fas fa-star"
+                                                                         style="color: #ffc107;"></i></label>
 
-                        <input type="radio" id="star1" name="rating" value="1" style="display: none;" th:checked="${produit.cote >= 1}">
+                        <input type="radio" id="star1" name="rating" value="1" style="display: none;"
+                               th:checked="${produit.cote >= 1}">
                         <label for="star1"><i class="fas fa-star" style="color: #ffc107;"></i></label>
                     </div>
 
                     <p>[[${produit.description}]]</p>
-                    <h2 class="product-price" style="font-size: 1.5rem; font-weight: bold; color: #28a745;">[[${produit.prix}]]&euro;</h2>
+                    <h2 class="product-price" style="font-size: 1.5rem; font-weight: bold; color: #28a745;">
+                        [[${produit.prix}]]&euro;</h2>
                     <div class="detail-group mb-3">
                         <div class="input-group input-spinner me-3" style="max-width: 120px;">
                             <button class="button-minus btn btn-sm btn-outline-secondary" type="button"
                                     onclick="var input = this.nextElementSibling; input.value = Math.max(parseInt(input.value) - 1, 1);">
                                 <i class="fa-solid fa-minus"></i>
                             </button>
-                            <input style="width: 50px; text-align: center;" type="number" step="1" min="1" max="10" value="1"
-                                   name="quantity" th:id="'quantite-' + ${produit.id}" class="quantity-field form-control form-control-sm">
+                            <input style="width: 50px; text-align: center;" type="number" step="1" min="1" max="10"
+                                   value="1"
+                                   name="quantity" th:id="'quantite-' + ${produit.id}"
+                                   class="quantity-field form-control form-control-sm">
                             <button class="button-plus btn btn-sm btn-outline-secondary" type="button"
                                     onclick="var input = this.previousElementSibling; input.value = Math.min(parseInt(input.value) + 1, 10);">
                                 <i class="fa-solid fa-plus"></i>
                             </button>
                         </div>
 
-                        <button id="favorite-btn-${produit.id}" class="favorite-btn btn btn-outline-danger" title="Ajouter aux favoris" data-product-id="${produit.id}" style="border-radius: 50%;">
+                        <button id="favorite-btn-${produit.id}" class="favorite-btn btn btn-outline-danger"
+                                th:title="#{product.view.addToFavorites}" data-product-id="${produit.id}"
+                                style="border-radius: 50%;">
                             <i class="far fa-heart"></i>
                             <i class="fas fa-heart" style="display: none;"></i>
                         </button>
 
                     </div>
-                    <button class="btn btn-success w-100 mb-3" th:onclick="'addToCart(' + ${produit.id} + ')'"><i class="fa fa-shopping-cart"></i> Ajouter </button>
+                    <button class="btn btn-success w-100 mb-3" th:onclick="'addToCart(' + ${produit.id} + ')'"
+                            th:text="#{product.view.addToCart}"><i class="fa fa-shopping-cart"></i> Ajouter
+                    </button>
                     <ul class="list-group list-group-flush" style="text-align:left;">
                         <li class="list-group-item">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <p style="margin: 0;">Catégorie</p>
+                                <p style="margin: 0;" th:text="#{product.view.category}">Catégorie</p>
                                 <p style="margin: 0;">[[${produit.categorie.nom}]]</p>
                             </div>
                         </li>
                         <li class="list-group-item">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <p style="margin: 0;">Disponibilité</p>
-                                <p th:if="${produit.disponibilite}" style="margin: 0;">En stock</p>
+                                <p style="margin: 0;" th:text="#{product.view.availability}">Disponibilité</p>
+                                <p th:if="${produit.disponibilite}" style="margin: 0;"
+                                   th:text="#{product.view.inStock}">En stock</p>
                             </div>
                         </li>
                         <li class="list-group-item">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <p style="margin: 0;">Marque</p>
+                                <p style="margin: 0;" th:text="#{product.view.brand}">Marque</p>
                                 <p style="margin: 0;">
                                     <span th:if="${produit.marque != null and !#strings.isEmpty(produit.marque.nom)}">[[${produit.marque.nom}]]</span>
-                                    <span th:if="${produit.marque == null or #strings.isEmpty(produit.marque.nom)}">Pas de marque</span>
+                                    <span th:if="${produit.marque == null or #strings.isEmpty(produit.marque.nom)}"
+                                          th:text="#{product.view.noBrand}">Pas de marque</span>
                                 </p>
                             </div>
                         </li>
                         <li th:if="${!produit.motsCles.isEmpty()}" class="list-group-item">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <p style="margin: 0;">Mots clés</p>
+                                <p style="margin: 0;" th:text="#{product.view.keywords}">Mots clés</p>
                                 <div>
-                                    <button th:each="motCle : ${produit.motsCles}" type="button" style="margin-left:2px;" class="btn btn-outline-info" th:text="${motCle.nom}"></button>
+                                    <button th:each="motCle : ${produit.motsCles}" type="button"
+                                            style="margin-left:2px;" class="btn btn-outline-info"
+                                            th:text="${motCle.nom}"></button>
                                 </div>
                             </div>
                         </li>
