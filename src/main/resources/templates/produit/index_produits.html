@@ -253,6 +253,16 @@
             margin-bottom: 20px;
         }
 
+
+
+
+
+
+
+
+
+
+
     </style>
 </head>
 <body>
@@ -352,13 +362,18 @@
                                                            class="form-control form-control-sm form-input text-center">
                                                 </div>
                                             </div>
-                                            <div>
+                                            <div style="display: flex; align-items: center; justify-content: flex-start;">
+                                                <a href="@{'/produit/'+${produit.id}}"
+                                                   class="btn btn-outline-primary"
+                                                   style="border-radius: 50%; margin-right: 10px;"
+                                                   th:title="#{indexProduit.button.viewProduct}">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
                                                 <button id="favorite-btn-${produit.id}"
                                                         class="favorite-btn btn btn-outline-danger"
                                                         th:title="#{indexProduit.button.addToFavorites}"
                                                         data-product-id="${produit.id}"
                                                         style="border-radius: 50%;">
-
                                                     <i class="far fa-heart"></i>
                                                     <i class="fas fa-heart" style="display: none;"></i>
                                                 </button>
@@ -522,13 +537,20 @@
                                                                        class="form-control form-control-sm form-input text-center">
                                                             </div>
                                                         </div>
-                                                        <button id="favorite-btn-${produit.id}" class="favorite-btn btn btn-outline-danger"
-                                                                th:title="#{indexProduit.button.addToFavorites}"
-                                                                data-product-id="${produit.id}" style="border-radius: 50%;">
-                                                            <i class="far fa-heart"></i>
-                                                            <i class="fas fa-heart" style="display: none;"></i>
-                                                        </button>
-
+                                                        <div style="display: flex; align-items: center; justify-content: flex-start;">
+                                                            <a href="/produit/${produit.id}"
+                                                               class="btn btn-outline-primary"
+                                                               style="border-radius: 50%; margin-right: 10px;"
+                                                               th:title="#{indexProduit.button.viewProduct}">
+                                                                <i class="fas fa-eye"></i>
+                                                            </a>
+                                                            <button id="favorite-btn-${produit.id}" class="favorite-btn btn btn-outline-danger"
+                                                                    th:title="#{indexProduit.button.addToFavorites}"
+                                                                    data-product-id="${produit.id}" style="border-radius: 50%;">
+                                                                <i class="far fa-heart"></i>
+                                                                <i class="fas fa-heart" style="display: none;"></i>
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                     <button class="btn btn-success"  onclick="addToCart(${produit.id})">
                                                         <span th:text="#{indexProduit.button.addToCart}"
@@ -584,6 +606,16 @@
                             $(this).toggleClass('active');
                         });
                     });
+
+
+
+
+
+
+
+
+
+
 
 
 
