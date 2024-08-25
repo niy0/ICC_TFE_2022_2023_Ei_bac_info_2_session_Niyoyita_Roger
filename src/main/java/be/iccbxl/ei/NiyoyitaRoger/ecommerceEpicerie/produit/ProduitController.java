@@ -167,8 +167,7 @@ public class ProduitController {
         return "produit/index_produits";
     }
 
-    // bonne liste List<Produit> produits = produitService.getProduitsAvecQuantiteMinEtActif();
-
+    
     @GetMapping("/produit/{id}")
     public String getProduitById(@PathVariable long id,
                                  Model model,
@@ -177,25 +176,33 @@ public class ProduitController {
                                  Authentication authentication) throws ProduitNotFoundException {
         Produit produit = produitRepository.getPro(id);
 
+        // Vérifier si le produit existe
+        if (produit == null) {
+            throw new ProduitNotFoundException("Produit non trouvé");
+        }
+
+        // Récupération ou création du panier
         Panier panierTest = panierService.getOrCreatePanier(principal, session);
         Panier panier = panierService.getPanierById(panierTest.getId());
 
-        // Récupération de l'utilisateur connecté
-        Object principalTest = authentication.getPrincipal();
-        if (principalTest instanceof UserDetails) {
-            UserDetails userDetails = (UserDetails) principalTest;
-            String username = userDetails.getUsername();
-            User user = userService.getUserByEmail(username);
-            model.addAttribute("user", user);
-
-            if (produit != null) {
-                model.addAttribute("produit", produit);
-                model.addAttribute("panier", panier);
-                return "/produit/show";
+        // Si l'utilisateur est connecté, ajouter les informations utilisateur au modèle
+        if (authentication != null && authentication.isAuthenticated() && !(authentication.getPrincipal() instanceof String && authentication.getPrincipal().equals("anonymousUser"))) {
+            Object principalTest = authentication.getPrincipal();
+            if (principalTest instanceof UserDetails) {
+                UserDetails userDetails = (UserDetails) principalTest;
+                String username = userDetails.getUsername();
+                User user = userService.getUserByEmail(username);
+                model.addAttribute("user", user);
             }
         }
-        return "redirect:/produits/admin";
+
+        // Ajouter les informations du produit et du panier au modèle, accessible à tous les utilisateurs
+        model.addAttribute("produit", produit);
+        model.addAttribute("panier", panier);
+
+        return "/produit/show";
     }
+
 
     @GetMapping("/user/favoris")
     public String showFavoris(Model model,
