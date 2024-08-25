@@ -32,7 +32,7 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .content-section h3 {
-            margin-bottom: 15px;
+            margin-bottom: 25px;
             color: #333;
         }
 
@@ -41,127 +41,89 @@
 <body>
 <div layout:fragment="content" class="content">
     <div class="container mt-5">
-        <h1 class="custom-title"><i class="fas fa-shield-alt"></i> Politique de Confidentialité</h1>
+        <h1 class="custom-title"><i class="fas fa-shield-alt"></i> <span th:text="#{privacy.policy.title}"></span></h1>
 
         <div class="content-section">
-            <h3><i class="fas fa-balance-scale section-icon"></i>Conformité Juridique et Cadre Légal</h3>
-            <p>
-                Chez L'épicerie de l'Houmeau, nous respectons les normes du RGPD pour protéger vos données personnelles.
-                Cela inclut l'obtention de votre consentement explicite avant toute collecte ou utilisation de vos
-                données.
-            </p>
+            <h3><i class="fas fa-balance-scale section-icon"></i> <span th:text="#{privacy.legal.compliance}"></span>
+            </h3>
+            <p th:text="#{privacy.legal.compliance.text}"></p>
+        </div>
+
+
+        <div class="content-section">
+            <h3 style=" margin-bottom: 15px;"><i class="fas fa-user-shield section-icon"></i> <span
+                    th:text="#{privacy.data.protection}"></span></h3>
+            <h4><i class="fas fa-check-circle section-icon"></i> <span th:text="#{privacy.consent}"></span></h4>
+            <p th:text="#{privacy.consent.text}"></p>
+            <h4><i class="fas fa-clock section-icon"></i> <span th:text="#{privacy.storage.duration}"></span></h4>
+            <p th:text="#{privacy.storage.duration.text}"></p>
+            <h4><i class="fas fa-trash-alt section-icon"></i> <span th:text="#{privacy.right.to.be.forgotten}"></span>
+            </h4>
+            <p th:text="#{privacy.right.to.be.forgotten.text}"></p>
         </div>
 
         <div class="content-section">
-            <h3><i class="fas fa-user-shield section-icon"></i>Protection des Données (RGPD)</h3>
-            <h4><i class="fas fa-check-circle section-icon"></i>Consentement</h4>
-            <p>
-                Nous collectons vos données personnelles uniquement avec votre consentement explicite, libre et éclairé.
-            </p>
-            <h4><i class="fas fa-clock section-icon"></i>Durée de Stockage</h4>
-            <p>
-                Vos données sont conservées uniquement le temps nécessaire pour atteindre les objectifs pour lesquels
-                elles ont été collectées, conformément aux recommandations de la CNIL.
-            </p>
-            <h4><i class="fas fa-trash-alt section-icon"></i>Droit à l'Oubli</h4>
-            <p>
-                Vous avez le droit de demander la suppression de vos données personnelles à tout moment, sous réserve
-                des obligations légales.
-            </p>
+            <h3 style=" margin-bottom: 15px;"><i class="fas fa-shopping-cart section-icon"></i> <span
+                    th:text="#{privacy.ecommerce}"></span></h3>
+            <h4><i class="fas fa-receipt section-icon"></i> <span th:text="#{privacy.purchase.confirmation}"></span>
+            </h4>
+            <p th:text="#{privacy.purchase.confirmation.text}"></p>
+            <h4><i class="fas fa-money-check-alt section-icon"></i> <span th:text="#{privacy.cost.transparency}"></span>
+            </h4>
+            <p th:text="#{privacy.cost.transparency.text}"></p>
         </div>
 
         <div class="content-section">
-            <h3><i class="fas fa-shopping-cart section-icon"></i>Commerce Électronique</h3>
-            <h4><i class="fas fa-receipt section-icon"></i>Confirmation d'Achat</h4>
-            <p>
-                Une page de confirmation récapitulative est affichée avant la finalisation de votre achat, conformément
-                aux lois françaises et belges.
-            </p>
-            <h4><i class="fas fa-money-check-alt section-icon"></i>Transparence des Coûts</h4>
-            <p>
-                Tous les coûts, y compris les taxes et frais supplémentaires, sont clairement affichés avant la
-                finalisation de l'achat.
-            </p>
+            <h3 style=" margin-bottom: 15px;"><i class="fas fa-user-cog section-icon"></i> <span
+                    th:text="#{privacy.consumer.protection}"></span></h3>
+            <h4><i class="fas fa-info-circle section-icon"></i> <span th:text="#{privacy.product.information}"></span>
+            </h4>
+            <p th:text="#{privacy.product.information.text}"></p>
+            <h4><i class="fas fa-shield-alt section-icon"></i> <span th:text="#{privacy.security.standards}"></span>
+            </h4>
+            <p th:text="#{privacy.security.standards.text}"></p>
         </div>
 
         <div class="content-section">
-            <h3><i class="fas fa-user-cog section-icon"></i>Protection des Consommateurs</h3>
-            <h4><i class="fas fa-info-circle section-icon"></i>Informations sur les Produits</h4>
-            <p>
-                Les descriptions de nos produits sont complètes et conformes aux normes de protection des consommateurs
-                en vigueur en France et en Belgique.
-            </p>
-            <h4><i class="fas fa-shield-alt section-icon"></i>Normes de Sécurité</h4>
-            <p>
-                Tous nos produits respectent les normes de sécurité en vigueur, incluant les réglementations sur la
-                sécurité des jouets et des appareils électroniques.
-            </p>
+            <h3 style=" margin-bottom: 15px;"><i class="fas fa-file-invoice-dollar section-icon"></i> <span
+                    th:text="#{privacy.taxation}"></span></h3>
+            <h4><i class="fas fa-percentage section-icon"></i> <span th:text="#{privacy.vat}"></span></h4>
+            <p th:text="#{privacy.vat.text}"></p>
+            <h4><i class="fas fa-file-alt section-icon"></i> <span th:text="#{privacy.tax.records}"></span></h4>
+            <p th:text="#{privacy.tax.records.text}"></p>
         </div>
 
         <div class="content-section">
-            <h3><i class="fas fa-file-invoice-dollar section-icon"></i>Fiscalité</h3>
-            <h4><i class="fas fa-percentage section-icon"></i>TVA</h4>
-            <p>
-                La TVA est appliquée conformément aux lois fiscales belges et européennes, avec une attention
-                particulière aux spécificités fiscales françaises.
-            </p>
-            <h4><i class="fas fa-file-alt section-icon"></i>Registres Fiscaux</h4>
-            <p>
-                Des registres fiscaux précis sont tenus en conformité avec les exigences légales en France et en
-                Belgique.
-            </p>
+            <h3><i class="fas fa-truck section-icon"></i> <span th:text="#{privacy.delivery.returns}"></span></h3>
+            <p th:text="#{privacy.delivery.returns.text}"></p>
         </div>
 
         <div class="content-section">
-            <h3><i class="fas fa-truck section-icon"></i>Livraison et Retours</h4>
-                <p>
-                    Nous livrons principalement en France, avec des options disponibles pour la Belgique. Nos politiques
-                    de retour sont transparentes et conformes aux droits de rétractation en vigueur en France et en
-                    Belgique.
-                </p>
+            <h3><i class="fas fa-copyright section-icon"></i> <span th:text="#{privacy.copyright}"></span></h3>
+            <p th:text="#{privacy.copyright.text}"></p>
         </div>
 
         <div class="content-section">
-            <h3><i class="fas fa-copyright section-icon"></i>Droits d'Auteur et Propriété Intellectuelle</h3>
-            <p>
-                Tous les contenus de ce site respectent les lois sur le droit d'auteur et la propriété intellectuelle en
-                vigueur en France et en Belgique.
-            </p>
+            <h3><i class="fas fa-globe section-icon"></i> <span th:text="#{privacy.accessibility.language}"></span></h3>
+            <p th:text="#{privacy.accessibility.language.text}"></p>
         </div>
 
         <div class="content-section">
-            <h3><i class="fas fa-globe section-icon"></i>Accessibilité et Langue</h3>
-            <p>
-                Bien que le site soit principalement destiné à un public francophone, il est également accessible en
-                plusieurs langues, y compris en anglais et néerlandais, pour servir les deux principales communautés
-                linguistiques de la Belgique.
-            </p>
+            <h3><i class="fas fa-headset section-icon"></i> <span th:text="#{privacy.customer.support}"></span></h3>
+            <p th:text="#{privacy.customer.support.text}"></p>
         </div>
 
         <div class="content-section">
-            <h3><i class="fas fa-headset section-icon"></i>Support Client</h3>
-            <p>
-                Un support client est disponible en français et en anglais pour garantir une communication efficace
-                adaptée aux besoins de nos clients.
-            </p>
+            <h3><i class="fas fa-users section-icon"></i> <span th:text="#{privacy.cultural.adaptation}"></span></h3>
+            <p th:text="#{privacy.cultural.adaptation.text}"></p>
         </div>
 
         <div class="content-section">
-            <h3><i class="fas fa-users section-icon"></i>Adaptation Culturelle</h3>
-            <p>
-                Nos produits et services sont sélectionnés pour répondre aux préférences et aux besoins des
-                consommateurs français et belges.
-            </p>
-        </div>
-
-        <div class="content-section">
-            <h3><i class="fas fa-check section-icon"></i>Conclusion</h3>
-            <p>
-                Notre projet "E-commerce de l’Épicerie de l’Houmeau" respecte les cadres juridiques de la France et de
-                la Belgique et est conçu pour répondre aux besoins spécifiques de notre clientèle.
-            </p>
+            <h3><i class="fas fa-check section-icon"></i> <span th:text="#{privacy.conclusion}"></span></h3>
+            <p th:text="#{privacy.conclusion.text}"></p>
         </div>
     </div>
+
 </div>
 </body>
 </html>
