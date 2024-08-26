@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout" layout:decorate="~{layouts/main}">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
 <head>
     <meta charset="UTF-8">
     <title>Informations de Commande</title>
@@ -12,7 +13,8 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <!-- Bootstrap Bundle JS (inclut Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+            crossorigin="anonymous"></script>
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <style>
@@ -78,99 +80,132 @@
         .btn-outline-danger:hover, .btn-outline-warning:hover {
             color: #fff;
         }
+
     </style>
 </head>
 <body>
 <div class="container mt-4">
     <div layout:fragment="content">
         <div class="mt-5">
-            <h2 class="custom-title" style="color:#ff5e62;"><i class="fas fa-info-circle"></i> Informations de Commande</h2>
+            <h2 class="custom-title" style="color:#ff5e62;"><i class="fas fa-info-circle"></i> <span
+                    th:text="#{orderInfo.title}">Informations de Commande</span></h2>
             <form id="orderInfoForm" th:action="@{/api/checkout/confirm-order}" method="post">
                 <input type="hidden" th:value="${panier.id}" name="idPanierStripe" id="idPanierStripe">
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="prenom" class="form-label">Prénom</label>
-                        <input type="text" class="form-control" id="prenom" name="prenom" th:value="${firstName}" required>
-                        <div class="invalid-feedback">Ce champ est requis.</div>
+                        <label for="prenom" class="form-label"
+                               th:text="#{orderInfo.form.firstName.label}">Prénom</label>
+                        <input type="text" class="form-control" id="prenom" name="prenom" th:value="${firstName}"
+                               required>
+                        <div class="invalid-feedback" th:text="#{orderInfo.form.firstName.invalidFeedback}">Ce champ est
+                            requis.
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label for="nom" class="form-label">Nom</label>
+                        <label for="nom" class="form-label" th:text="#{orderInfo.form.lastName.label}">Nom</label>
                         <input type="text" class="form-control" id="nom" name="nom" th:value="${lastName}" required>
-                        <div class="invalid-feedback">Ce champ est requis.</div>
+                        <div class="invalid-feedback" th:text="#{orderInfo.form.lastName.invalidFeedback}">Ce champ est
+                            requis.
+                        </div>
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
+                    <label for="email" class="form-label" th:text="#{orderInfo.form.email.label}">Email</label>
                     <input type="email" class="form-control" id="email" name="email" th:value="${email}" required>
-                    <div class="invalid-feedback">Ce champ est requis.</div>
+                    <div class="invalid-feedback" th:text="#{orderInfo.form.email.invalidFeedback}">Ce champ est
+                        requis.
+                    </div>
                 </div>
                 <div class="mb-3">
-                    <label for="rue" class="form-label">Rue</label>
+                    <label for="rue" class="form-label" th:text="#{orderInfo.form.street.label}">Rue</label>
                     <input type="text" class="form-control" id="rue" name="rue" required>
-                    <div class="invalid-feedback">Ce champ est requis.</div>
+                    <div class="invalid-feedback" th:text="#{orderInfo.form.street.invalidFeedback}">Ce champ est
+                        requis.
+                    </div>
                 </div>
                 <div class="mb-3">
-                    <label for="numero" class="form-label">Numéro</label>
+                    <label for="numero" class="form-label" th:text="#{orderInfo.form.number.label}">Numéro</label>
                     <input type="text" class="form-control" id="numero" name="numero" required>
-                    <div class="invalid-feedback">Ce champ est requis.</div>
+                    <div class="invalid-feedback" th:text="#{orderInfo.form.number.invalidFeedback}">Ce champ est
+                        requis.
+                    </div>
                 </div>
                 <div class="mb-3">
-                    <label for="localite" class="form-label">Localité</label>
+                    <label for="localite" class="form-label" th:text="#{orderInfo.form.locality.label}">Localité</label>
                     <input type="text" class="form-control" id="localite" name="localite">
                 </div>
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="ville" class="form-label">Ville</label>
+                        <label for="ville" class="form-label" th:text="#{orderInfo.form.city.label}">Ville</label>
                         <input type="text" class="form-control" id="ville" name="ville" required>
-                        <div class="invalid-feedback">Ce champ est requis.</div>
+                        <div class="invalid-feedback" th:text="#{orderInfo.form.city.invalidFeedback}">Ce champ est
+                            requis.
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <label for="codePostal" class="form-label">Code Postal</label>
+                        <label for="codePostal" class="form-label" th:text="#{orderInfo.form.postalCode.label}">Code
+                            Postal</label>
                         <input type="text" class="form-control" id="codePostal" name="codePostal" required>
-                        <div class="invalid-feedback">Ce champ est requis.</div>
+                        <div class="invalid-feedback" th:text="#{orderInfo.form.postalCode.invalidFeedback}">Ce champ
+                            est requis.
+                        </div>
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label for="departement" class="form-label">Département</label>
+                    <label for="departement" class="form-label"
+                           th:text="#{orderInfo.form.department.label}">Département</label>
                     <input type="text" class="form-control" id="departement" name="departement">
                 </div>
                 <div class="mb-3">
-                    <label for="pays" class="form-label">Pays</label>
+                    <label for="pays" class="form-label" th:text="#{orderInfo.form.country.label}">Pays</label>
                     <input type="text" class="form-control" id="pays" name="pays" required>
-                    <div class="invalid-feedback">Ce champ est requis.</div>
+                    <div class="invalid-feedback" th:text="#{orderInfo.form.country.invalidFeedback}">Ce champ est
+                        requis.
+                    </div>
                 </div>
 
                 <!-- Méthode de commande -->
                 <div class="mb-3">
-                    <h2 class="custom-title" style="color:#ff5e62;"><label for="methodCommande" class="form-label"><i class="fas fa-info-circle"></i> Méthode de commande</label></h2>
+                    <h2 class="custom-title" style="color:#ff5e62;"><label for="methodCommande" class="form-label"
+                                                                           th:text="#{orderInfo.form.orderMethod.title}"><i
+                            class="fas fa-info-circle"></i> Méthode de commande</label></h2>
                     <select class="form-select" id="methodCommande" name="methodCommande" required>
-                        <option value="" disabled selected>Sélectionnez une méthode</option>
-                        <option value="DELIVERY">Livraison</option>
-                        <option value="PICKUP">Récupérer au magasin</option>
+                        <option value="" disabled selected th:text="#{orderInfo.form.orderMethod.placeholder}">
+                            Sélectionnez une méthode
+                        </option>
+                        <option value="DELIVERY" th:text="#{orderInfo.form.orderMethod.delivery}">Livraison</option>
+                        <option value="PICKUP" th:text="#{orderInfo.form.orderMethod.pickup}">Récupérer au magasin
+                        </option>
                     </select>
-                    <div class="invalid-feedback">Ce champ est requis.</div>
+                    <div class="invalid-feedback" th:text="#{orderInfo.form.orderMethod.invalidFeedback}">Ce champ est
+                        requis.
+                    </div>
                 </div>
 
                 <div class="d-flex justify-content-between">
-                    <button type="submit" id="checkout-button" class="btn btn-primary" disabled><i class="fas fa-check"></i> Confirmer la commande</button>
-                    <a href="/panier" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Retour au panier</a>
+                    <button type="submit" id="checkout-button" class="btn btn-primary" disabled><i
+                            class="fas fa-check"></i> <span th:text="#{orderInfo.form.confirmButton}">Confirmer la commande</span>
+                    </button>
+                    <a href="/panier" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> <span
+                            th:text="#{orderInfo.form.backToCart}">Retour au panier</span></a>
                 </div>
             </form>
 
             <div th:if="${not #lists.isEmpty(panier.lignesDeCommande)}" class="mt-5">
-                <h3><i class="bi bi-cart-fill"></i>Résumé de la commande</h3>
+                <h3><i class="bi bi-cart-fill"></i><span th:text="#{orderSummary.title}">Résumé de la commande</span>
+                </h3>
                 <table class="table facture-card">
                     <thead>
                     <tr>
                         <th hidden>Id Ligne de Commande</th>
                         <th hidden>Id Panier</th>
-                        <th>Numéro Article</th>
-                        <th>Image</th>
-                        <th>Nom Article</th>
-                        <th>Prix Unitaire</th>
-                        <th>Quantité</th>
-                        <th>Prix Total</th>
-                        <th>Actions</th>
+                        <th th:text="#{orderSummary.column.articleNumber}">Numéro Article</th>
+                        <th th:text="#{orderSummary.column.image}">Image</th>
+                        <th th:text="#{orderSummary.column.productName}">Nom Article</th>
+                        <th th:text="#{orderSummary.column.unitPrice}">Prix Unitaire</th>
+                        <th th:text="#{orderSummary.column.quantity}">Quantité</th>
+                        <th th:text="#{orderSummary.column.totalPrice}">Prix Total</th>
+                        <th th:text="#{orderSummary.column.actions}">Actions</th>
                     </tr>
                     </thead>
                     <tbody id="cart-items">
@@ -184,64 +219,91 @@
                         <td th:text="${ligne.produit.nom}" name="nom_produit">Nom du produit</td>
                         <td th:text="${ligne.produit.prix}" id="prix-produit">Prix</td>
                         <td>
-                            <input type="number" th:value="${ligne.quantite}" min="1" class="form-control quantity-input"
-                                   th:data-product-id="${ligne.produit.id}" th:id="'quantite_' + ${ligne.produit.id}" style="width:85px;"/>
+                            <input type="number" th:value="${ligne.quantite}" min="1"
+                                   class="form-control quantity-input"
+                                   th:data-product-id="${ligne.produit.id}" th:id="'quantite_' + ${ligne.produit.id}"
+                                   style="width:85px;"/>
                             <div th:id="'error_' + ${ligne.produit.id}" class="text-danger" style="display: none;">
-                                Quantité demandée non disponible en stock. Maximum : <span th:text="${ligne.produit.quantite}"></span>
+                                Quantité demandée non disponible en stock. Maximum : <span
+                                    th:text="${ligne.produit.quantite}"></span>
                             </div>
                         </td>
-                        <td id="total-produit" class="product-total" th:text="${ligne.produit.prix * ligne.quantite + ' €'} ">Total</td>
+                        <td id="total-produit" class="product-total"
+                            th:text="${ligne.produit.prix * ligne.quantite + ' €'} ">Total
+                        </td>
                         <td>
                             <button type="button" class="btn btn-outline-danger launch-modal" data-bs-toggle="modal"
                                     th:attr="data-bs-target='#exampleModalCenter'+${ligne.id}"
                                     th:data-id="${ligne.produit.id}" th:data-nom="${ligne.produit.nom}"
                                     th:data-prix="${ligne.produit.prix}" th:data-quantite="${ligne.quantite}"
                                     th:data-image-url="@{'/display?id=' + ${ligne.produit.id}}">
-                                <i class="fas fa-trash-alt"></i> Supprimer du panier
+                                <i class="fas fa-trash-alt"></i> <span th:text="#{orderSummary.deleteFromCart}">Supprimer du panier</span>
                             </button>
-                            <div class="modal fade" th:id="'exampleModalCenter'+${ligne.id}" tabindex="-1" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                            <div class="modal fade" th:id="'exampleModalCenter'+${ligne.id}" tabindex="-1"
+                                 aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="exampleModalLongTitle">Êtes-vous sûr ?</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            <h5 class="modal-title" th:text="#{orderSummary.modal.confirmDelete}">
+                                                Êtes-vous sûr ?</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body text-center">
-                                            <img th:src="@{/display(id=${ligne.produit.id})}" alt="Image du produit" class="img-fluid mb-3" style="max-height: 200px;"/>
+                                            <img th:src="@{/display(id=${ligne.produit.id})}" alt="Image du produit"
+                                                 class="img-fluid mb-3" style="max-height: 200px;"/>
                                             <h6 th:text="${ligne.produit.nom}">Nom du produit</h6>
                                             <p class="mb-1" th:text="'Prix : '+ ${ligne.produit.prix} + ' €'">Prix</p>
-                                            <p class="mb-2 quantite-text" data-product-id="${ligne.produit.id}" th:text=" 'Quantité : '+ ${ligne.quantite} ">Quantité :</p>
-                                            <h5 class="mt-3">Total : <span class="product-total" th:text="${ligne.produit.prix * ligne.quantite} + ' €'">Total</span></h5>
+                                            <p class="mb-2 quantite-text" data-product-id="${ligne.produit.id}"
+                                               th:text=" 'Quantité : '+ ${ligne.quantite} ">Quantité :</p>
+                                            <h5 class="mt-3">Total : <span class="product-total"
+                                                                           th:text="${ligne.produit.prix * ligne.quantite} + ' €'">Total</span>
+                                            </h5>
                                         </div>
                                         <div class="modal-footer justify-content-between">
-                                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Annuler</button>
-                                            <form th:if="${iterStat.first}" th:action="@{/deleteFirstElemPanier}" method="post" th:id="'deleteFirstForm'+${ligne.id}">
+                                            <button type="button" class="btn btn-light" data-bs-dismiss="modal"
+                                                    th:text="#{orderSummary.modal.cancel}">Annuler
+                                            </button>
+                                            <form th:if="${iterStat.first}" th:action="@{/deleteFirstElemPanier}"
+                                                  method="post" th:id="'deleteFirstForm'+${ligne.id}">
                                                 <input type="hidden" th:value="${ligne.panier.id}" name="idPanier"/>
                                                 <input type="hidden" th:value="${ligne.id}" name="idLigneDeCommande"/>
-                                                <button type="submit" th:attr="form='deleteFirstForm'+${ligne.id}" class="btn btn-danger delete-first-line"><i class="fas fa-trash-alt"></i> Confirmer la suppression</button>
+                                                <button type="submit" th:attr="form='deleteFirstForm'+${ligne.id}"
+                                                        class="btn btn-danger delete-first-line"><i
+                                                        class="fas fa-trash-alt"></i> <span
+                                                        th:text="#{orderSummary.modal.confirmButton}">Confirmer la suppression</span>
+                                                </button>
                                             </form>
-                                            <form th:if="${!iterStat.first}" th:action="@{/lignedecommande/delete/{id}(id=${ligne.id})}" method="post" th:id="'deleteForm'+${ligne.id}">
-                                                <button type="submit" th:attr="form='deleteForm'+${ligne.id}" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Confirmer la suppression</button>
+                                            <form th:if="${!iterStat.first}"
+                                                  th:action="@{/lignedecommande/delete/{id}(id=${ligne.id})}"
+                                                  method="post" th:id="'deleteForm'+${ligne.id}">
+                                                <button type="submit" th:attr="form='deleteForm'+${ligne.id}"
+                                                        class="btn btn-danger"><i class="fas fa-trash-alt"></i> <span
+                                                        th:text="#{orderSummary.modal.confirmButton}">Confirmer la suppression</span>
+                                                </button>
                                             </form>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <a class="btn btn-outline-warning" th:href="@{/produit/{id}(id=${ligne.produit.id})}"><i class="fas fa-eye"></i> Voir produit</a>
+                            <a class="btn btn-outline-warning" th:href="@{/produit/{id}(id=${ligne.produit.id})}"><i
+                                    class="fas fa-eye"></i> <span
+                                    th:text="#{orderSummary.viewProduct}">Voir produit</span></a>
                         </td>
                     </tr>
                     </tbody>
                     <tfoot>
                     <tr class="total" style="text-align: center;">
                         <td colspan="4">
-                            <strong>Total du panier : <span id="panier-total" th:text="${montantTotalPanier}"></span> €</strong>
+                            <strong><span th:text="#{orderSummary.total}">Total du panier : </span><span
+                                    id="panier-total" th:text="${montantTotalPanier}"></span> €</strong>
                         </td>
                     </tr>
                     </tfoot>
                 </table>
             </div>
             <div th:unless="${not #lists.isEmpty(panier.lignesDeCommande)}">
-                <p>Votre panier est vide.</p>
+                <p th:text="#{orderSummary.emptyCart}">Votre panier est vide.</p>
             </div>
         </div>
     </div>
