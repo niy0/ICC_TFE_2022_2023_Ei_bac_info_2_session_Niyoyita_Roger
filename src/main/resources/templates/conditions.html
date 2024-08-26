@@ -36,65 +36,78 @@
             color: #333;
         }
 
+
+
+
+
     </style>
 </head>
 <body>
 <div layout:fragment="content" class="content">
     <div class="container mt-5">
-        <h1 class="custom-title"><i class="fas fa-gavel"></i> Conditions d'Utilisation</h1>
+        <h1 class="custom-title"><i class="fas fa-gavel"></i> <span th:text="#{termsOfUse.title}">Conditions d'utilisation</span>
+        </h1>
 
         <div class="content-section">
-            <h3><i class="fas fa-info-circle section-icon"></i>Introduction</h3>
-            <p>
-                Les présentes conditions d'utilisation régissent l'accès et l'utilisation du site web de L'épicerie de
-                l'Houmeau. En accédant au site, vous acceptez sans réserve les conditions suivantes.
+            <h3><i class="fas fa-info-circle section-icon"></i> <span th:text="#{termsOfUse.introduction.title}">Introduction</span>
+            </h3>
+            <p th:text="#{termsOfUse.introduction.text}">
+                Les présentes conditions d'utilisation régissent l'accès et l'utilisation du site web de l'épicerie de
+                l'Houmeau. En accédant au site, vous acceptez sans réserve les conditions détaillées ci-après.
             </p>
         </div>
 
         <div class="content-section">
-            <h3><i class="fas fa-user section-icon"></i>Utilisation du Site</h3>
-            <p>
+            <h3><i class="fas fa-user section-icon"></i> <span
+                    th:text="#{termsOfUse.usage.title}">Utilisation du site</span></h3>
+            <p th:text="#{termsOfUse.usage.text}">
                 Le site et son contenu sont destinés à un usage personnel. Toute utilisation commerciale du contenu est
                 interdite sans autorisation écrite préalable.
             </p>
         </div>
 
         <div class="content-section">
-            <h3><i class="fas fa-copyright section-icon"></i>Propriété Intellectuelle</h3>
-            <p>
+            <h3><i class="fas fa-copyright section-icon"></i> <span th:text="#{termsOfUse.intellectualProperty.title}">Propriété intellectuelle</span>
+            </h3>
+            <p th:text="#{termsOfUse.intellectualProperty.text}">
                 Tous les contenus présents sur ce site, incluant textes, images, logos, et graphiques, sont protégés par
                 des droits d'auteur et ne peuvent être reproduits sans permission.
             </p>
         </div>
 
         <div class="content-section">
-            <h3><i class="fas fa-shield-alt section-icon"></i>Protection des Données</h3>
+            <h3><i class="fas fa-shield-alt section-icon"></i> <span th:text="#{termsOfUse.dataProtection.title}">Protection des données</span>
+            </h3>
             <p>
-                Nous nous engageons à protéger vos données personnelles conformément aux réglementations en vigueur.
-                Consultez notre <a href="/politique-de-confidentialite" th:href="@{/politique-de-confidentialite}">Politique
-                de Confidentialité</a> pour plus d'informations.
+                <span th:text="#{termsOfUse.dataProtection.text.before}">Nous nous engageons à protéger vos données personnelles conformément aux réglementations en vigueur. Consultez notre</span>
+                <a th:href="@{/politique-de-confidentialite}" th:text="#{termsOfUse.dataProtection.text.link}">Politique
+                    de Confidentialité</a>
+                <span th:text="#{termsOfUse.dataProtection.text.after}">pour plus d'informations.</span>
             </p>
         </div>
 
         <div class="content-section">
-            <h3><i class="fas fa-exclamation-triangle section-icon"></i>Limitation de Responsabilité</h3>
-            <p>
+            <h3><i class="fas fa-exclamation-triangle section-icon"></i> <span th:text="#{termsOfUse.liability.title}">Limitation de responsabilité</span>
+            </h3>
+            <p th:text="#{termsOfUse.liability.text}">
                 L'épicerie de l'Houmeau décline toute responsabilité en cas de dommages directs ou indirects résultant
                 de l'utilisation du site.
             </p>
         </div>
 
         <div class="content-section">
-            <h3><i class="fas fa-edit section-icon"></i>Modifications des Conditions</h3>
-            <p>
+            <h3><i class="fas fa-edit section-icon"></i> <span th:text="#{termsOfUse.modifications.title}">Modifications des conditions</span>
+            </h3>
+            <p th:text="#{termsOfUse.modifications.text}">
                 Nous nous réservons le droit de modifier ces conditions à tout moment. Les modifications seront
                 effectives dès leur publication sur le site.
             </p>
         </div>
 
         <div class="content-section">
-            <h3><i class="fas fa-balance-scale section-icon"></i>Loi Applicable</h3>
-            <p>
+            <h3><i class="fas fa-balance-scale section-icon"></i> <span th:text="#{termsOfUse.applicableLaw.title}">Loi applicable</span>
+            </h3>
+            <p th:text="#{termsOfUse.applicableLaw.text}">
                 Les présentes conditions sont régies par la loi française. Tout litige sera soumis à la juridiction
                 exclusive des tribunaux français.
             </p>

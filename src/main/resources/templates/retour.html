@@ -36,50 +36,43 @@
             color: #333;
         }
 
+
     </style>
 </head>
 <body>
 <div layout:fragment="content" class="content">
     <div class="container mt-5">
-        <h1 class="custom-title"><i class="fas fa-undo"></i> Politique de Retour</h1>
+        <h1 class="custom-title"><i class="fas fa-undo"></i> <span
+                th:text="#{returnPolicy.title}">Politique de retour</span></h1>
 
         <div class="content-section">
-            <h3><i class="fas fa-clipboard-check section-icon"></i>Conditions de Retour</h3>
-            <p>
-                Vous avez 14 jours à compter de la réception de votre commande pour retourner un produit. Les produits
-                doivent être retournés dans leur état d'origine, non utilisés et non endommagés.
+            <h3><i class="fas fa-clipboard-check section-icon"></i> <span th:text="#{returnPolicy.conditions.title}">Conditions de retour</span>
+            </h3>
+            <p th:text="#{returnPolicy.conditions.text}">
+                Vous avez 14 jours à compter de la réception de votre commande pour retourner un produit.
+            </p>
+            <h3><i class="fas fa-exclamation-circle section-icon"></i> <span th:text="#{returnPolicy.exceptions.title}">Exceptions</span>
+            </h3>
+            <p th:text="#{returnPolicy.exceptions.text}">
+                Les produits dont l'emballage a été endommagé ou ouvert ne peuvent pas être acceptés pour un retour.
             </p>
         </div>
 
         <div class="content-section">
-            <h3><i class="fas fa-shipping-fast section-icon"></i>Procédure de Retour</h3>
-            <p>
+            <h3><i class="fas fa-shipping-fast section-icon"></i> <span th:text="#{returnPolicy.procedure.title}">Procédure de retour</span>
+            </h3>
+            <p th:text="#{returnPolicy.procedure.text}">
                 Pour retourner un produit, veuillez contacter notre service client pour obtenir un numéro de retour.
                 Emballez soigneusement le produit et expédiez-le à l'adresse fournie par notre service client.
             </p>
         </div>
 
         <div class="content-section">
-            <h3><i class="fas fa-euro-sign section-icon"></i>Frais de Retour</h3>
-            <p>
-                Les frais de retour sont à la charge de l'acheteur, sauf en cas de produit défectueux ou d'erreur de
-                notre part.
-            </p>
-        </div>
-
-        <div class="content-section">
-            <h3><i class="fas fa-hand-holding-usd section-icon"></i>Remboursements</h3>
-            <p>
+            <h3><i class="fas fa-hand-holding-usd section-icon"></i> <span th:text="#{returnPolicy.refunds.title}">Remboursements</span>
+            </h3>
+            <p th:text="#{returnPolicy.refunds.text}">
                 Une fois le produit retourné et inspecté, nous procéderons à votre remboursement sous 14 jours. Le
                 remboursement sera effectué via le mode de paiement original.
-            </p>
-        </div>
-
-        <div class="content-section">
-            <h3><i class="fas fa-exclamation-circle section-icon"></i>Exceptions</h3>
-            <p>
-                Certains produits, comme les articles alimentaires périssables, ne peuvent être retournés pour des
-                raisons d'hygiène et de sécurité.
             </p>
         </div>
     </div>

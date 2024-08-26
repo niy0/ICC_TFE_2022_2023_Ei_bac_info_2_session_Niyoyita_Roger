@@ -37,41 +37,44 @@
         }
 
 
+
+
+
+
+
+
     </style>
 </head>
 <body>
 <div layout:fragment="content" class="content">
     <div class="container mt-5">
-        <h1 class="custom-title"><i class="fas fa-info-circle"></i> À Propos de Nous</h1>
+        <h1 class="custom-title"><i class="fas fa-info-circle"></i> <span
+                th:text="#{apropos.title}">À propos de nous</span></h1>
 
         <div class="content-section">
-            <h3><i class="fas fa-store section-icon"></i>Notre Histoire</h3>
-            <p>
-                Bienvenue à L'épicerie de l'Houmeau, située au cœur d'Angoulême.
-                Fondée en 2024, notre épicerie se consacre à fournir des produits frais, locaux et de qualité,
-                en mettant l'accent sur le commerce équitable et le soutien aux producteurs locaux.
-                Nous croyons fermement à l'importance de la communauté, en offrant à nos clients non seulement des
-                produits sains et durables,
-                mais aussi un service chaleureux et personnalisé qui reflète les valeurs de notre région.
-            </p>
-        </div>
-
-
-        <div class="content-section">
-            <h3><i class="fas fa-leaf section-icon"></i>Nos Valeurs</h3>
-            <p>
-                Notre équipe passionnée travaille chaque jour pour sélectionner les meilleurs produits du terroir, en
-                mettant l'accent sur la qualité et le goût. Que vous soyez à la recherche de produits biologiques, de
-                spécialités locales, ou simplement de vos articles quotidiens, nous sommes là pour répondre à vos
-                besoins.
+            <h3><i class="fas fa-store section-icon"></i> <span th:text="#{apropos.history.title}">Notre histoire</span>
+            </h3>
+            <p th:text="#{apropos.history.text}">
+                Bienvenue à l'épicerie de l'Houmeau, située au cœur d'Angoulême. Fondée en 2024, notre épicerie se
+                consacre à fournir des produits de première nécessité ainsi qu'un large choix de boissons, d'alcool et
+                de produits exotiques comme des épices venant des quatre coins du monde.
             </p>
         </div>
 
         <div class="content-section">
-            <h3><i class="fas fa-heart section-icon"></i>Merci à Vous</h3>
-            <p>
-                Merci de faire partie de notre aventure et de soutenir les producteurs locaux. Nous sommes ravis de vous
-                accueillir à L'épicerie de l'Houmeau.
+            <h3><i class="fas fa-leaf section-icon"></i> <span th:text="#{apropos.values.title}">Nos valeurs</span></h3>
+            <p th:text="#{apropos.values.text}">
+                Notre équipe passionnée travaille chaque jour pour sélectionner les meilleurs produits, en mettant
+                l'accent sur la qualité et le goût. Quoi que vous cherchiez, nous sommes là pour répondre à vos besoins.
+                Un accueil chaleureux et personnalisé est au cœur de notre démarche.
+            </p>
+        </div>
+
+        <div class="content-section">
+            <h3><i class="fas fa-heart section-icon"></i> <span th:text="#{apropos.thanks.title}">Merci à vous</span>
+            </h3>
+            <p th:text="#{apropos.thanks.text}">
+                Merci de faire partie de notre aventure. Nous sommes ravis de vous accueillir à l'épicerie de l'Houmeau.
             </p>
         </div>
     </div>

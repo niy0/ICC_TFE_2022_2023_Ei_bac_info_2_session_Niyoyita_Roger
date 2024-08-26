@@ -36,24 +36,31 @@
             color: #333;
         }
 
+
+
+
+
     </style>
 </head>
 <body>
 <div layout:fragment="content" class="content">
     <div class="container mt-5">
-        <h1 class="custom-title"><i class="fas fa-shipping-fast"></i> Politique de Livraison</h1>
+        <h1 class="custom-title"><i class="fas fa-shipping-fast"></i> <span th:text="#{deliveryPolicy.title}">Politique de livraison</span>
+        </h1>
 
         <div class="content-section">
-            <h3><i class="fas fa-map-marked-alt section-icon"></i>Zones de Livraison</h3>
-            <p>
+            <h3><i class="fas fa-map-marked-alt section-icon"></i> <span th:text="#{deliveryPolicy.zones.title}">Zones de livraison</span>
+            </h3>
+            <p th:text="#{deliveryPolicy.zones.text}">
                 Nous livrons principalement en France métropolitaine, avec des options pour la Belgique. Si vous êtes
                 situé en dehors de ces zones, veuillez nous contacter pour discuter des possibilités.
             </p>
         </div>
 
         <div class="content-section">
-            <h3><i class="fas fa-clock section-icon"></i>Délais de Livraison</h3>
-            <p>
+            <h3><i class="fas fa-clock section-icon"></i> <span th:text="#{deliveryPolicy.timings.title}">Délais de livraison</span>
+            </h3>
+            <p th:text="#{deliveryPolicy.timings.text}">
                 Les délais de livraison varient en fonction de la localisation. En général, les commandes sont expédiées
                 sous 24 à 48 heures et livrées sous 3 à 5 jours ouvrés. Les délais peuvent varier en période de forte
                 demande.
@@ -61,34 +68,38 @@
         </div>
 
         <div class="content-section">
-            <h3><i class="fas fa-euro-sign section-icon"></i>Frais de Livraison</h3>
-            <p>
+            <h3><i class="fas fa-euro-sign section-icon"></i> <span th:text="#{deliveryPolicy.costs.title}">Frais de livraison</span>
+            </h3>
+            <p th:text="#{deliveryPolicy.costs.text}">
                 Les frais de livraison sont calculés en fonction du poids de votre commande et de votre localisation.
                 Les frais exacts sont indiqués au moment de la finalisation de la commande.
             </p>
         </div>
 
         <div class="content-section">
-            <h3><i class="fas fa-truck section-icon"></i>Suivi de Commande</h3>
-            <p>
+            <h3><i class="fas fa-truck section-icon"></i> <span th:text="#{deliveryPolicy.tracking.title}">Suivi de commande</span>
+            </h3>
+            <p th:text="#{deliveryPolicy.tracking.text}">
                 Une fois votre commande expédiée, vous recevrez un email avec un lien pour suivre l'état de votre
                 livraison en temps réel.
             </p>
         </div>
 
         <div class="content-section">
-            <h3><i class="fas fa-exclamation-circle section-icon"></i>Problèmes de Livraison</h3>
-            <p>
+            <h3><i class="fas fa-exclamation-circle section-icon"></i> <span th:text="#{deliveryPolicy.issues.title}">Problèmes de livraison</span>
+            </h3>
+            <p th:text="#{deliveryPolicy.issues.text}">
                 Si vous rencontrez des problèmes avec votre livraison, veuillez contacter notre service client. Nous
                 nous engageons à résoudre les problèmes dans les plus brefs délais.
             </p>
         </div>
 
         <div class="content-section">
-            <h3><i class="fas fa-store section-icon"></i>Collecte en Magasin</h3>
-            <p>
-                Vous pouvez également choisir de récupérer votre commande directement à notre magasin à La Rochelle,
-                sans frais supplémentaires.
+            <h3><i class="fas fa-store section-icon"></i> <span th:text="#{deliveryPolicy.pickup.title}">Collecte en magasin</span>
+            </h3>
+            <p th:text="#{deliveryPolicy.pickup.text}">
+                Vous pouvez également choisir de récupérer votre commande directement à notre magasin à l'adresse : Rue
+                de Paris 117, 16000 Angoulême, France. Sans frais supplémentaires.
             </p>
         </div>
     </div>

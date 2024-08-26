@@ -171,51 +171,54 @@
         }
 
 
-
-
     </style>
 </head>
 <body>
 <div layout:fragment="content">
     <div class="hero-section">
-        <h1>Bienvenue à l'Épicerie de l'Houmeau</h1>
-        <p>Vous trouverez ici les meilleurs produits pour vos moments de convivialité.</p>
-        <a href="/produit" class="btn">Explorez notre sélection</a>
+        <h1 th:text="#{indexPage.hero.welcome}">Bienvenue à l'Épicerie de l'Houmeau</h1>
+        <p th:text="#{indexPage.hero.description}">Vous trouverez ici les meilleurs produits pour vos moments de
+            convivialité.</p>
+        <a href="/produit" class="btn" th:text="#{indexPage.hero.cta}">Explorez notre sélection</a>
     </div>
 
     <div class="category-section container"
          style="margin-top: 40px; padding: 20px; background-color: #f8f9fa; border-radius: 10px;">
         <p style="font-size: 1.5em; color: #555; margin-bottom: 15px;">
             <i class="fas fa-clock" style="margin-right: 12px; color: #ff9966; font-size: 1.5em;"></i>
-            Ouvert tous les jours de 9h à 22h, du lundi au dimanche.
+            <span th:text="#{indexPage.category.hours}">Ouvert tous les jours de 9h à 22h, du lundi au dimanche.</span>
         </p>
         <p style="font-size: 1.5em; color: #555;">
             <i class="fas fa-envelope" style="margin-right: 12px; color: #ff9966; font-size: 1.5em;"></i>
-            <a href="/info-contact" style="color: #ff5e62; text-decoration: none;">Contactez-nous</a>
+            <a href="/info-contact" style="color: #ff5e62; text-decoration: none;"
+               th:text="#{indexPage.category.contact}">Contactez-nous</a>
         </p>
     </div>
 
     <div class="cta-section">
-        <h2>Rejoignez notre communauté aujourd'hui !</h2>
-        <p>Inscrivez-vous et profitez d'avantages exclusifs, de produits de qualité supérieure et de services
-            personnalisés.</p>
-        <a href="/user/signup" class="btn">S'inscrire maintenant</a>
+        <h2 th:text="#{indexPage.cta.title}">Rejoignez notre communauté aujourd'hui !</h2>
+        <p th:text="#{indexPage.cta.description}">Inscrivez-vous et profitez d'avantages exclusifs, de produits de
+            qualité supérieure et de services personnalisés.</p>
+        <a href="/user/signup" class="btn" th:text="#{indexPage.cta.button}">S'inscrire maintenant</a>
     </div>
 
     <div class="info-section container">
-        <h2>Pourquoi choisir L'épicerie de l'Houmeau ?</h2>
+        <h2 th:text="#{indexPage.info.whyChoose}">Pourquoi choisir L'épicerie de l'Houmeau ?</h2>
         <div class="row">
             <div class="col-md-4 info-box">
-                <h3>Qualité supérieure</h3>
-                <p>Tous nos produits sont soigneusement sélectionnés pour vous offrir le meilleur.</p>
+                <h3 th:text="#{indexPage.info.quality}">Qualité supérieure</h3>
+                <p th:text="#{indexPage.info.qualityDescription}">Tous nos produits sont soigneusement sélectionnés pour
+                    vous offrir le meilleur.</p>
             </div>
             <div class="col-md-4 info-box">
-                <h3>Large sélection</h3>
-                <p>Découvrez une vaste gamme de produits pour satisfaire tous vos goûts et besoins.</p>
+                <h3 th:text="#{indexPage.info.selection}">Large sélection</h3>
+                <p th:text="#{indexPage.info.selectionDescription}">Découvrez une vaste gamme de produits pour
+                    satisfaire tous vos goûts et besoins.</p>
             </div>
             <div class="col-md-4 info-box">
-                <h3>Service client dévoué</h3>
-                <p>Notre équipe est là pour vous accompagner à chaque étape de votre achat.</p>
+                <h3 th:text="#{indexPage.info.customerService}">Service client dévoué</h3>
+                <p th:text="#{indexPage.info.customerServiceDescription}">Notre équipe est là pour vous accompagner à
+                    chaque étape de votre achat.</p>
             </div>
         </div>
     </div>
@@ -231,26 +234,27 @@
         </div>
         <div class="carousel-inner">
             <div class="carousel-item active">
-                <img src="/images/alcool.jpg" class="d-block w-100" alt="Produit 1">
+                <img src="/images/alcool.jpg" class="d-block w-100" th:alt="#{indexPage.carousel.alt1}" alt="Produit 1">
             </div>
             <div class="carousel-item">
-                <img src="/images/epp.jpg" class="d-block w-100" alt="Produit 2">
+                <img src="/images/epp.jpg" class="d-block w-100" th:alt="#{indexPage.carousel.alt2}" alt="Produit 2">
             </div>
             <div class="carousel-item">
-                <img src="/images/angou.jpg" class="d-block w-100" alt="Produit 3">
+                <img src="/images/angou.jpg" class="d-block w-100" th:alt="#{indexPage.carousel.alt3}" alt="Produit 3">
             </div>
         </div>
         <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
                 data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Previous</span>
+            <span class="visually-hidden" th:text="#{indexPage.carousel.previous}">Précédent</span>
         </button>
         <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
                 data-bs-slide="next">
             <span class="carousel-control-next-icon" aria-hidden="true"></span>
-            <span class="visually-hidden">Next</span>
+            <span class="visually-hidden" th:text="#{indexPage.carousel.next}">Suivant</span>
         </button>
     </div>
 </div>
+
 </body>
 </html>
