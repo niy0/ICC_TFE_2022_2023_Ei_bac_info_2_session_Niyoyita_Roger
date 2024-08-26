@@ -1,3 +1,34 @@
+-- Insertion de paniers pour les utilisateurs avec les IDs spécifiés
+
+insert into `panier` (`actif`, `date_creation`, `date_modification`, `user_id`)
+VALUES (1, NOW(), NOW(), 2);
+
+insert into `panier` (`actif`, `date_creation`, `date_modification`, `user_id`)
+VALUES (1, NOW(), NOW(), 36);
+
+insert into `panier` (`actif`, `date_creation`, `date_modification`, `user_id`)
+VALUES (1, NOW(), NOW(), 37);
+
+insert into `panier` (`actif`, `date_creation`, `date_modification`, `user_id`)
+VALUES (1, NOW(), NOW(), 38);
+
+insert into `panier` (`actif`, `date_creation`, `date_modification`, `user_id`)
+VALUES (1, NOW(), NOW(), 39);
+
+insert into `panier` (`actif`, `date_creation`, `date_modification`, `user_id`)
+VALUES (1, NOW(), NOW(), 40);
+
+insert into `panier` (`actif`, `date_creation`, `date_modification`, `user_id`)
+VALUES (1, NOW(), NOW(), 41);
+
+insert into `panier` (`actif`, `date_creation`, `date_modification`, `user_id`)
+VALUES (1, NOW(), NOW(), 42);
+
+insert into `panier` (`actif`, `date_creation`, `date_modification`, `user_id`)
+VALUES (1, NOW(), NOW(), 43);
+
+
+
 -- Insérer les adresses pour chaque utilisateur de type 'User'
 
 -- Adresse pour User1
@@ -58,3 +89,19 @@ from `user` u WHERE u.email = 'employee@test.com';
 insert into `adresse` (`pays`, `ville`, `localite`, `rue`, `numero`, `code_postal`, `departement`, `nom`, `prenom`, `date_creation`, `date_modification`, `utilisateur_id`)
 select 'France', 'Lyon', 'Centre-Ville', 'Boulevard de la Croisette', '56', '69001', 'Rhône', u.nom, u.prenom, NOW(), NOW(), u.id
 from `user` u WHERE u.email = 'admin@test.com';
+
+
+-- Insérer une adresse pour l'utilisateur avec id = 1, nom = User, prénom = User
+insert into `adresse` (`pays`, `ville`, `localite`, `rue`, `numero`, `code_postal`, `departement`, `nom`, `prenom`, `date_creation`, `date_modification`, `utilisateur_id`)
+select 'France', 'Paris', 'Centre-Ville', 'Rue de Rivoli', '10', '75001', 'Île-de-France', 'User', 'User', NOW(), NOW(), u.id
+from `user` u WHERE u.id = 1;
+
+-- Insérer une adresse pour l'utilisateur avec id = 2, nom = Employee, prénom = Employee
+insert into `adresse` (`pays`, `ville`, `localite`, `rue`, `numero`, `code_postal`, `departement`, `nom`, `prenom`, `date_creation`, `date_modification`, `utilisateur_id`)
+select 'France', 'Marseille', 'Centre-Ville', 'Avenue des Champs-Élysées', '20', '13001', 'Bouches-du-Rhône', 'Employee', 'Employee', NOW(), NOW(), u.id
+from `user` u WHERE u.id = 2;
+
+-- Insérer une adresse pour l'utilisateur avec id = 3, nom = Admin, prénom = Admin
+insert into `adresse` (`pays`, `ville`, `localite`, `rue`, `numero`, `code_postal`, `departement`, `nom`, `prenom`, `date_creation`, `date_modification`, `utilisateur_id`)
+select 'France', 'Lyon', 'Centre-Ville', 'Boulevard de la Croisette', '30', '69001', 'Rhône', 'Admin', 'Admin', NOW(), NOW(), u.id
+from `user` u WHERE u.id = 3;
