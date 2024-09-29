@@ -4,6 +4,7 @@ import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit.Produit;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -20,14 +21,16 @@ public class Categorie {
     @JsonIgnore
     private List<Produit> produits;
 
+    @Column(name = "taux_tva", nullable = false)
+    private BigDecimal tauxTVA;
+
     public Categorie() {
     }
 
     public Categorie(String nom) {
         this.nom = nom;
     }
-
-
+    
     public Long getId() {
         return id;
     }
@@ -52,12 +55,19 @@ public class Categorie {
         this.produits = produits;
     }
 
+    public BigDecimal getTauxTVA() {
+        return tauxTVA;
+    }
+
+    public void setTauxTVA(BigDecimal tauxTVA) {
+        this.tauxTVA = tauxTVA;
+    }
+
     @Override
     public String toString() {
         return "Categorie{" +
                 "id=" + id +
                 ", nom='" + nom + '\'' +
-
                 '}';
     }
 }

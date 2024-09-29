@@ -1,6 +1,7 @@
 package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.commande;
 
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.ligneDeCommande.LigneDeCommande;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.livraison.LivraisonService;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -78,8 +79,12 @@ public class Commande {
     @NotNull
     private BigDecimal montantCommande;
 
+    @NotNull
+    private BigDecimal fraisCommande;
+
     // Constructeur par défaut
-    protected Commande() {}
+    protected Commande() {
+    }
 
     // Constructeur avec utilisateur connecté
     public Commande(User utilisateur, MethodCommande methodCommande) {
@@ -264,6 +269,30 @@ public class Commande {
         this.lignesDeCommande = lignesDeCommande;
     }
 
+    public void setUtilisateur(User utilisateur) {
+        this.utilisateur = utilisateur;
+    }
+
+    // Getter et Setter pour fraisCommande
+    public BigDecimal getFraisCommande() {
+        return fraisCommande;
+    }
+
+    public void setFraisCommande(BigDecimal fraisCommande) {
+        this.fraisCommande = fraisCommande;
+    }
+
+    public void calculerFraisDeCommande(LivraisonService livraisonService) {
+        if (this.methodCommande == MethodCommande.PICKUP) {
+            // Si c'est un retrait en magasin, les frais sont de 0
+            this.fraisCommande = BigDecimal.ZERO;
+        } else {
+            // Si c'est une livraison, on calcule les frais via le service
+            BigDecimal fraisLivraison = livraisonService.calculerFraisLivraison(this);
+            this.fraisCommande = fraisLivraison;
+        }
+    }
+
     // Méthode de validation pour vérifier que la liste des lignes de commande n'est pas vide
     @AssertTrue(message = "La commande doit avoir au moins une ligne de commande.")
     public boolean isLignesDeCommandeNotEmpty() {
@@ -271,7 +300,7 @@ public class Commande {
     }
 
     // Méthode pour initialiser une nouvelle commande
-    private void iniNouvelleCommande(MethodCommande methodCommande){
+    private void iniNouvelleCommande(MethodCommande methodCommande) {
         this.dateCommande = new Date();
         this.statut = StatutCommande.EN_COURS;
         this.methodCommande = methodCommande;
@@ -298,6 +327,7 @@ public class Commande {
                 ", dateDerniereMajStatut=" + dateDerniereMajStatut +
                 ", historiqueStatuts=" + historiqueStatuts +
                 ", montantCommande=" + montantCommande +
+                ", fraisCommande=" + fraisCommande +
                 ", lignesDeCommande=" + lignesDeCommande +
                 '}';
     }

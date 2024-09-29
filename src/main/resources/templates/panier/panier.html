@@ -49,6 +49,25 @@
             transform: translateY(-2px);
         }
 
+        .text-danger {
+            color: red;
+            font-size: 0.9em;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     </style>
@@ -67,7 +86,7 @@
                         <i class="fas fa-trash-alt"></i> <span th:text="#{panier.button.emptyCart}">Vider Panier</span>
                     </button>
                 </form>
-                <form id="confirmerPanier" th:action="@{/checkout/infos_de_commande(idPanierStripe=${panier.id})}"
+                <form th:action="@{/checkout/infos_de_commande(idPanierStripe=${panier.id})}"
                       method="get">
                     <input type="hidden" th:value="${panier.id}" name="idPanierStripe">
                     <table class="table">
@@ -97,15 +116,21 @@
                             <td th:text="${ligne.produit.nom}" name="nom_produit">Nom du produit</td>
                             <td th:text="${ligne.produit.prix}" id="prix-produit">Prix</td>
                             <td>
-                                <input type="number" th:value="${ligne.quantite}" min="1"
+                                <input type="number"
+                                       th:value="${ligne.quantite}"
+                                       min="1"
+                                       max="${ligne.produit.quantite}"
                                        class="form-control quantity-input"
                                        th:data-product-id="${ligne.produit.id}"
-                                       th:id="'quantite_' + ${ligne.produit.id}" style="width:85px;"/>
-                                <div th:id="'error_' + ${ligne.produit.id}" class="text-danger" style="display: none;">
+                                       th:data-ligne-commande-id="${ligne.id}"
+                                       th:data-max-quantite="${ligne.produit.quantite}"
+                                       onchange="updateLigneDeCommande(this)">
+                                <div th:id="'error_' + ${ligne.id}" class="text-danger" style="display: none;">
                                     Quantité demandée non disponible en stock. Maximum : <span
                                         th:text="${ligne.produit.quantite}"></span>
                                 </div>
                             </td>
+
                             <td id="total-produit" class="product-total"
                                 th:text="${ligne.produit.prix * ligne.quantite}">Total
                             </td>
@@ -154,9 +179,11 @@
                                                             th:text="#{panier.modal.confirmButton}">Confirm Deletion</span>
                                                     </button>
                                                 </form>
-                                                <form th:if="${!iterStat.first}"
-                                                      th:action="@{/lignedecommande/delete/{id}(id=${ligne.id})}"
+                                                <form th:if="${!iterStat.first}" th:action="@{/lignedecommande/delete}"
                                                       method="post" th:id="'deleteForm'+${ligne.id}">
+                                                    <input type="hidden" th:value="${ligne.panier.id}" name="idPanier"/>
+                                                    <input type="hidden" th:value="${ligne.id}"
+                                                           name="idLigneDeCommande"/>
                                                     <button type="submit" th:attr="form='deleteForm'+${ligne.id}"
                                                             class="btn btn-danger">
                                                         <i class="fas fa-trash-alt"></i> <span
@@ -185,7 +212,7 @@
                         </tr>
                         </tfoot>
                     </table>
-                    <button type="submit" class="btn-custom2" id="confirmerPanier'">
+                    <button type="submit" class="btn-custom2" id="confirmerPanier">
                         <i class="fas fa-check"></i> <span
                             th:text="#{panier.button.confirmCart}">Confirmer Panier</span>
                     </button>
@@ -196,6 +223,132 @@
                 <h4 th:text="${errorMessage}" class="title text-center mb-4"></h4>
             </div>
         </div>
+        <script>
+            // Initialiser les variables CSRF une seule fois
+            var csrfToken = $("meta[name='_csrf']").attr("content");
+            var csrfHeader = $("meta[name='_csrf_header']").attr("content");
+
+            $(document).on('input change', '.quantity-input', function() {
+                var maxQuantite = parseInt($(this).attr('max'));  // Récupérer la valeur max
+                var currentVal = parseInt($(this).val());  // Récupérer la valeur saisie
+                var price = parseFloat($(this).closest('tr').find('#prix-produit').text());  // Récupérer le prix du produit
+                var ligneDeCommandeId = $(this).data('ligne-commande-id');  // Récupérer l'ID de la ligne de commande
+
+                // Si la valeur saisie dépasse la valeur max
+                if (currentVal > maxQuantite) {
+                    $(this).val(maxQuantite);  // Remplacer par la valeur max
+                    alert("Vous ne pouvez pas commander plus de " + maxQuantite + " unités.");  // Message d'alerte
+                    currentVal = maxQuantite;  // Ajuster currentVal à la valeur max
+                    $("#error_" + ligneDeCommandeId).show();  // Afficher l'erreur
+                    $("#confirmerPanier").prop("disabled", true);  // Désactiver le bouton de validation
+                } else {
+                    // Si la valeur est valide, cacher l'erreur et réactiver le bouton
+                    $("#error_" + ligneDeCommandeId).hide();  // Cacher l'erreur
+                    $("#confirmerPanier").prop("disabled", false);  // Réactiver le bouton de validation
+                }
+
+                // Calculer et mettre à jour le total pour cette ligne de commande
+                var totalProduit = currentVal * price;
+                $(this).closest('tr').find('#total-produit').text(totalProduit.toFixed(2) + ' €');
+
+                // Appel de la fonction de mise à jour de la ligne de commande
+                updateLigneDeCommande(this);
+            });
+
+            function updateLigneDeCommande(inputElement) {
+                var ligneDeCommandeId = $(inputElement).data('ligne-commande-id');  // Récupérer l'id de la ligne de commande
+                var ligneDeCommandePanierId = $(inputElement).closest('tr').find('td[name="ligneDeCommandePanierId"]').text(); // Récupérer l'id du panier
+                var nouvelleQuantite = parseInt($(inputElement).val());  // Récupérer la valeur saisie dans le champ
+
+                if (!ligneDeCommandePanierId) {
+                    console.error("Erreur : idPanier non trouvé");
+                    return;
+                }
+
+                // Appel AJAX pour mettre à jour la quantité de la ligne de commande
+                $.ajax({
+                    url: '/lignedecommande/update2',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        id: ligneDeCommandeId,
+                        quantite: nouvelleQuantite
+                    }),
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader(csrfHeader, csrfToken);  // Utilisez les tokens CSRF
+                    },
+                    success: function(response) {
+                        console.log("Ligne de commande mise à jour avec succès:", response);
+                        // Mettre à jour le total du panier
+                        updateCartTotal(ligneDeCommandePanierId);
+                    },
+                    error: function(xhr, status, error) {
+                        let errorMessage = xhr.responseText || "Erreur inconnue lors de la mise à jour de la ligne de commande.";
+                        $("#error_" + ligneDeCommandeId).show().text(errorMessage);
+                        $("#confirmerPanier").prop("disabled", true);  // Désactiver le bouton de confirmation en cas d'erreur
+                        console.error("Erreur lors de la mise à jour de la ligne de commande:", errorMessage);
+                    }
+                });
+            }
+
+            function updateCartTotal(idPanier) {
+                var idPanierval = parseInt(idPanier);
+                getPanier(idPanierval, function(panier) {
+                    var total = panier.montantTotalPanier;
+                    $('#panier-total').text(total.toFixed(2));
+                });
+            }
+
+            function getPanier(idPanier, callback) {
+                var idPanierval = parseInt(idPanier);
+
+                var headers = {};
+                headers[csrfHeader] = csrfToken;
+
+                $.ajax({
+                    url: '/panier/api/' + idPanierval,
+                    type: 'GET',
+                    dataType: 'json',
+                    headers: headers,
+                    success: function (panierData) {
+                        console.log('Panier récupéré avec succès :', panierData);
+                        if (callback) callback(panierData);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Erreur AJAX :', error);
+                    }
+                });
+            }
+
+            function initialiserQuantitesMax() {
+                $('.quantity-input').each(function() {
+                    var produitId = $(this).data('product-id');
+                    getQuantiteProduit(produitId, $(this));
+                });
+            }
+
+            function getQuantiteProduit(produitId, inputElement) {
+                $.ajax({
+                    type: "GET",
+                    url: "/quantite-produit/" + produitId,
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader(csrfHeader, csrfToken);
+                    },
+                    success: function(quantite) {
+                        inputElement.attr('max', quantite);
+                    },
+                    error: function(error) {
+                        console.error('Erreur lors de la récupération de la quantité du produit:', error);
+                    }
+                });
+            }
+
+            // Initialisation des quantités max au chargement de la page
+            initialiserQuantitesMax();
+
+
+        </script>
+
     </div>
 </div>
 

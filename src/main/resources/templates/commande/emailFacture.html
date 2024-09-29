@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <title>Facture commande</title>
@@ -52,6 +52,7 @@
             font-weight: bold;
         }
 
+
     </style>
 </head>
 <body>
@@ -65,9 +66,9 @@
                             <h2>Facture</h2>
                         </td>
                         <td>
-                            Facture #: <span th:text="${commande.id}"></span><br>
-                            Date: <span th:text="${#dates.format(commande.dateCommande, 'dd/MM/yyyy')}"></span><br>
-                            Heure: <span th:text="${#dates.format(commande.dateCommande, 'HH:mm')}"></span>
+                            Facture #: ${commandeId}<br>
+                            Date: ${dateCommande}<br>
+                            Heure: ${heureCommande}
                         </td>
                     </tr>
                 </table>
@@ -79,19 +80,19 @@
                     <tr>
                         <td>
                             <strong>Adresse de facturation:</strong><br>
-                            <span th:text="${commande.prenom} + ' ' + ${commande.nom}"></span><br>
-                            <span th:text="${commande.rue}"></span>, <span th:text="${commande.numero}"></span><br>
-                            <span th:text="${commande.codePostal}"></span> <span th:text="${commande.ville}"></span><br>
-                            <span th:text="${commande.pays}"></span><br>
-                            <span th:text="${commande.email}"></span>
+                            ${prenom} ${nom}<br>
+                            ${rue}, ${numero}<br>
+                            ${codePostal} ${ville}<br>
+                            ${pays}<br>
+                            ${email}
                         </td>
                         <td>
                             <strong>Adresse de livraison:</strong><br>
-                            <span th:text="${commande.prenom} + ' ' + ${commande.nom}"></span><br>
-                            <span th:text="${commande.rue}"></span>, <span th:text="${commande.numero}"></span><br>
-                            <span th:text="${commande.codePostal}"></span> <span th:text="${commande.ville}"></span><br>
-                            <span th:text="${commande.pays}"></span><br>
-                            <span th:text="${commande.email}"></span>
+                            ${prenom} ${nom}<br>
+                            ${rue}, ${numero}<br>
+                            ${codePostal} ${ville}<br>
+                            ${pays}<br>
+                            ${email}
                         </td>
                     </tr>
                 </table>
@@ -99,27 +100,43 @@
         </tr>
         <tr class="heading">
             <td>Mode de commande</td>
-            <td>Status</td>
+            <td>Statut</td>
         </tr>
         <tr class="details">
-            <td th:text="${commande.methodCommande}"></td>
-            <td th:text="${commande.statut.name()}"></td>
+            <td>${methodCommande}</td>
+            <td>${statut}</td>
         </tr>
         <tr class="heading">
             <td>Article</td>
-            <td>Prix</td>
+            <td>Quantité</td>
+            <td>Prix Unitaire</td>
+            <td>Total</td>
         </tr>
-        <tr th:each="ligne : ${commande.lignesDeCommande}" class="item">
-            <td>
-                <span th:text="${ligne.produit.nom}"></span> (x<span th:text="${ligne.quantite}"></span>)
-            </td>
-            <td th:text="${ligne.montantTotal} + ' €'"></td>
+
+        <!--Ligne de commande remplie dynamiquement -->
+        ${lignesDeCommande}
+
+        <tr class="total">
+            <td colspan="3">Sous-total :</td>
+            <td>${montantCommande} €</td>
         </tr>
         <tr class="total">
-            <td></td>
-            <td>Total: <span th:text="${commande.montantCommande} + ' €'"></span></td>
+            <td colspan="3">TVA (20%) :</td>
+        </tr>
+        <tr class="total">
+            <td colspan="3">Frais de livraison :</td>
+            <td>${fraisCommande} €</td>
+        </tr>
+        <tr class="total">
+            <td colspan="3"><strong>Total (avec frais de livraison et TVA) :</strong></td>
+            <td><strong>${totalAvecFrais} €</strong></td>
         </tr>
     </table>
+    <div style="text-align: center; margin-top: 30px;">
+        <h4>Merci pour votre achat !</h4>
+        <p>Nous vous remercions d'avoir commandé chez <strong>Épicerie de L’Houmeau</strong>. Nous espérons vous revoir
+            bientôt !</p>
+    </div>
 </div>
 </body>
 </html>

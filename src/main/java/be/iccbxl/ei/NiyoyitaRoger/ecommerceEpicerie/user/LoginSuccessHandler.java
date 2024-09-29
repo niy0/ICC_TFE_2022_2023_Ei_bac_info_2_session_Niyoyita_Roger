@@ -20,26 +20,27 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
 
     private SessionListener sessionListener;
 
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
-        if(authentication != null){
+        if (authentication != null) {
             CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-            System.out.println("Nom :"+ customUserDetails.getFullName());
-            System.out.println("roles:"+ customUserDetails.getAuthorities());
+            System.out.println("Nom :" + customUserDetails.getFullName());
+            System.out.println("roles:" + customUserDetails.getAuthorities());
             String redirecturl = request.getContextPath();
 
-            if( customUserDetails.hasRole("Admin")) {
-                redirecturl += "/user/"+customUserDetails.getId()+"/profile";
+            if (customUserDetails.hasRole("Admin")) {
+                redirecturl += "/user/" + customUserDetails.getId() + "/profile";
                 System.out.println("je suis connecté");
-            } else if( customUserDetails.hasRole("User")) {
-                redirecturl += "/user/"+customUserDetails.getId()+"/profile";
-            } else  if(customUserDetails.hasRole("Employee")) {
-                redirecturl += "/user/"+customUserDetails.getId()+"/profile";
+            } else if (customUserDetails.hasRole("User")) {
+                redirecturl += "/user/" + customUserDetails.getId() + "/profile";
+            } else if (customUserDetails.hasRole("Employee")) {
+                redirecturl += "/user/" + customUserDetails.getId() + "/profile";
             } else {
                 redirecturl += "/";
             }
             response.sendRedirect(redirecturl);
-        }else{
+        } else {
             System.out.println("Authentication failed");
             // handle failed authentication here
         }

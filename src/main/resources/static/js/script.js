@@ -1,38 +1,3 @@
-//Panier : modifier une ligne de commande par quantite
-function updateLigneDeCommande(ligneDeCommandeId, nouvelleQuantite) {
-    // Récupérer le jeton CSRF pour la sécurité
-    var csrfToken = $("meta[name='_csrf']").attr("content");
-    var csrfHeader = $("meta[name='_csrf_header']").attr("content");
-
-    $.ajax({
-        url: '/api/ligne-de-commande/update', // L'URL de votre endpoint côté serveur
-        type: 'POST', // ou 'PUT' selon la configuration de votre serveur
-        contentType: 'application/json', // Type de contenu envoyé
-        data: JSON.stringify({
-            ligneDeCommandeId: ligneDeCommandeId,
-            quantite: nouvelleQuantite
-            // Pas besoin d'envoyer le total, il peut être recalculé côté serveur
-        }),
-        beforeSend: function(xhr) {
-            // Ajouter le jeton CSRF dans les en-têtes de la requête pour la sécurité
-            xhr.setRequestHeader(csrfHeader, csrfToken);
-        },
-        success: function(response) {
-            console.log("Ligne de commande mise à jour avec succès 'Test totale':", response);
-            // Mettre à jour l'interface utilisateur en conséquence
-            // Par exemple, mettez à jour le total affiché pour cette ligne de commande
-            // et potentiellement le total global du panier si nécessaire
-            $("#total-ligne-" + ligneDeCommandeId).text(response.total + ' €');
-            updateCartTotal(); // Mettez à jour le total du panier si cette fonction est définie
-        },
-        error: function(xhr, status, error) {
-            console.error("Erreur lors de la mise à jour de la ligne de commande:", error);
-            // Gérez l'erreur, par exemple, en affichant un message à l'utilisateur
-        }
-    });
-}
-
-
 
 
 //Affiche la liste des produits actif et quantite >= 1
@@ -132,45 +97,6 @@ function getProduitActif() {
         },
         error: function (error) {
             console.error('Erreur lors de la récupération des produits :', error);
-        }
-    });
-}
-
-
-function getProduitDetails2(produitId) {
-    // Convertir produitId en un Long
-    var produitIdValue = parseInt(produitId);
-
-    $.ajax({
-        url: '/produit/api/' + produitIdValue, // URL pour récupérer les détails du produit
-        type: 'GET',
-        dataType: 'json',
-        beforeSend: function () {
-            // Afficher l'indicateur de chargement pendant la requête AJAX (si nécessaire)
-            // Vous pouvez ajouter votre propre indication de chargement ici
-        },
-        success: function (data) {
-            // La réponse a été reçue avec succès
-            console.log('Produit récupéré avec succès :', data);
-
-            // Maintenant, vous avez les détails du produit dans l'objet 'data'
-            // Vous pouvez traiter ces détails comme vous le souhaitez ici
-
-            // Exemple : Afficher le nom et le prix du produit
-            /**var nom = data.nom;
-            var prix = parseFloat(data.prix);
-            console.log('Nom du produit :', nom);
-            console.log('Prix du produit :', prix);**/
-
-           return data;
-
-            // Effectuez d'autres actions nécessaires avec les détails du produit
-        },
-        error: function (error) {
-            // Une erreur s'est produite lors de la requête AJAX pour récupérer les détails du produit
-            console.error('Erreur lors de la récupération du produit :', error);
-
-            // Vous pouvez gérer les erreurs ici, par exemple, afficher un message d'erreur à l'utilisateur
         }
     });
 }
@@ -336,56 +262,6 @@ function getProduitDetails(produitId) {
 
 
 $(document).ready(function () {
-
-    $(document).on('click', '.favorite-btn', function() {
-        var produitId = $(this).closest('.product-card').find('input[name="produitId"]').val();
-        if(produitId == ''){
-            var produitId = $(this).data('product-id');
-        }
-        var userId = $('#userId').val();
-
-        if (userId) {
-            // Afficher une alerte avec les données envoyées
-            //alert("Données envoyées :\nProduit ID: " + produitId + "\nUtilisateur ID: " + userId);
-
-            ajouterAuxFavoris(produitId, userId);
-        } else {
-            alert("Veuillez vous connecter pour ajouter des produits aux favoris.");
-        }
-    });
-
-    function ajouterAuxFavoris(produitId, userId) {
-        // Récupérez le jeton CSRF depuis les balises meta
-        var csrfParameterName = $("meta[name='_csrf.parameterName']").attr("content");
-        var csrfToken = $("meta[name='_csrf.token']").attr("content");
-
-        // Créer l'objet de données
-        var data = {
-            produitId: produitId,
-            userId: userId
-        };
-        // Affichez une alerte avec les données envoyées
-        //alert("Données envoyées :\nProduit ID: " + produitId + "\nUtilisateur ID: " + userId);
-
-        $.ajax({
-            url: '/user/add/favoris', // Assurez-vous que l'URL est correcte
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader(csrfParameterName, csrfToken); // Ajouter les en-têtes CSRF
-            },
-            success: function(response) {
-                // Toggle icon based on whether the product is now a favorite or not
-                var button = $('#favorite-btn-' + produitId);
-                button.find('.far').toggle();
-                button.find('.fas').toggle();
-            },
-            error: function(error) {
-                console.error('Erreur lors de l\'ajout aux favoris:', error);
-            }
-        });
-    }
 
     //Avoir la quantite d'un produit (version modifiée pour retourner une promesse)
     // Fonction modifiée pour définir l'attribut 'max' de l'input

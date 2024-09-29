@@ -105,7 +105,21 @@ public class PanierController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Panier non trouvé");
         }
     }
-    
+
+    @PostMapping("/lignedecommande/delete")
+    public String deleteLigneDeCommande(@RequestParam("idLigneDeCommande") String idLigneDeCommande,
+                                        @RequestParam("idPanier") String idPanier) {
+        if (NumberUtils.isDigits(idLigneDeCommande) && NumberUtils.isDigits(idPanier)) {
+            Long panierId = Long.parseLong(idPanier);
+            Long ligneDeCommandeId = Long.parseLong(idLigneDeCommande);
+
+            panierService.deleteLigneDeCommandePanier(panierId, ligneDeCommandeId);
+            return "redirect:/panier";
+        } else {
+            return "redirect:/errorPage"; // Rediriger vers une page d'erreur spécifique
+        }
+    }
+
 
     @PostMapping("/deleteFirstElemPanier")
     public String deleteFirstElementInPanier(@RequestParam("idPanier") String idPanier,

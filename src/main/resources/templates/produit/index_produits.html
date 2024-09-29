@@ -256,13 +256,6 @@
 
 
 
-
-
-
-
-
-
-
     </style>
 </head>
 <body>
@@ -343,12 +336,6 @@
                                                     <i th:class="${produit.cote == 5 ? 'fas fa-star' : (produit.cote > 4 && produit.cote < 5) ? 'fas fa-star-half-alt' : 'far fa-star'}"></i>
                                                 </div>
                                             </div>
-                                            <div>
-                                                <p>
-                                                    <span th:text="${produit.cote}"></span>
-                                                    (nb x)
-                                                </p>
-                                            </div>
                                         </div>
                                         <h4 class="product-price" th:text="${produit.prix} + '&euro;'"></h4>
                                         <div class="form-group mb-3" style="display: flex;">
@@ -363,25 +350,20 @@
                                                 </div>
                                             </div>
                                             <div style="display: flex; align-items: center; justify-content: flex-start;">
-                                                <a href="@{'/produit/'+${produit.id}}"
+                                                <a th:href="@{'/produit/'+${produit.id}}"
                                                    class="btn btn-outline-primary"
+                                                   id="view-product-${produit.id}"
                                                    style="border-radius: 50%; margin-right: 10px;"
-                                                   th:title="#{indexProduit.button.viewProduct}">
+                                                   data-produit-id="${produit.id}"
+                                                   th:title="#{indexProduit.button.viewProduct}"
+                                                   onclick="incrementerVues(event, ${produit.id});">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
-                                                <button id="favorite-btn-${produit.id}"
-                                                        class="favorite-btn btn btn-outline-danger"
-                                                        th:title="#{indexProduit.button.addToFavorites}"
-                                                        data-product-id="${produit.id}"
-                                                        style="border-radius: 50%;">
-                                                    <i class="far fa-heart"></i>
-                                                    <i class="fas fa-heart" style="display: none;"></i>
-                                                </button>
                                             </div>
                                         </div>
                                         <button class="btn btn-success" th:onclick="'addToCart(' + ${produit.id} + ')'">
                                             <span th:text="#{indexProduit.button.addToCart}"
-                                                  style="color: #fff;"><i class="bi bi-cart-plus"></i> Ajouter au panier</span>
+                                                  style="color: #fff;"><i class="bi bi-cart-plus"></i> [[${addToCartText}]] </span>
                                         </button>
                                     </div>
                                 </div>
@@ -523,9 +505,6 @@
                                                         <div class="rating">
                                                             ${renderStars(produit.cote)}
                                                         </div>
-                                                        <div>
-                                                            <p>${produit.cote} (nb x)</p>
-                                                        </div>
                                                     </div>
                                                     <h4 class="product-price">${produit.prix} €</h4>
                                                     <div class="form-group mb-3" style="display: flex;">
@@ -540,22 +519,19 @@
                                                         <div style="display: flex; align-items: center; justify-content: flex-start;">
                                                             <a href="/produit/${produit.id}"
                                                                class="btn btn-outline-primary"
+                                                               id="view-product-${produit.id}"
                                                                style="border-radius: 50%; margin-right: 10px;"
-                                                               th:title="#{indexProduit.button.viewProduct}">
-                                                                <i class="fas fa-eye"></i>
+                                                               th:title="#{indexProduit.button.viewProduct}"
+                                                               data-produit-id="${produit.id}"
+                                                               onclick="incrementerVues(event, ${produit.id});">
+                                                               <i class="fas fa-eye"></i>
                                                             </a>
-                                                            <button id="favorite-btn-${produit.id}" class="favorite-btn btn btn-outline-danger"
-                                                                    th:title="#{indexProduit.button.addToFavorites}"
-                                                                    data-product-id="${produit.id}" style="border-radius: 50%;">
-                                                                <i class="far fa-heart"></i>
-                                                                <i class="fas fa-heart" style="display: none;"></i>
-                                                            </button>
                                                         </div>
                                                     </div>
                                                     <button class="btn btn-success"  onclick="addToCart(${produit.id})">
                                                         <span th:text="#{indexProduit.button.addToCart}"
                                                             style="color: #fff;">
-                                                            <i class="bi bi-cart-plus"></i>Ajouter au panier
+                                                            <i class="bi bi-cart-plus"></i>[[${addToCartText}]]
                                                         </span>
                                                     </button>
                                                 </div>
@@ -606,25 +582,6 @@
                             $(this).toggleClass('active');
                         });
                     });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
                 </script>
             </div>

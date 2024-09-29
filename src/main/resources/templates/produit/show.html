@@ -105,6 +105,8 @@
             }
         }
 
+
+
     </style>
 </head>
 <body>
@@ -119,31 +121,96 @@
                      alt="Image du produit">
                 <div class="card-body product-details">
                     <h1 class="product-title">[[${produit.nom}]]</h1>
-                    <div class="rating d-flex align-items-center" style="justify-content: flex-start;">
-                        <!-- Les étoiles... -->
-                        <input type="radio" id="star5" name="rating" value="5" style="display: none;"
-                               th:checked="${produit.cote >= 5}">
-                        <label for="star5" style="margin-right: 5px;"><i class="fas fa-star"
-                                                                         style="color: #ffc107;"></i></label>
+                    <div class="rating d-flex align-items-center" style="justify-content: flex-start; gap: 20px;">
+                        <!-- Étoiles de notation dynamiques -->
+                        <div class="stars" style="margin-right: 15px;">
+                            <span class="star" data-value="1"><i class="fas fa-star"
+                                                                 style="color: #ffc107; font-size: 1.6rem;"></i></span>
+                            <span class="star" data-value="2"><i class="fas fa-star"
+                                                                 style="color: #ffc107; font-size: 1.6rem;"></i></span>
+                            <span class="star" data-value="3"><i class="fas fa-star"
+                                                                 style="color: #ffc107; font-size: 1.6rem;"></i></span>
+                            <span class="star" data-value="4"><i class="fas fa-star"
+                                                                 style="color: #ffc107; font-size: 1.6rem;"></i></span>
+                            <span class="star" data-value="5"><i class="fas fa-star"
+                                                                 style="color: #ffc107; font-size: 1.6rem;"></i></span>
+                        </div>
 
-                        <input type="radio" id="star4" name="rating" value="4" style="display: none;"
-                               th:checked="${produit.cote >= 4}">
-                        <label for="star4" style="margin-right: 5px;"><i class="fas fa-star"
-                                                                         style="color: #ffc107;"></i></label>
-
-                        <input type="radio" id="star3" name="rating" value="3" style="display: none;"
-                               th:checked="${produit.cote >= 3}">
-                        <label for="star3" style="margin-right: 5px;"><i class="fas fa-star"
-                                                                         style="color: #ffc107;"></i></label>
-
-                        <input type="radio" id="star2" name="rating" value="2" style="display: none;"
-                               th:checked="${produit.cote >= 2}">
-                        <label for="star2" style="margin-right: 5px;"><i class="fas fa-star"
-                                                                         style="color: #ffc107;"></i></label>
-
-                        <input type="radio" id="star1" name="rating" value="1" style="display: none;"
-                               th:checked="${produit.cote >= 1}">
-                        <label for="star1"><i class="fas fa-star" style="color: #ffc107;"></i></label>
+                        <!-- Formulaire de sélection de la note -->
+                        <div class="rating-container d-flex flex-column" style="gap: 10px;">
+                            <form id="ratingForm" method="post" action="#" onsubmit="return false;">
+                                <div class="form-group">
+                                    <label for="ratingSelect" style="color: #ffae42; font-weight: bold;"
+                                           th:text="#{rating.form.label}">Notez ce
+                                        produit :</label>
+                                    <select id="ratingSelect" class="form-select" name="rating" style="width: 60px;">
+                                        <option value="0" th:selected="${produit.cote == 0}">0</option>
+                                        <option value="1" th:selected="${produit.cote == 1}">1</option>
+                                        <option value="2" th:selected="${produit.cote == 2}">2</option>
+                                        <option value="3" th:selected="${produit.cote == 3}">3</option>
+                                        <option value="4" th:selected="${produit.cote == 4}">4</option>
+                                        <option value="5" th:selected="${produit.cote == 5}">5</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-primary mt-2" id="noterProduitBtn"
+                                            style="background-color: #007bff; border-color: #007bff; padding: 8px 16px; font-size: 1rem;"
+                                            th:text="#{rating.form.submit}">
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- Modal d'erreur pour demander la connexion avant la notation -->
+                    <div class="modal fade" id="errorModalNotation" tabindex="-1"
+                         aria-labelledby="errorModalNotationLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content shadow-lg border-0" style="border-radius: 15px;">
+                                <div class="modal-header"
+                                     style="background-color: #f8f9fa; border-bottom: 1px solid #e9ecef;">
+                                    <h5 class="modal-title" id="errorModalNotationLabel"
+                                        style="color: #dc3545; font-weight: bold;">
+                                        <i class="fas fa-exclamation-circle"
+                                           style="color: #dc3545; margin-right: 10px;"></i>
+                                        <span th:text="#{rating.form.error}"/>
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body text-center">
+                                    <p th:text="#{rating.form.error.message}"></p>
+                                </div>
+                                <div class="modal-footer" style="border-top: none;">
+                                    <button type="button" class="btn btn-danger w-100" data-bs-dismiss="modal"
+                                            style="border-radius: 30px;" th:text="#{rating.form.close}">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal de succès pour la notation -->
+                    <div class="modal fade" id="successModalNotation" tabindex="-1"
+                         aria-labelledby="successModalNotationLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content shadow-lg border-0" style="border-radius: 15px;">
+                                <div class="modal-header"
+                                     style="background-color: #f8f9fa; border-bottom: 1px solid #e9ecef;">
+                                    <h5 class="modal-title" id="successModalNotationLabel"
+                                        style="color: #28a745; font-weight: bold;">
+                                        <i class="fas fa-check-circle" style="color: #28a745; margin-right: 10px;"></i>
+                                        <span th:text="#{rating.form.success}"/>
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body text-center">
+                                    <p th:text="#{rating.form.success.message}"></p>
+                                </div>
+                                <div class="modal-footer" style="border-top: none;">
+                                    <button type="button" class="btn btn-success w-100" data-bs-dismiss="modal"
+                                            style="border-radius: 30px;" th:text="#{rating.form.close}">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <p>[[${produit.description}]]</p>
@@ -151,13 +218,13 @@
                         [[${produit.prix}]]&euro;</h2>
                     <div class="detail-group mb-3">
                         <div class="input-group input-spinner me-3" style="max-width: 120px;">
+                            <!-- Boutons pour ajuster la quantité -->
                             <button class="button-minus btn btn-sm btn-outline-secondary" type="button"
                                     onclick="var input = this.nextElementSibling; input.value = Math.max(parseInt(input.value) - 1, 1);">
                                 <i class="fa-solid fa-minus"></i>
                             </button>
                             <input style="width: 50px; text-align: center;" type="number" step="1" min="1" max="10"
-                                   value="1"
-                                   name="quantity" th:id="'quantite-' + ${produit.id}"
+                                   value="1" name="quantity" th:id="'quantite-' + ${produit.id}"
                                    class="quantity-field form-control form-control-sm">
                             <button class="button-plus btn btn-sm btn-outline-secondary" type="button"
                                     onclick="var input = this.previousElementSibling; input.value = Math.min(parseInt(input.value) + 1, 10);">
@@ -165,14 +232,76 @@
                             </button>
                         </div>
 
-                        <button id="favorite-btn-${produit.id}" class="favorite-btn btn btn-outline-danger"
+                        <!-- Bouton pour ajouter aux favoris avec vérification -->
+                        <button id="favorite-btn-${produit.id}" class="favorite-btn btn"
+                                th:classappend="${userProduitsFavoris != null and #lists.contains(userProduitsFavoris, produit)} ? 'btn-danger' : 'btn-outline-danger'"
                                 th:title="#{product.view.addToFavorites}" data-product-id="${produit.id}"
-                                style="border-radius: 50%;">
-                            <i class="far fa-heart"></i>
-                            <i class="fas fa-heart" style="display: none;"></i>
-                        </button>
+                                style="border-radius: 50%; display: inline-flex; align-items: center;">
 
+                            <!-- Icône de cœur -->
+                            <i th:class="${userProduitsFavoris != null and #lists.contains(userProduitsFavoris, produit)} ? 'fas fa-heart text-white' : 'far fa-heart'"
+                               style="font-size: 1.5rem;"></i>
+                        </button>
                     </div>
+
+                    <!-- Modal de succès pour l'ajout aux favoris -->
+                    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content shadow-lg border-0" style="border-radius: 15px;">
+                                <div class="modal-header"
+                                     style="background-color: #f8f9fa; border-bottom: 1px solid #e9ecef;">
+                                    <h5 class="modal-title" id="successModalLabel"
+                                        style="color: #28a745; font-weight: bold;">
+                                        <i class="fas fa-check-circle" style="color: #28a745; margin-right: 10px;"></i>
+                                        <span th:text="#{favorite.success.title}"/>
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body text-center">
+                                    <p th:text="#{favorite.success.message}"/>
+                                    <div class="icon-wrapper mt-3">
+                                        <i class="fas fa-heart" style="color: #ff5e62; font-size: 3rem;"></i>
+                                    </div>
+                                </div>
+                                <div class="modal-footer" style="border-top: none;">
+                                    <button type="button" class="btn btn-success w-100" data-bs-dismiss="modal"
+                                            style="border-radius: 30px;" th:text="#{favorite.close}">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal d'erreur pour l'ajout aux favoris si l'utilisateur n'est pas connecté -->
+                    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content shadow-lg border-0" style="border-radius: 15px;">
+                                <div class="modal-header"
+                                     style="background-color: #f8f9fa; border-bottom: 1px solid #e9ecef;">
+                                    <h5 class="modal-title" id="errorModalLabel"
+                                        style="color: #dc3545; font-weight: bold;">
+                                        <i class="fas fa-exclamation-circle"
+                                           style="color: #dc3545; margin-right: 10px;"></i>
+                                        <span th:text="#{favorite.error.title}"/>
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body text-center">
+                                    <p th:text="#{favorite.error.message}"/>
+                                </div>
+                                <div class="modal-footer" style="border-top: none;">
+                                    <button type="button" class="btn btn-danger w-100" data-bs-dismiss="modal"
+                                            style="border-radius: 30px;" th:text="#{favorite.close}">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <button class="btn btn-success w-100 mb-3" th:onclick="'addToCart(' + ${produit.id} + ')'"
                             th:text="#{product.view.addToCart}"><i class="fa fa-shopping-cart"></i> Ajouter
                     </button>
@@ -208,6 +337,15 @@
                                             style="margin-left:2px;" class="btn btn-outline-info"
                                             th:text="${motCle.nom}"></button>
                                 </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="card-body text-center mt-3">
+                                <a th:href="@{/produit}" class="btn btn-primary btn-lg"
+                                   style="background-color: #ff9966; border-color: #ff9966;">
+                                    <i class="fas fa-arrow-left"></i>
+                                    <span th:text="#{product.back}"/>
+                                </a>
                             </div>
                         </li>
                     </ul>

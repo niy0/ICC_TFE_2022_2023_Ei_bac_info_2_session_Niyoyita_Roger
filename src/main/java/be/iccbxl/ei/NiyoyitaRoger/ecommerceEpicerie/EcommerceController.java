@@ -1,7 +1,8 @@
 package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie;
 
-import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.User;
-import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.UserService;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.mail.javamail.JavaMailSender;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -14,26 +15,90 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.Locale;
+import java.util.Optional;
+import java.util.UUID;
 
 
 @Controller
 public class EcommerceController {
 
-    private JavaMailSender mailSender;
-    private UserService userService;
+    private final JavaMailSender mailSender;
+    private final UserService userService;
+    private final PasswordResetTokenService passwordResetTokenService;
+    private final EmailService emailService;
 
     @Autowired
     public EcommerceController(JavaMailSender mailSender,
-                               UserService userService) {
+                               UserService userService,
+                               PasswordResetTokenService passwordResetTokenService,
+                               EmailService emailService) {
         this.mailSender = mailSender;
         this.userService = userService;
+        this.passwordResetTokenService = passwordResetTokenService;
+        this.emailService = emailService;
+    }
+
+    // Page "Mot de passe oublié"
+    @GetMapping("/forgot-password")
+    public String showForgotPasswordPage() {
+        return "forgotPassword";
+    }
+
+    @PostMapping("/forgot-password")
+    public String processForgotPasswordForm(@RequestParam("email") String userEmail, HttpServletRequest request) {
+        User user = userService.findByEmail(userEmail);
+        if (user == null) {
+            return "redirect:/forgot-password?error";
+        }
+
+        // Générer un token
+        String token = UUID.randomUUID().toString();
+        passwordResetTokenService.createPasswordResetTokenForUser(user, token);
+
+        // Construire le lien de réinitialisation
+        String resetUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + "/reset-password?token=" + token;
+
+        // Envoyer l'e-mail de réinitialisation
+        emailService.sendPasswordResetEmail(userEmail, resetUrl);
+
+        return "redirect:/forgot-password?success";
+    }
+
+    // Page "Réinitialisation de mot de passe"
+    @GetMapping("/reset-password")
+    public String showResetPasswordPage(@RequestParam("token") String token, Model model) {
+        model.addAttribute("token", token);
+        return "resetPassword";
+    }
+
+    @PostMapping("/reset-password")
+    public String resetPassword(@RequestParam("token") String token,
+                                @RequestParam("password") String password,
+                                @RequestParam("confirmPassword") String confirmPassword) {
+
+        // Valider le token et réinitialiser le mot de passe de l'utilisateur
+        if (password.equals(confirmPassword)) {
+            userService.updatePassword(token, password);
+            return "redirect:/login?resetSuccess";
+        } else {
+            return "redirect:/reset-password?token=" + token + "&error";
+        }
     }
 
     @GetMapping("/login")
-    public String loginPage() {
+    public String loginPage(@RequestParam(value = "lang", required = false) String lang, HttpServletRequest request, HttpServletResponse response) {
+        if (lang != null) {
+            Locale newLocale = new Locale(lang);
+            CookieLocaleResolver localeResolver = new CookieLocaleResolver();
+            localeResolver.setLocale(request, response, newLocale);
+        }
         return "user/login";
     }
+
 
     @GetMapping("/info-contact")
     public String contactPage(Model model, Authentication authentication) {

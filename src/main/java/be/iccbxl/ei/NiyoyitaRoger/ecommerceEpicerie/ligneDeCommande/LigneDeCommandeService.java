@@ -1,10 +1,13 @@
 package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.ligneDeCommande;
 
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit.Produit;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class LigneDeCommandeService {
@@ -28,22 +31,32 @@ public class LigneDeCommandeService {
         return ligneDeCommandeRepository.findById(id).orElse(null);
     }
 
-    public void updateLigneDeCommande(LigneDeCommande ligneDeCommande) {
-        // Assurez-vous que la ligne de commande existe en base de données
-        LigneDeCommande existingLigneDeCommande = ligneDeCommandeRepository.findById(ligneDeCommande.getId()).orElse(null);
-
-        if (existingLigneDeCommande != null) {
-            // Mettez à jour les champs de la ligne de commande existante avec les valeurs de la nouvelle ligne de commande
-            //existingLigneDeCommande.setProduit(ligneDeCommande.getProduit());
-            existingLigneDeCommande.setQuantite(ligneDeCommande.getQuantite());
-
-            // Enregistrez la mise à jour dans la base de données
-            ligneDeCommandeRepository.save(existingLigneDeCommande);
-        } else {
-            // Gérer le cas où la ligne de commande n'existe pas
-            throw new EntityNotFoundException("Ligne de commande non trouvée");
+    @Transactional
+    public LigneDeCommande updateLigneDeCommandeQuantite(Long ligneDeCommandeId, int nouvelleQuantite) {
+        // Rechercher la ligne de commande
+        Optional<LigneDeCommande> ligneOpt = ligneDeCommandeRepository.findById(ligneDeCommandeId);
+        if (!ligneOpt.isPresent()) {
+            throw new RuntimeException("Ligne de commande non trouvée.");
         }
+
+        LigneDeCommande ligneDeCommande = ligneOpt.get();
+        Produit produit = ligneDeCommande.getProduit();
+
+        // Vérifier que la quantité demandée n'excède pas le stock disponible
+        if (nouvelleQuantite > produit.getQuantite()) {
+            throw new RuntimeException("Quantité demandée non disponible en stock. Maximum : " + produit.getQuantite());
+        }
+
+        // Mettre à jour la quantité
+        ligneDeCommande.setQuantite(nouvelleQuantite);
+
+        // Recalculer le montant total pour la ligne de commande
+        ligneDeCommande.calculerMontantTotal();
+
+        // Sauvegarder la ligne de commande mise à jour
+        return ligneDeCommandeRepository.save(ligneDeCommande);
     }
+
 
     //Methode supprimer une ligne de commande (dans un panier)
     public void deleteLigneDeCommande(Long id) {

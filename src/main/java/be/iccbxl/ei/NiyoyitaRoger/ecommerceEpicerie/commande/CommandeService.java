@@ -1,5 +1,6 @@
 package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.commande;
 
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.livraison.LivraisonService;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.PanierRepository;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.User;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.UserService;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -25,18 +27,20 @@ public class CommandeService {
     private final CommandeRepository commandeRepository;
     private final PanierRepository panierRepository;
     private final UserService userService;
-
     private final Validator validator;
+    private final LivraisonService livraisonService;
 
     @Autowired
     public CommandeService(CommandeRepository commandeRepository,
                            PanierRepository panierRepository,
                            UserService userService,
-                           Validator validator) {
+                           Validator validator,
+                           LivraisonService livraisonService) {
         this.commandeRepository = commandeRepository;
         this.panierRepository = panierRepository;
         this.userService = userService;
         this.validator = validator;
+        this.livraisonService = livraisonService;
     }
 
     public void save(Commande commande) {
@@ -106,6 +110,17 @@ public class CommandeService {
         }
 
         return commandeRepository.findAll(spec, pageable);
+    }
+
+    public void creerOuMettreAJourCommande(Commande commande, LivraisonService livraisonService) {
+        // Calculer les frais de commande en fonction de la méthode (Pickup ou Delivery)
+        commande.calculerFraisDeCommande(livraisonService);
+
+        // Associer chaque ligne de commande à la commande
+        commande.getLignesDeCommande().forEach(ligne -> ligne.setCommande(commande));
+
+        // Enregistrez ou mettez à jour la commande dans la base de données
+        commandeRepository.save(commande);
     }
 
 }

@@ -14,14 +14,13 @@ import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.Panier;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.PanierNotFoundException;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.PanierRepository;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.PanierService;
-import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.CustomUserDetails;
-import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.User;
-import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.UserRepository;
-import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.UserService;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +37,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -82,6 +82,10 @@ public class ProduitController {
 
     private PanierService panierService;
 
+    private MessageSource messageSource;
+
+    private UserProduitsNotesRepository userProduitsNotesRepository;
+
     @Autowired
     public ProduitController(ProduitRepository produitRepository,
                              ProduitService produitService,
@@ -94,7 +98,9 @@ public class ProduitController {
                              PanierRepository panierRepository,
                              UserRepository userRepository,
                              UserService userService,
-                             PanierService panierService) {
+                             PanierService panierService,
+                             MessageSource messageSource,
+                             UserProduitsNotesRepository userProduitsNotesRepository) {
         this.produitRepository = produitRepository;
         this.produitService = produitService;
         this.categorieService = categorieService;
@@ -107,6 +113,8 @@ public class ProduitController {
         this.userRepository = userRepository;
         this.userService = userService;
         this.panierService = panierService;
+        this.messageSource = messageSource;
+        this.userProduitsNotesRepository = userProduitsNotesRepository;
     }
 
     @GetMapping("/")//faire un autre pour les non admin gérent/manager
@@ -164,18 +172,78 @@ public class ProduitController {
         model.addAttribute("panier", panier);
         model.addAttribute("montantTotalPanier", montantTotal);
 
+        // Ajouter les traductions dans le modèle
+        model.addAttribute("addToCartText", messageSource.getMessage("indexProduit.button.addToCart", null, LocaleContextHolder.getLocale()));
+        model.addAttribute("viewProductText", messageSource.getMessage("indexProduit.button.viewProduct", null, LocaleContextHolder.getLocale()));
+        model.addAttribute("favoriteText", messageSource.getMessage("indexProduit.button.addToFavorites", null, LocaleContextHolder.getLocale()));
+
         return "produit/index_produits";
     }
 
-    
+    @GetMapping("/produit/incrementerVues/{id}")
+    @ResponseBody
+    public ResponseEntity<Boolean> incrementerVues(@PathVariable long id) {
+        // Récupérer le produit avec l'ID donné
+        Produit produit = produitRepository.getPro(id);
+
+        if (produit != null) {
+            // Si le produit est trouvé, incrémenter le nombre de vues
+            produit.setVues(produit.getVues() + 1);
+            produitService.updateProduit(produit);
+            // Retourne true pour indiquer que l'opération a réussi
+            return ResponseEntity.ok(true);
+        } else {
+            // Si le produit n'est pas trouvé, retourne false
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
+        }
+    }
+
+
+    @PostMapping("/produit/{id}/noter")
+    @Transactional
+    public ResponseEntity<Map<String, Object>> noterProduit(@PathVariable("id") long produitId, @RequestBody Map<String, Integer> noteData, Principal principal) {
+        int note = noteData.get("note");
+
+        // Récupérer l'utilisateur connecté
+        User user = userRepository.findByEmail(principal.getName());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();  // Utilisateur non connecté
+        }
+
+        // Récupérer le produit
+        Produit produit = produitRepository.findById(produitId).orElse(null);
+        if (produit != null) {
+            // Ajouter ou mettre à jour la note de l'utilisateur pour le produit dans la table user_produits_notes
+            userProduitsNotesRepository.saveOrUpdateNote(user.getId(), produitId, note);
+
+            // Calculer la nouvelle cote moyenne pour ce produit
+            Double nouvelleMoyenne = userProduitsNotesRepository.calculerMoyenneNotes(produitId);
+
+            // Mettre à jour la cote du produit
+            produit.setCote(nouvelleMoyenne);
+            produitRepository.save(produit);  // Sauvegarder le produit avec la nouvelle cote
+
+            // Préparer la réponse avec le produit, la nouvelle cote et la note de l'utilisateur
+            Map<String, Object> result = new HashMap<>();
+            result.put("produit", produit);
+            result.put("nouvelleCote", nouvelleMoyenne);
+            result.put("noteUtilisateur", note);
+
+            return ResponseEntity.ok(result);  // Retourne le produit, la nouvelle cote, et la note de l'utilisateur
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();  // Produit non trouvé
+        }
+    }
+
+
     @GetMapping("/produit/{id}")
     public String getProduitById(@PathVariable long id,
                                  Model model,
                                  Principal principal,
                                  HttpSession session,
                                  Authentication authentication) throws ProduitNotFoundException {
-        Produit produit = produitRepository.getPro(id);
 
+        Produit produit = produitRepository.getPro(id);
         // Vérifier si le produit existe
         if (produit == null) {
             throw new ProduitNotFoundException("Produit non trouvé");
@@ -185,6 +253,8 @@ public class ProduitController {
         Panier panierTest = panierService.getOrCreatePanier(principal, session);
         Panier panier = panierService.getPanierById(panierTest.getId());
 
+        Integer userNote = null; // Par défaut, la note de l'utilisateur est nulle.
+
         // Si l'utilisateur est connecté, ajouter les informations utilisateur au modèle
         if (authentication != null && authentication.isAuthenticated() && !(authentication.getPrincipal() instanceof String && authentication.getPrincipal().equals("anonymousUser"))) {
             Object principalTest = authentication.getPrincipal();
@@ -192,7 +262,11 @@ public class ProduitController {
                 UserDetails userDetails = (UserDetails) principalTest;
                 String username = userDetails.getUsername();
                 User user = userService.getUserByEmail(username);
+                // Récupérer la liste des produits favoris de l'utilisateur
+                List<Produit> userProduitsFavoris = user.getProduitsFavoris();
+
                 model.addAttribute("user", user);
+                model.addAttribute("userProduitsFavoris", userProduitsFavoris);
             }
         }
 

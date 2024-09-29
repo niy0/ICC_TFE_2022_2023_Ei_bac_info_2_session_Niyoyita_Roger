@@ -87,6 +87,12 @@ public class User implements Serializable {
     )
     private List<Produit> produitsFavoris = new ArrayList<>();
 
+    @ElementCollection
+    @CollectionTable(name = "user_produits_notes", joinColumns = @JoinColumn(name = "user_id"))
+    @MapKeyJoinColumn(name = "produit_id")  // Utilisation de produit comme clé
+    @Column(name = "note")
+    private Map<Produit, Integer> produitsNotes = new HashMap<>();
+
     @OneToOne(mappedBy = "utilisateur", cascade = CascadeType.ALL)
     private Panier panier;
 
@@ -239,6 +245,17 @@ public class User implements Serializable {
         return this.produitsFavoris.contains(produit);
     }
 
+    public Map<Produit, Integer> getProduitsNotes() {
+        return produitsNotes;
+    }
+
+    public void setProduitsNotes(Map<Produit, Integer> produitsNotes) {
+        this.produitsNotes = produitsNotes;
+    }
+
+    public void noterProduit(Produit produit, int note) {
+        this.produitsNotes.put(produit, note);
+    }
 
     @Override
     public String toString() {
@@ -255,6 +272,10 @@ public class User implements Serializable {
                 ", roles=" + roles +
                 ", commandes=" + commandes +
                 ", produitsFavoris=" + produitsFavoris +
+                ", produitsNotes=" + produitsNotes.entrySet().stream()
+                .limit(5) // Affiche les 5 premières notes pour éviter une sortie trop longue
+                .map(entry -> "Produit: " + entry.getKey().getNom() + ", Note: " + entry.getValue())
+                .toList() +
                 ", panier=" + (panier != null ? panier.getId() : null) +
                 ", sexe=" + sexe +
                 '}';

@@ -49,6 +49,8 @@
             font-size: 2rem;
         }
 
+
+
     </style>
 </head>
 <body>
@@ -108,8 +110,7 @@
                 </div>
                 <div class="text-center">
                     <button type="submit" class="btn btn-custom m-2" th:text="#{signup.page.submit}"></button>
-                    <button type="button" class="btn btn-secondary m-2" onclick="cancelForm();"
-                            th:text="#{signup.page.cancel}"></button>
+                    <a th:href="@{/}" class="btn btn-secondary m-2" th:text="#{signup.page.cancel}"></a>
                 </div>
             </div>
         </form>

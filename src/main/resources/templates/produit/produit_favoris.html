@@ -145,6 +145,8 @@
         }
 
 
+
+
     </style>
 </head>
 <body>
@@ -336,20 +338,72 @@
                     </div>
                 </div>
             </div>
+            <!-- Modal de confirmation pour la suppression des favoris -->
+            <div class="modal fade" id="confirmRemoveModal" tabindex="-1" aria-labelledby="confirmRemoveModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="confirmRemoveModalLabel">Confirmer la suppression</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <img id="productImage" src="" alt="Image du produit" class="img-fluid mb-3"
+                                 style="max-width: 150px;">
+                            <p>Êtes-vous sûr de vouloir retirer ce produit de vos favoris ?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="button" id="confirmRemoveBtn" class="btn btn-danger">Retirer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal de succès pour la suppression -->
+            <div class="modal fade" id="successRemoveModal" tabindex="-1" aria-labelledby="successRemoveModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="successRemoveModalLabel">Produit retiré</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Le produit a été retiré de vos favoris avec succès.
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-success" data-bs-dismiss="modal">Fermer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <!-- jQuery (Nécessaire avant les scripts Bootstrap) -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <!-- Bootstrap 5 Bundle JS (inclut Popper) -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-            // Récupération des traductions via Thymeleaf
-            const removeText = /*[[#{user.favoris.page.button.remove}]]*/ 'Retirer';
-            const removeConfirmText = /*[[${'user.favoris.page.confirm.remove'}]]*/ 'Êtes-vous sûr de vouloir retirer ce produit des favoris?';
-            const removeSuccessText = /*[[${'user.favoris.page.remove.success'}]]*/ 'Produit retiré des favoris avec succès';
-            const removeErrorText = /*[[${'user.favoris.page.remove.error'}]]*/ 'Une erreur est survenue lors du retrait du produit des favoris.';
+            $(document).ready(function() {
+                var produitIdToRemove;  // Variable pour stocker l'ID du produit à supprimer
 
-            function removeFromFavoris(produitId) {
-                if (confirm(removeConfirmText)) {
+                // Fonction pour afficher le modal de confirmation avant suppression avec l'image du produit
+                function showRemoveConfirmModal(produitId, produitImageSrc) {
+                    produitIdToRemove = produitId; // Stocker l'ID du produit à supprimer
+                    $('#productImage').attr('src', produitImageSrc);  // Mettre à jour l'image dans le modal
+                    var confirmModal = new bootstrap.Modal(document.getElementById('confirmRemoveModal'));
+                    confirmModal.show();
+                }
+
+                // Lorsque l'utilisateur clique sur "Retirer" dans le modal de confirmation
+                $('#confirmRemoveBtn').on('click', function() {
+                    if (produitIdToRemove) {
+                        removeFromFavoris(produitIdToRemove);  // Appeler la fonction de suppression avec l'ID du produit
+                    }
+                });
+
+                // Fonction pour supprimer un produit des favoris
+                function removeFromFavoris(produitId) {
                     const csrfToken = $('meta[name="_csrf"]').attr('content');
                     const csrfHeader = $('meta[name="_csrf_header"]').attr('content');
 
@@ -361,86 +415,102 @@
                             xhr.setRequestHeader(csrfHeader, csrfToken);
                         },
                         success: function(response) {
-                            alert(removeSuccessText);
+                            // Cacher le modal de confirmation après suppression
+                            var confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmRemoveModal'));
+                            confirmModal.hide();
+
+                            // Afficher le modal de succès
+                            var successModal = new bootstrap.Modal(document.getElementById('successRemoveModal'));
+                            successModal.show();
+
+                            // Recharger la liste des favoris
                             loadFavoris(0, 'dateCreation');
                         },
                         error: function(error) {
                             console.error('Erreur lors du retrait des favoris:', error);
-                            alert(removeErrorText);
+                            alert('Une erreur est survenue lors du retrait du produit des favoris.');
                         }
                     });
                 }
-            }
 
-            function loadFavoris(page, sortBy) {
-                $.ajax({
-                    url: '/api/user/favoris',
-                    data: {
-                        page: page,
-                        sortBy: sortBy,
-                        searchNom: $('#searchNom').val(),
-                        sortPrice: $('#sortPrice').val(),
-                        sortDate: $('#sortDate').val(),
-                        filterCategorie: $('#filterCategorie').val(),
-                        filterMarque: $('#filterMarque').val(),
-                        filterMotCle: $('#filterMotCle').val(),
-                    },
-                    success: function(data) {
-                        var favorisTableBody = $('#favorisTableBody');
-                        favorisTableBody.empty();
-                        $.each(data.content, function(index, produit) {
-                            favorisTableBody.append(`
-                                <tr>
-                                    <td><img src="/display?id=${produit.id}" alt="Image du produit" height="100px" width="auto"></td>
-                                    <td>${produit.nom}</td>
-                                    <td>${produit.description}</td>
-                                    <td>${produit.prix}€</td>
-                                    <td>${new Date(produit.dateCreation).toLocaleDateString()}</td>
-                                    <td>
-                                        <button class="btn btn-outline-danger" onclick="removeFromFavoris(${produit.id})">
-                                            <i class="fas fa-trash-alt"></i> ${removeText}
-                                        </button>
-                                    </td>
-                                </tr>
-                            `);
-                        });
+                // Lorsque l'utilisateur clique sur le bouton "Supprimer" pour un produit
+                $(document).on('click', '.btn-outline-danger', function() {
+                    var produitId = $(this).data('produit-id');
+                    var produitImageSrc = $(this).closest('tr').find('img').attr('src');  // Récupérer l'image du produit dans le tableau
+                    showRemoveConfirmModal(produitId, produitImageSrc);  // Afficher le modal de confirmation avec l'image du produit
+                });
 
-                        // Gestion de la pagination
-                        var pagination = $('.pagination');
-                        pagination.empty();
-                        pagination.append(`
-                            <li class="page-item ${data.number === 0 ? 'disabled' : ''}">
-                                <a class="page-link" href="#" aria-label="Previous" onclick="loadFavoris(${data.number - 1}, '${sortBy}')">
-                                    <span aria-hidden="true">&laquo;</span>
-                                </a>
-                            </li>
-                        `);
+                // Charger la liste des favoris
+                function loadFavoris(page, sortBy) {
+                    $.ajax({
+                        url: '/api/user/favoris',
+                        data: {
+                            page: page,
+                            sortBy: sortBy,
+                            searchNom: $('#searchNom').val(),
+                            sortPrice: $('#sortPrice').val(),
+                            sortDate: $('#sortDate').val(),
+                            filterCategorie: $('#filterCategorie').val(),
+                            filterMarque: $('#filterMarque').val(),
+                            filterMotCle: $('#filterMotCle').val(),
+                        },
+                        success: function(data) {
+                            var favorisTableBody = $('#favorisTableBody');
+                            favorisTableBody.empty();
+                            $.each(data.content, function(index, produit) {
+                                favorisTableBody.append(`
+                                    <tr>
+                                        <td><img src="/display?id=${produit.id}" alt="Image du produit" height="100px" width="auto"></td>
+                                        <td>${produit.nom}</td>
+                                        <td>${produit.description}</td>
+                                        <td>${produit.prix}€</td>
+                                        <td>${new Date(produit.dateCreation).toLocaleDateString()}</td>
+                                        <td>
+                                            <button class="btn btn-outline-danger" data-produit-id="${produit.id}">
+                                                <i class="fas fa-trash-alt"></i> Retirer
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `);
+                            });
 
-                        for (var i = 0; i < data.totalPages; i++) {
+                            // Gestion de la pagination
+                            var pagination = $('.pagination');
+                            pagination.empty();
                             pagination.append(`
-                                <li class="page-item ${data.number === i ? 'active' : ''}">
-                                    <a class="page-link" href="#" onclick="loadFavoris(${i}, '${sortBy}')">${i + 1}</a>
+                                <li class="page-item ${data.number === 0 ? 'disabled' : ''}">
+                                    <a class="page-link" href="#" aria-label="Previous" onclick="loadFavoris(${data.number - 1}, '${sortBy}')">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
                                 </li>
                             `);
+
+                            for (var i = 0; i < data.totalPages; i++) {
+                                pagination.append(`
+                                    <li class="page-item ${data.number === i ? 'active' : ''}">
+                                        <a class="page-link" href="#" onclick="loadFavoris(${i}, '${sortBy}')">${i + 1}</a>
+                                    </li>
+                                `);
+                            }
+
+                            pagination.append(`
+                                <li class="page-item ${data.number + 1 === data.totalPages ? 'disabled' : ''}">
+                                    <a class="page-link" href="#" aria-label="Next" onclick="loadFavoris(${data.number + 1}, '${sortBy}')">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            `);
+                        },
+                        error: function(error) {
+                            console.error('Erreur lors du chargement des favoris:', error);
                         }
+                    });
+                }
 
-                        pagination.append(`
-                            <li class="page-item ${data.number + 1 === data.totalPages ? 'disabled' : ''}">
-                                <a class="page-link" href="#" aria-label="Next" onclick="loadFavoris(${data.number + 1}, '${sortBy}')">
-                                    <span aria-hidden="true">&raquo;</span>
-                                </a>
-                            </li>
-                        `);
-                    },
-                    error: function(error) {
-                        console.error('Erreur lors du chargement des favoris:', error);
-                    }
-                });
-            }
-
-            $(document).ready(function() {
+                // Charger les favoris au démarrage
                 loadFavoris(0, 'dateCreation');
 
+                // Gérer les filtres et les tris
                 $('#searchNom, #sortPrice, #sortDate, #filterCategorie, #filterMarque, #filterMotCle').on('change input', function() {
                     loadFavoris(0, 'dateCreation');
                 });
@@ -450,7 +520,6 @@
                     loadFavoris(0, sortBy);
                 });
             });
-
 
         </script>
     </div>

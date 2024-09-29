@@ -36,10 +36,6 @@
             color: #333;
         }
 
-
-
-
-
     </style>
 </head>
 <body>
@@ -71,7 +67,10 @@
             <h3><i class="fas fa-euro-sign section-icon"></i> <span th:text="#{deliveryPolicy.costs.title}">Frais de livraison</span>
             </h3>
             <p th:text="#{deliveryPolicy.costs.text}">
-                Les frais de livraison sont calculés en fonction du poids de votre commande et de votre localisation.
+                Les frais de livraison sont calculés en fonction de la distance entre notre magasin et l'adresse de
+                livraison.
+                Un tarif fixe de 5 € est appliqué pour les livraisons jusqu'à 5 km. Pour les livraisons au-delà de 5 km,
+                un tarif de 1,50 € par kilomètre supplémentaire est appliqué.
                 Les frais exacts sont indiqués au moment de la finalisation de la commande.
             </p>
         </div>

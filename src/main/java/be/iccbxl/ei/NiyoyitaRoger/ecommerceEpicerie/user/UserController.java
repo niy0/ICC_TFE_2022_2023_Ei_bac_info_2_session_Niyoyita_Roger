@@ -332,8 +332,6 @@ public class UserController {
             User user = userService.getUserByEmail(username);
             Adresse adresse = user.getAdresse();
 
-            System.out.println(adresse + "aaaaaaaaaaaaaaaaaaaaaddddddddddddddddddddddrrrrrrrrrrrrrrreeeeeeeeeeeessssssssssssss************");
-
             if (user.getId() == userTest.getId()) {
                 model.addAttribute("adresse", adresse != null ? adresse : new Adresse()).addAttribute("user", user);
             } else {
@@ -435,11 +433,45 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/{userId}")
-    public void deleteUser(@PathVariable Long userId) {
-        userService.deleteUser(userId);
+    // Endpoint pour supprimer un utilisateur
+    @DeleteMapping("/admin/user/{userId}/delete")
+    @PreAuthorize("hasRole('ADMIN')") // Seuls les admins peuvent supprimer des utilisateurs
+    public ResponseEntity<String> deleteUser(@PathVariable("userId") Long userId) {
+        String result = userService.deleteUser(userId);
+
+        if (result.equals("Utilisateur supprimé avec succès")) {
+            return ResponseEntity.ok(result);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+        }
     }
-    
+
+    @PostMapping("/user/deleteAccount")
+    public String deleteOwnAccount(Authentication authentication, RedirectAttributes redirectAttributes) {
+        // Récupérer l'utilisateur connecté
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String email = userDetails.getUsername(); // L'email est utilisé comme identifiant dans ton système
+        User user = userService.getUserByEmail(email);
+
+        if (user != null) {
+            // Supprimer l'utilisateur (anonymisation + suppression)
+            String result = userService.deleteUser(user.getId());
+
+            if (result.equals("Utilisateur anonymisé avec succès")) {
+                // Déconnexion après suppression de l'utilisateur
+                SecurityContextHolder.clearContext(); // Supprime le contexte de sécurité
+                redirectAttributes.addFlashAttribute("message", "Votre compte a été supprimé avec succès.");
+                return "redirect:/login"; // Redirige vers la page de login ou une autre page appropriée
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "Erreur lors de la suppression du compte.");
+                return "redirect:/user/profile"; // Redirige vers la page de profil en cas d'erreur
+            }
+        } else {
+            redirectAttributes.addFlashAttribute("errorMessage", "Utilisateur non trouvé.");
+            return "redirect:/user/profile"; // Redirige vers la page de profil si l'utilisateur n'est pas trouvé
+        }
+    }
+
 
     /**
      * Cette méthode permet de récupérer les informations d'un utilisateur spécifique.
@@ -475,5 +507,7 @@ public class UserController {
         }
         return ResponseEntity.ok(user.getAdresse()); // Suppose que User a une méthode getAdresses()
     }
+
+    //Delete user
 
 }

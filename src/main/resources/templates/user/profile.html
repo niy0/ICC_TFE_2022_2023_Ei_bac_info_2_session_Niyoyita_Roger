@@ -178,12 +178,6 @@
 
 
 
-
-
-
-
-
-
     </style>
 </head>
 <body>
@@ -210,6 +204,13 @@
                     <i class="fas fa-address-card"></i>
                     <span th:text="#{menu.editAddress}">Modifier adresse</span>
                 </a>
+                <form th:action="@{/user/deleteAccount}" method="post"
+                      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.')">
+                    <button type="submit" class="btn btn-danger" style="font-size: 16px;">
+                        <i class="fas fa-user-slash"></i>
+                        <span th:text="#{menu.deleteAccount}">Supprimer mon compte</span>
+                    </button>
+                </form>
             </div>
 
             <a th:href="@{/commandes}">
@@ -349,6 +350,40 @@
                         <a class="btn btn-outline-primary" th:href="@{'/user/' + ${user.id} + '/adresse/edit'}">
                             <i class="fas fa-address-card"></i> <span th:text="#{profil.modifierAdresse}">Modifier adresse</span>
                         </a>
+                        <!-- Lien pour supprimer le compte avec un modal de confirmation -->
+                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
+                                data-bs-target="#deleteAccountModal">
+                            <i class="fas fa-user-slash"></i> <span th:text="#{profil.supprimerCompte}">Supprimer mon compte</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal de confirmation pour la suppression du compte -->
+            <div class="modal fade" id="deleteAccountModal" tabindex="-1"
+                 aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteAccountModalLabel"
+                                th:text="#{profil.confirmationSuppression}">Confirmation de la suppression</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p th:text="#{profil.suppressionMessage}">Êtes-vous sûr de vouloir supprimer votre
+                                compte ? Cette action est irréversible.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                    th:text="#{profil.annuler}">Annuler
+                            </button>
+                            <!-- Formulaire pour confirmer la suppression du compte -->
+                            <form th:action="@{/user/deleteAccount}" method="post">
+                                <button type="submit" class="btn btn-danger"
+                                        th:text="#{profil.confirmerSuppression}">Confirmer la suppression
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -81,6 +81,8 @@
             color: #fff;
         }
 
+
+
     </style>
 </head>
 <body>
@@ -297,6 +299,17 @@
                         <td colspan="4">
                             <strong><span th:text="#{orderSummary.total}">Total du panier : </span><span
                                     id="panier-total" th:text="${montantTotalPanier}"></span> €</strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" style="text-align: center;">
+                            <strong>Frais de livraison : <span id="frais-livraison">0.00</span> €</strong>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" style="text-align: center;">
+                            <strong>Total de la commande : <span id="total-commande"
+                                                                 th:text="${montantTotalPanier}"></span> €</strong>
                         </td>
                     </tr>
                     </tfoot>

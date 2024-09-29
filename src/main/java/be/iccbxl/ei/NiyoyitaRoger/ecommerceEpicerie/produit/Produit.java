@@ -88,6 +88,30 @@ public class Produit implements Serializable {
     @Column(name = "date_modification")
     private LocalDateTime dateModification;
 
+    @Column(name = "taux_tva", nullable = false)
+    private BigDecimal tauxTVA; // Taux de TVA pour le produit (5.5%, 20%, etc.)
+
+    @NotNull
+    @Column(name = "vues", nullable = false)
+    private Integer vues = 0;  // Initialisation à 0 pour le nombre de vues
+
+    @PrePersist
+    @PreUpdate
+    public void beforeSave() {
+        // Appliquer le taux de TVA avant la persistance ou la mise à jour
+        if (this.categorie != null) {
+            this.tauxTVA = this.categorie.getTauxTVA();
+        }
+
+        // Définir la date de création si elle n'est pas encore définie
+        if (this.dateCreation == null) {
+            this.dateCreation = LocalDateTime.now();
+        }
+
+        // Mettre à jour la date de modification
+        this.dateModification = LocalDateTime.now();
+    }
+
     @ManyToMany
     @JoinTable(
             name = "produit_mots_cles",
@@ -213,6 +237,14 @@ public class Produit implements Serializable {
         this.motsCles = motsCles;
     }
 
+    public BigDecimal getTauxTVA() {
+        return tauxTVA;
+    }
+
+    public void setTauxTVA(BigDecimal tauxTVA) {
+        this.tauxTVA = tauxTVA;
+    }
+
     // Méthode pour convertir Blob en byte[]
     private byte[] getImagePrincipaleBytes() {
         if (this.imagePrincipale != null) {
@@ -230,16 +262,6 @@ public class Produit implements Serializable {
             }
         }
         return null;
-    }
-
-    @PrePersist
-    protected void onCreate() {
-        dateCreation = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        dateModification = LocalDateTime.now();
     }
 
     public void setMinStock(Integer minStock) {
@@ -282,12 +304,25 @@ public class Produit implements Serializable {
         return cote;
     }
 
+    public void updateCote(double nouvelleCote) {
+        this.cote = nouvelleCote;
+    }
+
     public Boolean getActif() {
         return actif;
     }
 
     public String getTypePrix() {
         return typePrix;
+    }
+
+    // Getter et Setter pour 'vues'
+    public Integer getVues() {
+        return vues;
+    }
+
+    public void setVues(Integer vues) {
+        this.vues = vues;
     }
 
     @Override
@@ -309,6 +344,7 @@ public class Produit implements Serializable {
                 ", disponibilite=" + disponibilite +
                 ", dateCreation=" + dateCreation +
                 ", dateModification=" + dateModification +
+                ", vues=" + vues +
                 ", motsCles=" + (motsCles != null ? motsCles.size() + " mots clés" : "null") + // Afficher la taille au lieu des détails
                 ", utilisateursFavoris=" + (utilisateursFavoris != null ? utilisateursFavoris.size() + " utilisateurs favoris" : "null") + // Afficher la taille
                 '}';

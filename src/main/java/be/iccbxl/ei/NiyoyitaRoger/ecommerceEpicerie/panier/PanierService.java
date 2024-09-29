@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import jakarta.servlet.http.HttpSession;
+
 import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -82,19 +83,13 @@ public class PanierService {
         if (existingLigneDeCommande != null) {
             existingLigneDeCommande.setQuantite(existingLigneDeCommande.getQuantite() + quantite);
             ligneDeCommandeRepository.save(existingLigneDeCommande);
-            System.out.println("existe deeeeeeeeejjaaa"+ existingLigneDeCommande);
-            System.out.println(panier.getLignesDeCommande() +"ligne de comm");
         } else {
             LigneDeCommande nouvelleLigneDeCommande = new LigneDeCommande(produit, panier, quantite, produit.getPrix());
             ligneDeCommandeRepository.save(nouvelleLigneDeCommande);
 
             panier.getLignesDeCommande().add(nouvelleLigneDeCommande);
-
-            System.out.println("nouvellle ligne rajouter*************"+panier);
         }
-
         panierRepository.save(panier);
-        System.out.println(panier.getLignesDeCommande().size() + "lllllllllllllignne de commmmmmande size");
     }
 
     public List<LigneDeCommandeDTO> getLignesDeCommande(Long panierId) {

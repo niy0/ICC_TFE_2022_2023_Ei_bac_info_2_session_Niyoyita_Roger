@@ -183,6 +183,7 @@
     }
 
 
+
     </style>
 </head>
 <body>
@@ -388,16 +389,26 @@
                         <td th:text="${ligne.montantTotal} + ' €'"></td>
                     </tr>
                     <tr class="total">
-                        <td></td>
-                        <td th:text="#{facture.page.subtotal} + ': ' + ${commande.montantCommande} + ' €'"></td>
+                        <td th:text="#{facture.page.subtotal}"></td>
+                        <!-- Cette ligne affiche le sous-total des produits -->
+                        <td th:text="${commande.montantCommande} + ' €'"></td>
                     </tr>
+
+                    <tr class="total">
+                        <td th:text="#{facture.page.shippingFees}"></td>
+                        <!-- Cette ligne affiche les frais de livraison -->
+                        <td th:text="${commande.fraisCommande} + ' €'"></td>
+                    </tr>
+
                     <tr class="total">
                         <td></td>
                         <td th:text="#{facture.page.tax}"></td>
                     </tr>
+
                     <tr class="total">
-                        <td></td>
-                        <td th:text="#{facture.page.total} + ': ' + ${commande.montantCommande} + ' €'"></td>
+                        <td th:text="#{facture.page.totalWithShipping}"></td>
+                        <!-- Cette ligne affiche le total avec les frais de livraison -->
+                        <td th:text="(${commande.montantCommande} + ${commande.fraisCommande}) + ' €'"></td>
                     </tr>
                 </table>
                 <a href="/commandes" class="btn btn-primary mt-3"

@@ -1,5 +1,6 @@
 package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit;
 
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.UserProduitsNotesRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,9 @@ public class ProduitService {
 
     @Autowired
     private ProduitRepository produitRepository;
+
+    @Autowired
+    private UserProduitsNotesRepository userProduitsNotesRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -56,7 +60,7 @@ public class ProduitService {
     public void deleteProductById(Long id) {
         produitRepository.deleteById(id);
     }
-    
+
     //page admin tous les produits actif et non actif
     public Page<Produit> getAllProduits(Pageable pageable, String sortBy, String searchId, String searchNom, String sortPrice, String sortDate, String filterCategorie, String filterMarque, String filterMotCle) {
         Specification<Produit> spec = Specification.where(null);
@@ -152,5 +156,21 @@ public class ProduitService {
         return produitRepository.findAll(spec, pageable);
     }
 
+    // Sauvegarder ou mettre à jour la note de l'utilisateur pour un produit
+    public void noterProduit(Long produitId, Long userId, Integer note) {
+        userProduitsNotesRepository.saveOrUpdateNote(userId, produitId, note);
+        mettreAJourCoteProduit(produitId);
+    }
+
+    // Calculer la moyenne des notes et mettre à jour la cote du produit
+    public void mettreAJourCoteProduit(Long produitId) {
+        Double moyenne = userProduitsNotesRepository.calculerMoyenneNotes(produitId);
+        if (moyenne != null) {
+            Produit produit = produitRepository.findById(produitId)
+                    .orElseThrow(() -> new RuntimeException("Produit non trouvé"));
+            produit.setCote(moyenne);
+            produitRepository.save(produit);
+        }
+    }
 }
 

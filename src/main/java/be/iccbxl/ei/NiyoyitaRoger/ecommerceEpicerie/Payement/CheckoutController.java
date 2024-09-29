@@ -58,10 +58,20 @@ public class CheckoutController {
             System.out.println("Departement: " + checkoutRequest.getOrderInfo().getDepartement());
             System.out.println("Pays: " + checkoutRequest.getOrderInfo().getPays());
             System.out.println("Montant Commande: " + checkoutRequest.getOrderInfo().getMontantCommande());
+            System.out.println("Frais de livraison : " + checkoutRequest.getOrderInfo().getFraisLivraison());
             System.out.println("Id panier : " + checkoutRequest.getOrderInfo().getIdPanierStripe());
 
+            // Calcul des frais de livraison
+            BigDecimal fraisLivraison = checkoutRequest.getOrderInfo().getFraisLivraison(); // fourni par le front-end
+
+            // Utilisation directe des frais de livraison
+            if (checkoutRequest.getOrderInfo().getOrderMethod().equalsIgnoreCase("PICKUP")) {
+                // Si la méthode de commande est "PICKUP", les frais de livraison doivent être à 0 €
+                fraisLivraison = BigDecimal.ZERO;
+            }
+
             String successUrl = String.format(
-                    "http://localhost:8080/checkout/success?session_id={CHECKOUT_SESSION_ID}&methodCommande=%s&prenom=%s&nom=%s&email=%s&rue=%s&numero=%s&localite=%s&ville=%s&codePostal=%s&departement=%s&pays=%s&montantCommande=%s&idPanierStripe=%s",
+                    "http://localhost:8080/checkout/success?session_id={CHECKOUT_SESSION_ID}&methodCommande=%s&prenom=%s&nom=%s&email=%s&rue=%s&numero=%s&localite=%s&ville=%s&codePostal=%s&departement=%s&pays=%s&montantCommande=%s&idPanierStripe=%s&fraisLivraison=%s",
                     encode(checkoutRequest.getOrderInfo().getOrderMethod()),
                     encode(checkoutRequest.getOrderInfo().getFirstName()),
                     encode(checkoutRequest.getOrderInfo().getLastName()),
@@ -74,7 +84,8 @@ public class CheckoutController {
                     encode(checkoutRequest.getOrderInfo().getDepartement()),
                     encode(checkoutRequest.getOrderInfo().getPays()),
                     encode(checkoutRequest.getOrderInfo().getMontantCommande().toString()),
-                    encode(String.valueOf(checkoutRequest.getOrderInfo().getIdPanierStripe())) // Ajout de ce paramètre
+                    encode(String.valueOf(checkoutRequest.getOrderInfo().getIdPanierStripe())),
+                    encode(checkoutRequest.getOrderInfo().getFraisLivraison().toString())  // Ajoutez ce paramètre
             );
 
             SessionCreateParams.Builder paramsBuilder = SessionCreateParams.builder()
@@ -98,6 +109,26 @@ public class CheckoutController {
                                                 .build()
                                 )
                                 .setQuantity(item.getQuantity())
+                                .build()
+                );
+            }
+
+            // Ajouter les frais de livraison comme un élément distinct s'il y en a
+            if (fraisLivraison.compareTo(BigDecimal.ZERO) > 0) {
+                paramsBuilder.addLineItem(
+                        SessionCreateParams.LineItem.builder()
+                                .setPriceData(
+                                        SessionCreateParams.LineItem.PriceData.builder()
+                                                .setCurrency("eur")
+                                                .setUnitAmount(fraisLivraison.movePointRight(2).longValue())  // Convertir en centimes
+                                                .setProductData(
+                                                        SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                                                .setName("Frais de livraison")
+                                                                .build()
+                                                )
+                                                .build()
+                                )
+                                .setQuantity(1L)
                                 .build()
                 );
             }
@@ -173,6 +204,8 @@ public class CheckoutController {
             private Long idPanierStripe;
             @NotNull
             private BigDecimal montantCommande;
+            @NotNull
+            private BigDecimal fraisLivraison;
 
             public String getFirstName() {
                 return firstName;
@@ -278,6 +311,14 @@ public class CheckoutController {
                 this.montantCommande = montantCommande;
             }
 
+            public BigDecimal getFraisLivraison() {
+                return fraisLivraison;
+            }
+
+            public void setFraisLivraison(BigDecimal fraisLivraison) {
+                this.fraisLivraison = fraisLivraison;
+            }
+
             @Override
             public String toString() {
                 return "OrderInfo{" +
@@ -294,6 +335,7 @@ public class CheckoutController {
                         "orderMethod='" + orderMethod + '\'' +
                         "idPanierStripe=" + idPanierStripe +
                         "montantCommande=" + montantCommande +
+                        ", fraisLivraison=" + fraisLivraison +
                         '}';
             }
         }
