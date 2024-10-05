@@ -3,6 +3,7 @@ package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.UserProduitsNotesRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -172,5 +173,48 @@ public class ProduitService {
             produitRepository.save(produit);
         }
     }
+
+    //statistiques
+
+    //Nombre de vues des produits
+    public Page<Produit> getProduitsLesPlusVus(int page, int limit, String order, int vuesMin, Integer vuesMax) {
+        Pageable pageable = PageRequest.of(page, limit, order.equals("asc") ? Sort.by("vues").ascending() : Sort.by("vues").descending());
+
+        // Si vuesMax est fourni, utilisez la méthode pour trouver les produits entre deux valeurs de vues
+        if (vuesMax != null) {
+            return produitRepository.findByVuesBetween(vuesMin, vuesMax, pageable);
+        } else {
+            // Sinon, récupérez les produits dont le nombre de vues est supérieur ou égal à vuesMin
+            return produitRepository.findByVuesGreaterThanEqual(vuesMin, pageable);
+        }
+    }
+
+
+    //Notes moyennes des produits
+    public Page<Produit> getProduitsAvecCote(int page, int limit, String order, int noteMin, Integer noteMax) {
+        // Définir le Pageable avec tri croissant ou décroissant basé sur la cote
+        Pageable pageable = PageRequest.of(page, limit, order.equals("asc") ? Sort.by("cote").ascending() : Sort.by("cote").descending());
+
+        // Si une valeur maximale pour la cote est fournie et qu'elle est valide (supérieure ou égale à noteMin)
+        if (noteMax != null && noteMax >= noteMin) {
+            return produitRepository.findByCoteBetween(noteMin, noteMax, pageable);
+        } else {
+            // Si aucune cote maximale valide n'est fournie, récupérer les produits avec une cote supérieure ou égale à noteMin
+            return produitRepository.findByCoteGreaterThanEqual(noteMin, pageable);
+        }
+    }
+
+    public Page<Produit> getProduitsLesPlusVendusAvecInterval(int page, int limit, String order, int minAchats, Integer maxAchats) {
+        Pageable pageable = PageRequest.of(page, limit, order.equals("asc") ? Sort.by("compteurAchats").ascending() : Sort.by("compteurAchats").descending());
+
+        // Si le maxAchats n'est pas fourni, on ignore cette limite dans la requête
+        if (maxAchats != null) {
+            return produitRepository.findByCompteurAchatsBetween(minAchats, maxAchats, pageable);
+        } else {
+            return produitRepository.findByCompteurAchatsGreaterThanEqual(minAchats, pageable);
+        }
+    }
+
+
 }
 

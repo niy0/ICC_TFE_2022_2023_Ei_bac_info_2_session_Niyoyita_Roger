@@ -7,6 +7,8 @@ import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user.AdresseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.UUID;
 
 @Service
@@ -21,39 +23,58 @@ public class FactureService {
     @Autowired
     private AdresseRepository adresseRepository;
 
-    public Facture creerFacture(
-            Commande commande,
-            String prenom,
-            String nom,
-            String rue,
-            String numero,
-            String localite,
-            String ville,
-            String codePostal,
-            String departement,
-            String pays
-    ) {
+    public Facture creerFacture(Commande commande) {
         Facture facture = new Facture();
-        facture.setCommande(commande);
+        //genererNumeroAutomatique("FACT-" + UUID.randomUUID().toString().substring(0, 10));
         facture.setNumeroFacture("FACT-" + UUID.randomUUID().toString().substring(0, 10));
+        facture.setCommande(commande);
+        facture.setDateFacture(commande.getDateCommande());
+        facture.setMontantHT(commande.getMontantCommande());
+        facture.setMontantTVA(commande.getMontantCommande());
+        facture.setMontantTTC(commande.getMontantCommande());
 
-        // Générer automatiquement le numéro si nécessaire
-        numero = genererNumeroAutomatique(numero);
+        String numero = "";
+        numero = commande.getNumero();
+        if (numero != null && numero.length() > 10) {
+            numero = numero.substring(0, 10);
+        }
 
         // Créer et sauvegarder l'adresse de facturation avec le numéro généré
-        Adresse adresseFacturation = new Adresse(prenom, nom, rue, numero, localite, ville, codePostal, departement, pays);
+        Adresse adresseFacturation = new Adresse(
+                commande.getPrenom(),
+                commande.getNom(),
+                commande.getRue(),
+                numero,
+                commande.getLocalite(),
+                commande.getVille(),
+                commande.getCodePostal(),
+                commande.getDepartement(),
+                commande.getPays()
+        );
+
+
         adresseRepository.save(adresseFacturation); // Sauvegarder l'adresse dans la base de données
 
         // Utilisation de la même adresse pour la livraison
-        Adresse adresseLivraison = new Adresse(prenom, nom, rue, numero, localite, ville, codePostal, departement, pays);
+        Adresse adresseLivraison = new Adresse(
+                commande.getPrenom(),
+                commande.getNom(),
+                commande.getRue(),
+                numero,
+                commande.getLocalite(),
+                commande.getVille(),
+                commande.getCodePostal(),
+                commande.getDepartement(),
+                commande.getPays()
+        );
         adresseRepository.save(adresseLivraison); // Sauvegarder l'adresse de livraison
 
         // Assigner les adresses à la facture
         facture.setAdresseFacturation(adresseFacturation);
         facture.setAdresseLivraison(adresseLivraison);
-
-        // Calcul des montants (HT, TVA et TTC)
-        facture.calculerMontantFacture();
+        if (commande.getUtilisateur() != null) {
+            adresseLivraison.setUtilisateur(commande.getUtilisateur());  // Associer l'utilisateur si nécessaire
+        }
 
         // Sauvegarder la facture
         return factureRepository.save(facture);

@@ -48,6 +48,22 @@ public class Facture {
         dateFacture = new Date();
     }
 
+    protected Facture() {
+    }
+
+    // Constructeur avec tous les paramètres
+    public Facture(String numeroFacture, Date dateFacture, BigDecimal montantHT, BigDecimal montantTVA, BigDecimal montantTTC,
+                   Commande commande, Adresse adresseFacturation, Adresse adresseLivraison) {
+        this.numeroFacture = numeroFacture;
+        this.dateFacture = dateFacture;
+        this.montantHT = montantHT;
+        this.montantTVA = montantTVA;
+        this.montantTTC = montantTTC;
+        this.commande = commande;
+        this.adresseFacturation = adresseFacturation;
+        this.adresseLivraison = adresseLivraison;
+    }
+
     // Getters and setters
 
     public Long getId() {

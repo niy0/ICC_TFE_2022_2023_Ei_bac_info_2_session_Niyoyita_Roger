@@ -20,6 +20,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import jakarta.servlet.http.HttpSession;
 import org.thymeleaf.TemplateEngine;
@@ -148,29 +149,18 @@ public class SuccessCancelController {
                 produit.setActif(false); // Supposons que le produit ait un champ "actif" pour indiquer s'il est disponible à la vente
             }
 
+            // Incrémenter le compteur d'achats du produit
+            produit.setCompteurAchats(produit.getCompteurAchats() + quantiteAchetee);
+
             // Enregistrer les modifications du produit
             produitService.updateProduit(produit);
         }
-
         //crée une facture
-        /**Facture nouvelleFacture = factureService.creerFacture(
-         nouvelleCommande,
-         prenom,
-         nom,
-         rue,
-         numero,
-         localite,
-         ville,
-         codePostal,
-         departement,
-         pays
-         );**/
+        //Facture nouvelleFacture = factureService.creerFacture(nouvelleCommande);
 
         //envoyer mail facture
         sendInvoiceEmail(nouvelleCommande, email);
 
-        //vider le panier
-        panierService.deleteAllLigneDeCommande(panier.getId());
         return "redirect:/commande/detail/" + nouvelleCommande.getId();
     }
 

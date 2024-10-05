@@ -273,6 +273,10 @@ public class Commande {
         this.utilisateur = utilisateur;
     }
 
+    public User getUtilisateur() {
+        return utilisateur;
+    }
+
     // Getter et Setter pour fraisCommande
     public BigDecimal getFraisCommande() {
         return fraisCommande;

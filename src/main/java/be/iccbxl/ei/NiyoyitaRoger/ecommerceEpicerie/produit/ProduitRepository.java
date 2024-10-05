@@ -32,4 +32,34 @@ public interface ProduitRepository extends JpaRepository<Produit, Long>, JpaSpec
     @Query("SELECT p FROM Produit p WHERE p.quantite >= 1 AND p.actif = true")
     Page<Produit> findProduitsAvecQuantiteMin(Pageable pageable);
 
+
+    //statistiques
+
+    // Requête pour obtenir les produits dont le nombre de vues est compris entre deux valeurs
+    Page<Produit> findByVuesBetween(int vuesMin, int vuesMax, Pageable pageable);
+
+    // Requête pour obtenir les produits dont le nombre de vues est supérieur ou égal à une valeur
+    Page<Produit> findByVuesGreaterThanEqual(int vuesMin, Pageable pageable);
+
+    Page<Produit> findByCompteurAchatsBetween(int minAchats, int maxAchats, Pageable pageable);
+
+    Page<Produit> findByCompteurAchatsGreaterThanEqual(int minAchats, Pageable pageable);
+
+
+    @Query("SELECT p FROM Produit p WHERE p.cote BETWEEN :noteMin AND :noteMax")
+    Page<Produit> findProduitsAvecCote(
+            @Param("noteMin") Double noteMin,
+            @Param("noteMax") Double noteMax,
+            Pageable pageable
+    );
+
+    // Trouver les produits avec une cote entre deux valeurs
+    @Query("SELECT p FROM Produit p WHERE p.cote BETWEEN :noteMin AND :noteMax")
+    Page<Produit> findByCoteBetween(@Param("noteMin") int noteMin, @Param("noteMax") int noteMax, Pageable pageable);
+
+    // Trouver les produits avec une cote supérieure ou égale à une valeur minimale
+    @Query("SELECT p FROM Produit p WHERE p.cote >= :noteMin")
+    Page<Produit> findByCoteGreaterThanEqual(@Param("noteMin") int noteMin, Pageable pageable);
+
+
 }

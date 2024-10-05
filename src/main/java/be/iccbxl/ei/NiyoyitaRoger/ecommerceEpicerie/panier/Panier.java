@@ -20,7 +20,7 @@ public class Panier implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = "panier", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "panier", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<LigneDeCommande> lignesDeCommande = new LinkedList<>();
 

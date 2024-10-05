@@ -5,6 +5,7 @@ import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.panier.Panier;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit.Produit;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 
 @Entity
@@ -20,8 +21,8 @@ public class LigneDeCommande {
     @JsonIgnore
     private Produit produit;
 
-    @ManyToOne
-    @JoinColumn(name = "panier_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "panier_id", nullable = true)
     private Panier panier;
 
     @ManyToOne

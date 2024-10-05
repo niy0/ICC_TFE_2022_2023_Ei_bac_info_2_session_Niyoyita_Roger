@@ -29,7 +29,7 @@ public class PasswordResetToken {
         this.token = token;
         this.user = user;
 
-        // Définir la date d'expiration du token (24 heures après la création)
+        // La date d'expiration du token (24 heures après la création)
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR, 24); // Définit l'expiration à 24 heures
         this.expiryDate = calendar.getTime();

@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.mx/thymeleaf/layout"
+      layout:decorate="~{layouts/main}">
+<head>
+    <meta charset="UTF-8">
+    <title>Statistiques Globales</title>
+    <!-- Bootstrap 5 CSS depuis unpkg CDN -->
+    <link href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Bootstrap Bundle JS (inclut Popper) depuis unpkg CDN -->
+    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body {
+            background-color: #f7f8fa;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        /* Style des boutons pour la section Produits les plus vus */
+        .btn-custom {
+            background-color: #ff9966; /* Couleur de fond initiale */
+            border: none; /* Pas de bordure */
+            border-radius: 5px; /* Coins arrondis */
+            width: auto;
+            color: #fff;
+            padding: 10px;
+            cursor: pointer; /* Curseur main sur hover */
+            transition: background-color 0.3s, transform 0.3s; /* Transition fluide */
+            text-align: center; /* Centrer le contenu à l'intérieur du bouton */
+            display: inline-flex; /* Pour garder l'icône centrée */
+            justify-content: center; /* Centrer horizontalement */
+            align-items: center; /* Centrer verticalement */
+        }
+
+        .btn-custom:hover {
+            background-color: #ff5e62; /* Couleur sur hover */
+            transform: translateY(-2px); /* Léger effet de montée */
+        }
+
+        .btn-custom i {
+            margin-right: 5px; /* Marge entre l'icône et le texte */
+        }
+
+        .sidenav {
+            background-color: #343a40;
+            color: white;
+            padding-top: 0;
+            overflow-y: auto;
+            height: auto; /* Pour que la hauteur s'adapte au contenu sur les petits écrans */
+            border-radius: 0.5rem;
+            margin: 0;
+            width: 300px;
+        }
+
+        .sidenav a {
+            padding: 15px 25px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+            transition: background 0.2s, color 0.2s, padding-left 0.2s;
+        }
+
+        .sidenav a:hover {
+            background-color: #495057;
+            color: rgb(255, 193, 7);
+            padding-left: 35px;
+        }
+
+        .sidenav .active, .sidenav .active:hover {
+            background-color: #007bff;
+            color: white;
+            padding-left: 35px;
+        }
+
+        .content {
+            display: flex;
+            flex-wrap: wrap; /* Pour permettre l'adaptation des colonnes */
+            height: auto;
+            align-items: flex-start;
+            margin-left: 20px;
+        }
+
+        .centered-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            width: 100%;
+        }
+
+        h1, h2 {
+            font-weight: 700;
+        }
+
+        h1 {
+            color: #343a40;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+
+        h2 {
+            color: #6c757d;
+            margin-top: 20px;
+            font-size: 1.5rem;
+        }
+
+        .card {
+            background-color: white;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .table {
+            margin-top: 20px;
+        }
+
+        .table th, .table td {
+            padding: 15px;
+            vertical-align: middle;
+        }
+
+        .icon {
+            color: #007bff;
+            margin-right: 10px;
+        }
+
+        .section-icon {
+            font-size: 24px;
+            color: #6c757d;
+        }
+
+        .section-header {
+            font-size: 1.75rem;
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+
+        .progress {
+            height: 20px;
+            border-radius: 50px;
+        }
+
+        .progress-bar {
+            background-color: #28a745;
+        }
+
+        @media (max-width: 1024px) {
+            .sidenav {
+                width: 75%;
+                height: auto;
+                position: relative;
+            }
+            .sidenav a {
+                float: left;
+                padding: 15px;
+            }
+            .sidenav a:hover {
+                padding-left: 15px;
+            }
+            .content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            .centered-content {
+                margin-top: 20px;
+                width: 90%;
+            }
+            .card {
+                margin-top: 20px;
+                width: 90%;
+            }
+            .table-responsive {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidenav {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            .sidenav a {
+                float: left;
+                padding: 12px;
+            }
+            .sidenav a:hover {
+                padding-left: 12px;
+            }
+            .content {
+                margin-left: 0;
+                padding: 15px;
+            }
+            .centered-content {
+                margin-top: 15px;
+                width: 95%;
+            }
+            .card {
+                margin-top: 15px;
+                width: 95%;
+            }
+            .table-responsive {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .sidenav a, .sidenav a:hover {
+                padding-left: 10px;
+            }
+            .content {
+                margin-left: 0;
+                padding: 10px;
+            }
+            .centered-content {
+                margin-top: 10px;
+                width: 100%;
+            }
+            .card {
+                margin-top: 10px;
+                width: 100%;
+            }
+            .table-responsive {
+                display: block;
+                width: 100%;
+                overflow-x: auto;
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div layout:fragment="content" class="row content">
+        <div class="col-12 col-md-4 col-lg-3 sidenav">
+            <a href="javascript:location.reload()" class="btn-refresh">
+                <span class="refresh-text marginL" th:text="#{menu.refresh}">Replier les sous-menus</span>
+                <i class="fas fa-sync-alt" style="color: rgb(255, 193, 7);"></i>
+            </a>
+            <a class="collapsed" data-bs-toggle="collapse" href="#profileSubmenu" role="button" aria-expanded="false"
+               aria-controls="profileSubmenu">
+                <i class="fas fa-user-circle"></i>
+                <span th:text="#{menu.profile}">Profil</span> :
+                <span th:text="${user.nom} + ' ' + ${user.prenom}"></span>
+                <span class="submenu-icon fas fa-caret-right"></span>
+            </a>
+            <div class="collapse marginR" id="profileSubmenu">
+                <a th:href="@{'/user/' + ${user.id} + '/profile'}" style="font-size: 16px;">
+                    <i class="fas fa-user-circle"></i>
+                    <span th:text="#{menu.viewProfile}">Voir profil</span>
+                </a>
+                <a th:href="@{'/user/' + ${user.id} + '/profile/edit'}" style="font-size: 16px;">
+                    <i class="fas fa-user-edit"></i>
+                    <span th:text="#{menu.editProfile}">Modifier profil</span>
+                </a>
+                <a th:href="@{'/user/' + ${user.id} + '/adresse/edit'}" style="font-size: 16px;">
+                    <i class="fas fa-address-card"></i>
+                    <span th:text="#{menu.editAddress}">Modifier adresse</span>
+                </a>
+            </div>
+
+            <a th:href="@{/commandes}">
+                <i class="fas fa-shopping-cart"></i>
+                <span th:text="#{menu.orders}">Mes commandes</span>
+            </a>
+            <a th:href="@{/user/favoris}">
+                <i class="fas fa-heart"></i>
+                <span th:text="#{menu.favorites}">Mes produits favoris</span>
+            </a>
+
+            <div th:if="${user.hasRole('Employee') or user.hasRole('Admin')}">
+                <a class="collapsed" data-bs-toggle="collapse" href="#employeeSubmenu" role="button"
+                   aria-expanded="false"
+                   aria-controls="employeeSubmenu">
+                    <i class="fas fa-briefcase"></i> <span th:text="#{menu.employee}">Employé</span>
+                    <span class="submenu-icon fas fa-caret-right"></span>
+                </a>
+                <div class="collapse marginR" id="employeeSubmenu">
+                    <a th:href="@{/employe/commandes}" style="font-size: 16px;">
+                        <i class="fas fa-list"></i> <span th:text="#{menu.employee.orders}">Liste des commandes</span>
+                    </a>
+                    <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#statSubmenu"
+                       role="button" aria-expanded="false" aria-controls="statSubmenu">
+                        <i class="fas fa-chart-line"></i> <span th:text="#{menu.statistics}">Statistiques</span>
+                        <span class="submenu-icon fas fa-caret-right"></span>
+                    </a>
+                    <div class="collapse marginR" id="statSubmenu">
+                        <a th:href="@{/statistiques}" style="font-size: 14px;">
+                            <i class="fas fa-chart-bar"></i> <span th:text="#{menu.sales}">Ventes</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${user.hasRole('Admin')}">
+                <a class="collapsed" data-bs-toggle="collapse" href="#adminSubmenu" role="button" aria-expanded="false"
+                   aria-controls="adminSubmenu">
+                    <i class="fas fa-cog"></i> <span th:text="#{menu.admin}">Admin</span>
+                    <span class="submenu-icon fas fa-caret-right"></span>
+                </a>
+                <div class="collapse marginR" id="adminSubmenu">
+                    <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse" href="#stockSubmenu"
+                       role="button" aria-expanded="false" aria-controls="stockSubmenu">
+                        <i class="fas fa-box"></i> <span th:text="#{menu.stockManagement}">Gestion stock</span>
+                        <span class="submenu-icon fas fa-caret-right"></span>
+                    </a>
+                    <div class="collapse marginR" id="stockSubmenu">
+                        <a th:href="@{/admin/produits}" style="font-size: 14px;">
+                            <i class="fas fa-list"></i> <span th:text="#{menu.productList}">Liste des produits</span>
+                        </a>
+                        <a th:href="@{/produit/create}" style="font-size: 14px;">
+                            <i class="fas fa-plus-square"></i> <span
+                                th:text="#{menu.addProduct}">Ajouter un produit</span>
+                        </a>
+                    </div>
+                    <a class="collapsed" style="font-size: 16px;" data-bs-toggle="collapse"
+                       href="#userManagementSubmenu"
+                       role="button" aria-expanded="false" aria-controls="userManagementSubmenu">
+                        <i class="fas fa-users"></i> <span th:text="#{menu.userManagement}">Gestion utilisateurs</span>
+                        <span class="submenu-icon fas fa-caret-right"></span>
+                    </a>
+                    <div class="collapse marginR" id="userManagementSubmenu">
+                        <a th:href="@{/admin/users}" style="font-size: 14px;">
+                            <i class="fas fa-list"></i> <span th:text="#{menu.userList}">Liste des utilisateurs</span>
+                        </a>
+                        <a th:href="@{/admin/add_new_user}" style="font-size: 14px;">
+                            <i class="fas fa-user-plus"></i> <span
+                                th:text="#{menu.addUser}">Ajouter un utilisateur</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-8 col-lg-9 main-content">
+            <h1><i class="fas fa-chart-line icon"></i> Statistiques Globales</h1>
+
+            <!-- Section 1: Chiffre d'affaire mensuel -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-euro-sign section-icon" style="color: #FFD700;"></i> Chiffre d'Affaires Mensuel
+                </div>
+                <div class="card-body">
+                    <!-- Formulaire pour sélectionner l'année et la pagination -->
+                    <form id="filter-chiffre-affaire-form" class="form-inline row g-3 align-items-center">
+                        <div class="col-auto">
+                            <label for="year-select" class="col-form-label">Sélectionner l'année :</label>
+                        </div>
+                        <div class="col-auto">
+                            <input type="number" class="form-control" id="year-select" name="year" value="2024"
+                                   min="2023">
+                        </div>
+
+                        <div class="col-auto">
+                            <label for="chiffre-limit" class="col-form-label">Nombre de lignes à afficher :</label>
+                        </div>
+                        <div class="col-auto">
+                            <input type="number" class="form-control" id="chiffre-limit" name="limit" value="5" min="1"
+                                   max="12">
+                        </div>
+
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-custom">Appliquer</button>
+                        </div>
+                    </form>
+
+                    <hr>
+
+                    <!-- Conteneur pour les résultats des chiffres d'affaires mensuels -->
+                    <div id="chiffre-affaire">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Mois</th>
+                                <th>Année</th>
+                                <th>Montant Total</th>
+                            </tr>
+                            </thead>
+                            <tbody id="chiffre-affaire-body">
+                            <!-- Les données viendront ici via AJAX -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination Chiffre d'Affaires -->
+                    <div style="display:flex;align-items:center;">
+                        <nav aria-label="Page navigation" class="mx-auto">
+                            <ul id="pagination-chiffre-affaire" class="pagination">
+                                <!-- La pagination sera injectée ici via Ajax -->
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Produits les plus vendus -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-box-open section-icon" style="color: #8B4513;"></i> Produits les plus vendus
+                </div>
+                <div class="card-body">
+                    <!-- Formulaire pour filtrer par intervalle d'achats -->
+                    <form id="filter-form-achats" class="row g-3 align-items-center">
+                        <div class="col-12 col-md-6 col-lg-auto">
+                            <label for="achats-limit" class="form-label">Nombre de produits à afficher :</label>
+                            <input type="number" class="form-control" id="achats-limit" name="achats-limit" value="5"
+                                   min="1" max="20">
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-auto">
+                            <label for="min-achats" class="form-label">Min achats :</label>
+                            <input type="number" class="form-control" id="min-achats" value="0" name="minAchats" min="0"
+                                   placeholder="Min">
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-auto">
+                            <label for="max-achats" class="form-label">Max achats :</label>
+                            <input type="number" class="form-control" id="max-achats" name="maxAchats" min="0"
+                                   placeholder="Max">
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-auto">
+                            <label for="achats-order" class="form-label">Ordre :</label>
+                            <select class="form-control" id="achats-order" name="notesOrder">
+                                <option value="desc">Décroissant</option>
+                                <option value="asc">Croissant</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-auto">
+                            <button type="submit" class="btn btn-custom mt-3 mt-md-0">Appliquer</button>
+                        </div>
+                    </form>
+
+                    <hr>
+
+                    <!-- Conteneur pour les résultats des produits les plus vendus -->
+                    <div id="produits-les-plus-vendus" class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Image produit</th>
+                                <th>Nom produit</th>
+                                <th>Vendu</th>
+                                <th>Voir produit</th>
+                                <th th:if="${user.hasRole('Admin')}">Modifier produit</th>
+                            </tr>
+                            </thead>
+                            <tbody id="produits-les-plus-vendus-body">
+                            <!-- Le contenu sera mis à jour via AJAX -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination Produits Les Plus Vendus -->
+                    <div class="d-flex justify-content-center">
+                        <nav aria-label="Page navigation">
+                            <ul id="pagination-produits-vendus" class="pagination">
+                                <!-- La pagination sera injectée ici via Ajax -->
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Produits les plus vus -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-eye section-icon" style="color: #A9A9A9;"></i> Produits les plus vus
+                </div>
+                <div class="card-body">
+                    <!-- Formulaire pour changer l'ordre, le nombre de produits et la plage de vues -->
+                    <form id="filter-form" class="row g-3 align-items-center">
+                        <div class="col-12 col-md-6 col-lg-auto">
+                            <label for="limit" class="form-label">Nombre de produits à afficher :</label>
+                            <input type="number" class="form-control" id="limit" name="limit" value="5" min="1"
+                                   max="20">
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-auto">
+                            <label for="vues-min" class="form-label">Vues Min :</label>
+                            <input type="number" class="form-control" id="vues-min" name="vuesMin" value="0" min="0"
+                                   placeholder="Min">
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-auto">
+                            <label for="vues-max" class="form-label">Vues Max :</label>
+                            <input type="number" class="form-control" id="vues-max" name="vuesMax" min="0"
+                                   placeholder="Max">
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-auto">
+                            <label for="order" class="form-label">Ordre :</label>
+                            <select class="form-control" id="order" name="order">
+                                <option value="desc">Les plus vus</option>
+                                <option value="asc">Les moins vus</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-auto">
+                            <button type="submit" class="btn btn-custom mt-3 mt-md-0">Appliquer</button>
+                        </div>
+                    </form>
+
+                    <hr>
+
+                    <!-- Conteneur pour les résultats des produits les plus vus -->
+                    <div id="produits-les-plus-vus" class="table-responsive">
+                        <!-- Les résultats AJAX viendront ici -->
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Image produit</th>
+                                <th>Nom produit</th>
+                                <th>Nombre de vues</th>
+                                <th>Voir produit</th>
+                                <th th:if="${user.hasRole('Admin')}">Modifier produit</th>
+                            </tr>
+                            </thead>
+                            <tbody id="produits-les-plus-vus-body">
+                            <!-- Le contenu sera mis à jour via AJAX -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination Produits Les Plus Vus -->
+                    <div class="d-flex justify-content-center">
+                        <nav aria-label="Page navigation">
+                            <ul id="pagination-produits-vus" class="pagination">
+                                <!-- La pagination sera injectée ici via Ajax -->
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4: Moyenne des notes des produits -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-star section-icon" style="color: #FFD700;"></i> Moyenne des notes des produits
+                </div>
+                <div class="card-body">
+                    <!-- Formulaire pour filtrer par note minimale et maximale -->
+                    <form id="filter-notes-form" class="row g-3 align-items-center">
+                        <div class="col-12 col-md-6 col-lg-auto">
+                            <label for="notes-limit" class="form-label">Nombre de produits à afficher :</label>
+                            <input type="number" class="form-control" id="notes-limit" name="notesLimit" value="5"
+                                   min="1" max="20">
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-auto">
+                            <label for="note-min" class="form-label">Note Min :</label>
+                            <input type="number" class="form-control" id="note-min" name="noteMin" min="1" max="5"
+                                   placeholder="Min">
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-auto">
+                            <label for="note-max" class="form-label">Note Max :</label>
+                            <input type="number" class="form-control" id="note-max" name="noteMax" min="1" max="5"
+                                   placeholder="Max">
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-auto">
+                            <label for="notes-order" class="form-label">Ordre :</label>
+                            <select class="form-control" id="notes-order" name="notesOrder">
+                                <option value="desc">Décroissant</option>
+                                <option value="asc">Croissant</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-auto">
+                            <button type="submit" class="btn btn-custom mt-3 mt-md-0">Appliquer</button>
+                        </div>
+                    </form>
+
+                    <hr>
+
+                    <!-- Conteneur pour les résultats des notes moyennes des produits -->
+                    <div id="produits-notes" class="table-responsive">
+                        <!-- Les résultats AJAX viendront ici -->
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Image produit</th>
+                                <th>Nom produit</th>
+                                <th>Note Moyenne</th>
+                                <th>Voir produit</th>
+                                <th th:if="${user.hasRole('Admin')}">Modifier produit</th>
+                            </tr>
+                            </thead>
+                            <tbody id="produits-notes-body">
+                            <!-- Le contenu sera mis à jour via AJAX -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination Moyenne des Notes des Produits -->
+                    <div class="d-flex justify-content-center">
+                        <nav aria-label="Page navigation">
+                            <ul id="pagination-notes-produits" class="pagination">
+                                <!-- La pagination sera injectée ici via Ajax -->
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 5: Nombre de commandes par utilisateur -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-users section-icon" style="color: #6A5ACD;"></i> Nombre de commandes par
+                    utilisateur
+                </div>
+                <div class="card-body">
+                    <!-- Formulaire pour changer la limite et l'ordre des commandes -->
+                    <form id="filter-commandes-utilisateurs" class="row g-3 align-items-center">
+                        <div class="col-12 col-md-6 col-lg-auto">
+                            <label for="commandes-limit" class="form-label">Nombre de résultats à afficher :</label>
+                            <input type="number" class="form-control" id="commandes-limit" name="limit" value="5"
+                                   min="1" max="20">
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-auto">
+                            <label for="min-commandes" class="form-label">Min commandes :</label>
+                            <input type="number" class="form-control" id="min-commandes" value="0" name="minCommandes"
+                                   min="0" placeholder="Min">
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-auto">
+                            <label for="max-commandes" class="form-label">Max commandes :</label>
+                            <input type="number" class="form-control" id="max-commandes" name="maxCommandes" min="0"
+                                   placeholder="Max">
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-auto">
+                            <label for="commandes-order" class="form-label">Ordre :</label>
+                            <select class="form-control" id="commandes-order" name="order">
+                                <option value="desc">Décroissant</option>
+                                <option value="asc">Croissant</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-6 col-lg-auto">
+                            <button type="submit" class="btn btn-custom mt-3 mt-md-0">Appliquer</button>
+                        </div>
+                    </form>
+
+                    <hr>
+
+                    <!-- Table responsive pour les commandes par utilisateur -->
+                    <div id="commandes-utilisateurs" class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Email utilisateur</th>
+                                <th>Nom</th>
+                                <th>Prénom</th>
+                                <th>Nombre de commandes</th>
+                            </tr>
+                            </thead>
+                            <tbody id="commandes-utilisateurs-body">
+                            <!-- Les données viendront ici via AJAX -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination pour les commandes par utilisateur -->
+                    <div class="d-flex justify-content-center">
+                        <nav aria-label="Page navigation">
+                            <ul id="pagination-commandes-utilisateurs" class="pagination">
+                                <!-- La pagination sera injectée ici via Ajax -->
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script>
+            // Fonction pour gérer la pagination
+            function setupPagination(data, loadFunction, paginationId) {
+                const pagination = $(paginationId);
+                pagination.empty();
+
+                // Ne générer la pagination que s'il y a plus d'une page
+                if (data.totalPages > 1) {
+                    pagination.append(`
+                        <li class="page-item ${data.page === 0 ? 'disabled' : ''}">
+                            <a class="page-link" href="javascript:void(0);" aria-label="Previous" onclick="${loadFunction}(${data.page - 1})">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    `);
+
+                    for (let i = 0; i < data.totalPages; i++) {
+                        pagination.append(`
+                            <li class="page-item ${data.page === i ? 'active' : ''}">
+                                <a class="page-link" href="javascript:void(0);" onclick="${loadFunction}(${i})">${i + 1}</a>
+                            </li>
+                        `);
+                    }
+
+                    pagination.append(`
+                        <li class="page-item ${data.page + 1 === data.totalPages ? 'disabled' : ''}">
+                            <a class="page-link" href="javascript:void(0);" aria-label="Next" onclick="${loadFunction}(${data.page + 1})">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    `);
+                }
+            }
+
+
+            // Fonction pour charger les chiffres d'affaires avec pagination et tri
+            function loadChiffreAffaire(page = 0) {
+                const limit = $('#chiffre-limit').val();
+                const year = $('#year-select').val();
+
+                // Requête AJAX pour récupérer les données
+                $.ajax({
+                    url: '/statistiques/chiffre-affaire',
+                    method: 'GET',
+                    data: {
+                        annee: year,
+                        page: page,
+                        limit: limit
+                    },
+                    success: function(data) {
+                        $('#chiffre-affaire-body').empty(); // On vide le tableau avant d'ajouter les nouvelles données
+
+                        // Vérifier s'il y a des données
+                        if (data.chiffreAffaire.length === 0) {
+                            $('#chiffre-affaire-body').append('<tr><td colspan="3">Aucune donnée disponible pour l\'année sélectionnée.</td></tr>');
+                            return;
+                        }
+
+                        // Construction des lignes du tableau en fonction des filtres appliqués
+                        data.chiffreAffaire.forEach(function(item) {
+                            $('#chiffre-affaire-body').append(`
+                                <tr>
+                                    <td>${item[0]}</td> <!-- Mois -->
+                                    <td>${item[1]}</td> <!-- Année -->
+                                    <td>${item[2]}</td> <!-- Montant -->
+                                </tr>
+                            `);
+                        });
+
+                        // Gestion de la pagination
+                        setupPagination(data, 'loadChiffreAffaire', '#pagination-chiffre-affaire');
+                    },
+                    error: function() {
+                        alert("Une erreur s'est produite lors du chargement des chiffres d'affaire.");
+                    }
+                });
+            }
+
+            // Charger les chiffres d'affaires quand l'année change
+            $('#year-select').on('change', function() {
+                loadChiffreAffaire(0); // Recharger les données dès que l'année change, depuis la première page
+            });
+
+            // Charger les chiffres d'affaire au démarrage
+            loadChiffreAffaire();
+
+            // Gérer la soumission du formulaire et recharger les résultats
+            $('#filter-chiffre-affaire-form').submit(function(e) {
+                e.preventDefault();
+                loadChiffreAffaire(0);  // Recharger depuis la première page si le formulaire est soumis
+            });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        </script>
+        <script>
+            // Fonction pour gérer la pagination partagée
+            function setupPagination(data, loadFunction, paginationId) {
+                const pagination = $(paginationId);
+                pagination.empty();
+
+                // Ne générer la pagination que s'il y a plus d'une page
+                if (data.totalPages > 1) {
+                    pagination.append(`
+                        <li class="page-item ${data.page === 0 ? 'disabled' : ''}">
+                            <a class="page-link" href="javascript:void(0);" aria-label="Previous" onclick="${loadFunction}(${data.page - 1})">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    `);
+
+                    for (let i = 0; i < data.totalPages; i++) {
+                        pagination.append(`
+                            <li class="page-item ${data.page === i ? 'active' : ''}">
+                                <a class="page-link" href="javascript:void(0);" onclick="${loadFunction}(${i})">${i + 1}</a>
+                            </li>
+                        `);
+                    }
+
+                    pagination.append(`
+                        <li class="page-item ${data.page + 1 === data.totalPages ? 'disabled' : ''}">
+                            <a class="page-link" href="javascript:void(0);" aria-label="Next" onclick="${loadFunction}(${data.page + 1})">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    `);
+                }
+            }
+
+            // Fonction pour charger les produits les plus vus
+            function loadProduits(page = 0) {
+                const limit = $('#limit').val();
+                const order = $('#order').val();
+                const vuesMin = $('#vues-min').val();
+                const vuesMax = $('#vues-max').val();
+
+                $.ajax({
+                    url: '/statistiques/produits-les-plus-vus',
+                    method: 'GET',
+                    data: {
+                        page: page,
+                        limit: limit,
+                        order: order,
+                        vuesMin: vuesMin,
+                        vuesMax: vuesMax
+                    },
+                    success: function(data) {
+                        $('#produits-les-plus-vus-body').empty(); // Effacer les anciens résultats
+
+                        data.produits.forEach(function(produit) {
+                            let htmlRow = `
+                                <tr>
+                                    <td><img src="/display?id=${produit.id}" alt="${produit.nom}" height="50px" width="auto"></td>
+                                    <td>${produit.nom}</td>
+                                    <td>${produit.vues}</td>
+                                    <td style="width: 50px;">
+                                        <a href="/produit/${produit.id}" class="btn btn-custom">
+                                            <i class="fas fa-eye" style="color: black;"></i>
+                                        </a>
+                                    </td>`;
+
+                            if (data.isAdmin) {
+                                htmlRow += `
+                                    <td style="width: 50px;">
+                                        <a href="/admin/produit/${produit.id}/edit" class="btn btn-custom">
+                                            <i class="fas fa-edit" style="color: black;"></i>
+                                        </a>
+                                    </td>`;
+                            }
+
+                            htmlRow += '</tr>';
+                            $('#produits-les-plus-vus-body').append(htmlRow);
+                        });
+
+                        // Gérer la pagination avec la fonction commune
+                        setupPagination(data, 'loadProduits', '#pagination-produits-vus');
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error("Erreur lors du chargement des produits :", textStatus, errorThrown);
+                        console.log("Réponse d'erreur complète :", jqXHR.responseText);
+                        alert(`Une erreur s'est produite lors du chargement des produits.\nStatus: ${textStatus}\nErreur: ${errorThrown}`);
+                    }
+                });
+            }
+
+            // Fonction pour charger les produits avec notes
+            function loadNotesProduits(page = 0) {
+                const limit = $('#notes-limit').val();
+                const noteMin = $('#note-min').val();
+                const noteMax = $('#note-max').val();
+                const order = $('#notes-order').val();
+
+                $.ajax({
+                    url: '/statistiques/produits-notes',
+                    method: 'GET',
+                    data: {
+                        page: page,
+                        limit: limit,
+                        noteMin: noteMin,
+                        noteMax: noteMax,
+                        notesOrder: order
+                    },
+                    success: function(data) {
+                        // Effacer les anciens résultats
+                        $('#produits-notes-body').empty();
+
+                        // Construire dynamiquement les lignes du tableau
+                        data.produits.forEach(function(produit) {
+                            let htmlRow = `
+                                <tr>
+                                    <td><img src="/display?id=${produit.id}" alt="${produit.nom}" height="50px" width="auto"></td>
+                                    <td>${produit.nom}</td>
+                                    <td>${produit.cote}</td>
+                                    <td style="width: 50px;">
+                                        <a href="/produit/${produit.id}" class="btn btn-custom">
+                                        <i class="fas fa-eye" style="color: black;"></i></a>
+                                    </td>`;
+
+                            if (data.isAdmin) {
+                                htmlRow += `
+                                    <td style="width: 50px;">
+                                        <a href="/admin/produit/${produit.id}/edit" class="btn btn-custom">
+                                        <i class="fas fa-edit" style="color: black;"></i></a>
+                                    </td>`;
+                            }
+
+                            htmlRow += '</tr>';
+                            $('#produits-notes-body').append(htmlRow);
+                        });
+
+                        // Gérer la pagination avec la fonction commune
+                        setupPagination(data, 'loadNotesProduits', '#pagination-notes-produits');
+                    },
+                    error: function() {
+                        alert("Une erreur s'est produite lors du chargement des produits.");
+                    }
+                });
+            }
+
+            function loadProduitsLesPlusVendus(page = 0) {
+                // Récupérer les valeurs du formulaire
+                const minAchats = $('#min-achats').val();
+                const maxAchats = $('#max-achats').val();
+                const limit = $('#achats-limit').val();
+                const order = $('#achats-order').val();
+
+                // Faire la requête AJAX pour charger les produits les plus vendus
+                $.ajax({
+                    url: '/statistiques/produits-les-plus-vendus',
+                    method: 'GET',
+                    data: {
+                        page: page,
+                        limit: limit,
+                        order: order,
+                        minAchats: minAchats,
+                        maxAchats: maxAchats
+                    },
+                    success: function(data) {
+                        console.log(data);
+                        // Effacer les anciens résultats
+                        $('#produits-les-plus-vendus-body').empty();
+
+                        // Ajouter les nouvelles lignes au tableau
+                        data.produits.forEach(function(produit) {
+                            let htmlRow = `
+                                <tr>
+                                    <td><img src="/display?id=${produit.id}" alt="${produit.nom}" height="50px" width="auto"></td>
+                                    <td>${produit.nom}</td>
+                                    <td>${produit.compteurAchats}</td>
+                                    <td style="width: 50px;">
+                                        <a href="/produit/${produit.id}" class="btn btn-custom">
+                                            <i class="fas fa-eye" style="color: black;"></i>
+                                        </a>
+                                    </td>`;
+
+                            // Ajouter un bouton de modification si l'utilisateur est admin
+                            if (data.isAdmin) {
+                                htmlRow += `
+                                    <td style="width: 50px;">
+                                        <a href="/admin/produit/${produit.id}/edit" class="btn btn-custom">
+                                            <i class="fas fa-edit" style="color: black;"></i>
+                                        </a>
+                                    </td>`;
+                            }
+
+                            htmlRow += '</tr>';
+                            $('#produits-les-plus-vendus-body').append(htmlRow);
+                        });
+
+                        // Gérer la pagination avec la fonction commune setupPagination
+                        setupPagination(data, 'loadProduitsLesPlusVendus', '#pagination-produits-vendus');
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error("Erreur lors du chargement des produits les plus vendus :", textStatus, errorThrown);
+                        console.log("Réponse d'erreur complète :", jqXHR.responseText);
+                        alert(`Une erreur s'est produite lors du chargement des produits les plus vendus.\nStatus: ${textStatus}\nErreur: ${errorThrown}`);
+                    }
+                });
+            }
+
+            // Fonction pour charger les commandes des utilisateurs avec AJAX
+            function loadCommandesUtilisateurs(page = 0) {
+                const limit = $('#commandes-limit').val();
+                const order = $('#commandes-order').val();
+                const minCommandes = $('#min-commandes').val();
+                const maxCommandes = $('#max-commandes').val();
+
+                $.ajax({
+                    url: '/statistiques/commandes-par-utilisateur',
+                    method: 'GET',
+                    data: {
+                        page: page,
+                        limit: limit,
+                        order: order,
+                        minCommandes: minCommandes,
+                        maxCommandes: maxCommandes
+                    },
+                    success: function(data) {
+                        const tbody = $('#commandes-utilisateurs-body');
+                        tbody.empty(); // On vide le tableau avant d'ajouter les nouvelles données
+
+                        data.commandes.forEach(function(userStat) {
+                            tbody.append(`
+                                <tr>
+                                    <td>${userStat.email}</td> <!-- Email -->
+                                    <td>${userStat.nom}</td> <!-- Nom -->
+                                    <td>${userStat.prenom}</td> <!-- Prénom -->
+                                    <td>${userStat.nombreDeCommandes}</td> <!-- Nombre de commandes -->
+                                </tr>
+                            `);
+                        });
+
+                        // Mise en place de la pagination
+                        setupPagination(data, 'loadCommandesUtilisateurs', '#pagination-commandes-utilisateurs');
+                    },
+                    error: function() {
+                        alert("Une erreur s'est produite lors du chargement des commandes.");
+                    }
+                });
+            }
+
+
+            // Fonction commune pour charger les pages selon le type
+            function loadPage(page, type) {
+                if (type === 'vues') {
+                    loadProduits(page);
+                } else if (type === 'notes') {
+                    loadNotesProduits(page);
+                }
+            }
+
+            // Gérer la soumission du formulaire pour les produits les plus vus
+            $('#filter-form').submit(function(e) {
+                e.preventDefault();
+                loadProduits(0);  // Recharger depuis la première page pour les produits les plus vus
+            });
+
+            // Gérer la soumission du formulaire pour les produits avec notes
+            $('#filter-notes-form').submit(function(e) {
+                e.preventDefault();
+                loadNotesProduits(0);  // Recharger depuis la première page pour les produits notés
+            });
+
+            // Gérer la soumission du formulaire pour les produits les plus vendu
+            $('#filter-form-achats').submit(function(e) {
+                e.preventDefault();
+                loadProduitsLesPlusVendus(0);  // Recharger depuis la première page pour les produits les plus vendus
+            });
+
+            // Gérer la soumission du formulaire pour recharger les résultats avec les nouveaux paramètres
+            $('#filter-commandes-utilisateurs').submit(function(e) {
+                e.preventDefault();
+                loadCommandesUtilisateurs(0);  // Recharger depuis la première page si le formulaire est soumis
+            });
+
+            // Charger les produits au démarrage
+            loadProduits();
+            loadNotesProduits();
+            loadProduitsLesPlusVendus();
+            loadCommandesUtilisateurs();
+
+
+
+
+
+
+        </script>
+    </div>
+</div>
+</body>
+</html>

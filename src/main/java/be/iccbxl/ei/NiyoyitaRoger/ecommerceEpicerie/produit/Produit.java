@@ -95,6 +95,10 @@ public class Produit implements Serializable {
     @Column(name = "vues", nullable = false)
     private Integer vues = 0;  // Initialisation à 0 pour le nombre de vues
 
+    @NotNull
+    @Column(name = "compteur_achats", nullable = false)
+    private Integer compteurAchats = 0;  // Initialisation à 0 par défaut
+
     @PrePersist
     @PreUpdate
     public void beforeSave() {
@@ -120,6 +124,7 @@ public class Produit implements Serializable {
     )
     private Set<MotCle> motsCles = new HashSet<>();
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "produitsFavoris")
     private Set<User> utilisateursFavoris = new HashSet<>();
 
@@ -325,6 +330,22 @@ public class Produit implements Serializable {
         this.vues = vues;
     }
 
+    public Integer getCompteurAchats() {
+        return compteurAchats;
+    }
+
+    public void setCompteurAchats(Integer compteurAchats) {
+        this.compteurAchats = compteurAchats;
+    }
+
+    public Set<User> getUtilisateursFavoris() {
+        return utilisateursFavoris;
+    }
+
+    public void setUtilisateursFavoris(Set<User> utilisateursFavoris) {
+        this.utilisateursFavoris = utilisateursFavoris;
+    }
+
     @Override
     public String toString() {
         return "Produit{" +
@@ -345,6 +366,7 @@ public class Produit implements Serializable {
                 ", dateCreation=" + dateCreation +
                 ", dateModification=" + dateModification +
                 ", vues=" + vues +
+                ", compteurAchats=" + compteurAchats +
                 ", motsCles=" + (motsCles != null ? motsCles.size() + " mots clés" : "null") + // Afficher la taille au lieu des détails
                 ", utilisateursFavoris=" + (utilisateursFavoris != null ? utilisateursFavoris.size() + " utilisateurs favoris" : "null") + // Afficher la taille
                 '}';

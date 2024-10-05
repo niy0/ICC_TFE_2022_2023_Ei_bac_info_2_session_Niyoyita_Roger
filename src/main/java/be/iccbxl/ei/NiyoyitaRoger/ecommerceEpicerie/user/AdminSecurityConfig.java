@@ -41,11 +41,6 @@ public class AdminSecurityConfig {
         return new SessionRegistryImpl();
     }
 
-    /**
-     * @Bean public PasswordEncoder passwordEncoder(){
-     * return  NoOpPasswordEncoder.getInstance(); //BCryptPasswordEncoder();
-     * }
-     **/
 
     @Bean
     public PasswordEncoder passwordEncoder1() {
@@ -85,7 +80,7 @@ public class AdminSecurityConfig {
                     // Les routes réservées aux admins/employés
                     auth.requestMatchers("/admin/**", "/produit/create").hasAuthority("Admin");
                     auth.requestMatchers("/user/**").hasAnyAuthority("User", "Employee", "Admin");
-                    auth.requestMatchers("/employe/**").hasAnyAuthority("Employee", "Admin");
+                    auth.requestMatchers("/employe/**", "/statistiques/**").hasAnyAuthority("Employee", "Admin");
 
                     // Les routes pour la gestion des utilisateurs
                     auth.requestMatchers("/user/add/favoris", "/user/deleteAccount").hasAnyAuthority("User", "Employee", "Admin")

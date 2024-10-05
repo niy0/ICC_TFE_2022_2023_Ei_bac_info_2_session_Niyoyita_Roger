@@ -61,6 +61,13 @@ public class PanierService {
 
         for (Panier panier : paniersInactifs) {
             if (panier.getUtilisateur() == null) { // Vérifiez s'il s'agit d'un panier de visiteur non enregistré
+
+                // Détacher les lignes de commande du panier avant de supprimer le panier
+                for (LigneDeCommande ligne : panier.getLignesDeCommande()) {
+                    ligne.setPanier(null); // Détacher la ligne de commande du panier
+                    ligneDeCommandeRepository.save(ligne); // Sauvegarder la modification
+                }
+
                 panierRepository.delete(panier);
             }
         }

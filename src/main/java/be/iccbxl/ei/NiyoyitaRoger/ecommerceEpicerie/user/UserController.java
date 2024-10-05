@@ -1,6 +1,11 @@
 package be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.user;
 
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.categorie.Categorie;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.commande.Commande;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.commande.CommandeService;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.ligneDeCommande.LigneDeCommandeService;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit.Produit;
+import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.produit.ProduitService;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.role.Role;
 import be.iccbxl.ei.NiyoyitaRoger.ecommerceEpicerie.role.RoleRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,12 +32,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Controller
@@ -43,6 +49,11 @@ public class UserController {
     private final RoleRepository roleRepository;
     private final AdresseRepository adresseRepository;
     private final AuthenticationManager authenticationManager;
+    private final CommandeService commandeService;
+    private final ProduitService produitService;
+    private final UserProduitsNotesService userProduitsNotesService;
+    private final LigneDeCommandeService ligneDeCommandeService;
+
 
     @Autowired
     public UserController(UserService userService,
@@ -50,7 +61,11 @@ public class UserController {
                           UserSessionService userSessionService,
                           RoleRepository roleRepository,
                           AdresseRepository adresseRepository,
-                          AuthenticationManager authenticationManager) {
+                          AuthenticationManager authenticationManager,
+                          CommandeService commandeService,
+                          ProduitService produitService,
+                          UserProduitsNotesService userProduitsNotesService,
+                          LigneDeCommandeService ligneDeCommandeService) {
 
         this.userService = userService;
         this.customUserDetailsService = customUserDetailsService;
@@ -58,6 +73,10 @@ public class UserController {
         this.roleRepository = roleRepository;
         this.adresseRepository = adresseRepository;
         this.authenticationManager = authenticationManager;
+        this.commandeService = commandeService;
+        this.produitService = produitService;
+        this.userProduitsNotesService = userProduitsNotesService;
+        this.ligneDeCommandeService = ligneDeCommandeService;
     }
 
     @GetMapping("/auth/debug")
@@ -508,6 +527,236 @@ public class UserController {
         return ResponseEntity.ok(user.getAdresse()); // Suppose que User a une méthode getAdresses()
     }
 
-    //Delete user
+    //statistiques
+
+    private String buildHtmlTable(List<Produit> produits) {
+        StringBuilder html = new StringBuilder();
+        for (Produit produit : produits) {
+            html.append("<tr>")
+                    .append("<td>").append(produit.getNom()).append("</td>")  // Utiliser les getters de Produit
+                    .append("<td>").append(produit.getVues()).append("</td>") // Supposons que "vues" soit une propriété de Produit
+                    .append("</tr>");
+        }
+        return html.toString();
+    }
+
+    @GetMapping("/statistiques/produits-les-plus-vus")
+    public ResponseEntity<Map<String, Object>> getProduitsLesPlusVus(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "limit", defaultValue = "5") int limit,
+            @RequestParam(value = "order", defaultValue = "desc") String order,
+            @RequestParam(value = "vuesMin", defaultValue = "0") int vuesMin,
+            @RequestParam(value = "vuesMax", required = false) Integer vuesMax,
+            Authentication authentication) {
+
+        // Récupérer l'utilisateur connecté
+        Object principal = authentication.getPrincipal();
+        boolean isAdmin = false;
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            String username = userDetails.getUsername();
+            User user = userService.getUserByEmail(username);
+            isAdmin = user.hasRole("Admin");
+        }
+
+        // Récupérer les produits avec filtres
+        Page<Produit> produitsPage = produitService.getProduitsLesPlusVus(page, limit, order, vuesMin, vuesMax);
+
+        // Préparer la réponse
+        Map<String, Object> response = new HashMap<>();
+        response.put("produits", produitsPage.getContent());
+        response.put("isAdmin", isAdmin);  // Inclure "isAdmin" dans la réponse JSON
+        response.put("page", produitsPage.getNumber());
+        response.put("totalPages", produitsPage.getTotalPages());
+
+        // Retourner la réponse complète avec la liste des produits et l'état "isAdmin"
+        return ResponseEntity.ok(response);
+    }
+
+
+    @GetMapping("/statistiques/produits-notes")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getProduitsAvecCote(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "limit", defaultValue = "5") int limit,
+            @RequestParam(value = "notesOrder", defaultValue = "desc") String order,
+            @RequestParam(value = "noteMin", defaultValue = "1") int noteMin,
+            @RequestParam(value = "noteMax", required = false) Integer noteMax,
+            Authentication authentication) {
+
+        // Récupérer l'utilisateur connecté
+        Object principal = authentication.getPrincipal();
+        boolean isAdmin = false;
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            String username = userDetails.getUsername();
+            // Si vous avez un service utilisateur, vérifiez s'il a le rôle Admin
+            User user = userService.getUserByEmail(username);
+            isAdmin = user.hasRole("Admin");
+        }
+
+        // Récupérer les produits avec les filtres de cote
+        Page<Produit> produitsPage = produitService.getProduitsAvecCote(page, limit, order, noteMin, noteMax);
+
+        // Préparer la réponse
+        Map<String, Object> response = new HashMap<>();
+        response.put("produits", produitsPage.getContent());
+        response.put("page", produitsPage.getNumber());
+        response.put("totalPages", produitsPage.getTotalPages());
+        response.put("isAdmin", isAdmin);  // Inclure si l'utilisateur est admin dans la réponse
+
+        return ResponseEntity.ok(response);
+    }
+
+    // Montant total des commandes
+    @GetMapping("/statistiques/chiffre-affaire")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getChiffreAffaireMensuel(
+            @RequestParam(value = "annee") int annee,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "limit", defaultValue = "5") int limit) {
+
+        // Appeler la méthode du service pour récupérer les données (tri par défaut croissant par mois)
+        Page<Object[]> chiffreAffairePage = commandeService.getChiffreAffaireMensuelParAnnee(annee, page, limit);
+
+        // Préparer la réponse JSON avec la pagination
+        Map<String, Object> response = new HashMap<>();
+        response.put("chiffreAffaire", chiffreAffairePage.getContent());
+        response.put("totalPages", chiffreAffairePage.getTotalPages());
+        response.put("page", chiffreAffairePage.getNumber());
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    // Produits les plus vendus
+    @GetMapping("/statistiques/produits-les-plus-vendus")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getProduitsLesPlusVendus(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "limit", defaultValue = "5") int limit,
+            @RequestParam(value = "order", defaultValue = "desc") String order,
+            @RequestParam(value = "minAchats", defaultValue = "0") int minAchats,
+            @RequestParam(value = "maxAchats", required = false) Integer maxAchats,
+            Authentication authentication) {
+
+        // Récupérer l'utilisateur connecté
+        Object principal = authentication.getPrincipal();
+        boolean isAdmin = false;
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            String username = userDetails.getUsername();
+            User user = userService.getUserByEmail(username);
+            isAdmin = user.hasRole("Admin");
+        }
+
+        // Appeler le service pour obtenir les produits filtrés par `compteurAchats`
+        Page<Produit> produitsPage = produitService.getProduitsLesPlusVendusAvecInterval(page, limit, order, minAchats, maxAchats);
+
+        // Préparer la réponse
+        Map<String, Object> response = new HashMap<>();
+        response.put("produits", produitsPage.getContent());
+        response.put("page", produitsPage.getNumber());
+        response.put("totalPages", produitsPage.getTotalPages());
+        response.put("isAdmin", isAdmin);
+
+        return ResponseEntity.ok(response);
+    }
+
+    // Nombre de commandes par utilisateur
+    @GetMapping("/statistiques/commandes-par-utilisateur")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getCommandesParUtilisateur(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "limit", defaultValue = "5") int limit,
+            @RequestParam(value = "order", defaultValue = "desc") String order,
+            @RequestParam(value = "minCommandes", defaultValue = "0") int minCommandes,
+            @RequestParam(value = "maxCommandes", required = false) Integer maxCommandes,
+            Authentication authentication) {
+
+        // Vérifier si l'utilisateur est authentifié
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        // Récupérer l'utilisateur connecté
+        Object principal = authentication.getPrincipal();
+        boolean isAdmin = false;
+
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            String username = userDetails.getUsername();
+            User user = userService.getUserByEmail(username);
+            isAdmin = user.hasRole("Admin");
+        }
+
+        // Si l'utilisateur n'est pas un administrateur, il n'a pas accès à ces informations
+        if (!isAdmin) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
+        // Préparer la pagination
+        Pageable pageable = PageRequest.of(page, limit);
+
+        // Obtenir les commandes par utilisateur via le service
+        Page<Object[]> commandesParUtilisateur = commandeService.getCommandesParUtilisateur(minCommandes, maxCommandes, order, pageable);
+
+        // Préparer la réponse
+        List<Map<String, Object>> commandesList = new ArrayList<>();
+        for (Object[] result : commandesParUtilisateur.getContent()) {
+            Long userId = (Long) result[0];
+            Long nombreDeCommandes = (Long) result[1];
+
+            // Récupérer les informations de l'utilisateur uniquement si `userId` est valide
+            User user = userService.getUserById(userId);
+
+            Map<String, Object> userStat = new HashMap<>();
+            userStat.put("email", user.getEmail());
+            userStat.put("nom", user.getNom());
+            userStat.put("prenom", user.getPrenom());
+            userStat.put("nombreDeCommandes", nombreDeCommandes);
+            commandesList.add(userStat);
+        }
+
+        // Préparer la réponse avec la liste des commandes et les informations de pagination
+        Map<String, Object> response = new HashMap<>();
+        response.put("commandes", commandesList);
+        response.put("page", commandesParUtilisateur.getNumber());
+        response.put("totalPages", commandesParUtilisateur.getTotalPages());
+        response.put("isAdmin", isAdmin);
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    @GetMapping("/statistiques")
+    public String getStatistiques(Model model, Authentication authentication) {
+
+        // Vérification si l'utilisateur est connecté
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return "redirect:/login";  // Redirige vers la page de connexion si l'utilisateur n'est pas authentifié
+        }
+
+        // Récupération de l'utilisateur connecté
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            String username = userDetails.getUsername();
+            User user = userService.getUserByEmail(username);
+
+            // Vérification du rôle de l'utilisateur
+            if (!user.hasRole("Admin") && !user.hasRole("Employee")) {
+                // Redirection vers une page "Accès refusé" ou une autre page d'erreur
+                return "redirect:/";
+            }
+
+            model.addAttribute("user", user);
+        } else {
+            throw new IllegalStateException("L'utilisateur connecté n'est pas une instance de UserDetails");
+        }
+
+        return "/user/statistiques";
+    }
+
 
 }

@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface UserProduitsNotesRepository extends JpaRepository<UserProduitsNotes, UserProduitsNotesId> {
 
@@ -19,4 +21,11 @@ public interface UserProduitsNotesRepository extends JpaRepository<UserProduitsN
     // Méthode pour calculer la moyenne des notes d'un produit
     @Query("SELECT AVG(upn.note) FROM UserProduitsNotes upn WHERE upn.produit.id = :produitId")
     Double calculerMoyenneNotes(@Param("produitId") Long produitId);
+
+    //Notes moyennes des produits
+    @Query("SELECT p.nom, AVG(upn.note) " +
+            "FROM UserProduitsNotes upn " +
+            "JOIN upn.produit p " +
+            "GROUP BY p")
+    List<Object[]> findMoyenneNotesProduits();
 }
