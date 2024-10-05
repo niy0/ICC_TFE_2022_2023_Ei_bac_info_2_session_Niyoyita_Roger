@@ -242,6 +242,11 @@
 
 
 
+
+
+
+
+
     </style>
 </head>
 <body>
@@ -419,93 +424,123 @@
         <!-- Bootstrap 5 Bundle JS (inclut Popper) -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-                    // Déclarez la fonction en dehors de $(document).ready pour la rendre accessible globalement
-                    function loadCommandes(page, sortBy) {
-                        $.ajax({
-                            url: '/api/employe/commandes',
-                            data: {
-                                page: page,
-                                sortBy: sortBy,
-                                searchId: $('#searchId').val(),
-                                searchVille: $('#searchVille').val(),
-                                searchCodePostal: $('#searchCodePostal').val(),
-                                filterStatut: $('#filterStatut').val(),
-                                filterMethodCommande: $('#filterMethodCommande').val()
-                            },
-                            success: function(data) {
-                                // Mise à jour de la table des commandes
-                                var commandesTableBody = $('#commandesTableBody');
-                                commandesTableBody.empty();
-                                $.each(data.content, function(index, commande) {
-                                    commandesTableBody.append(`
-                                        <tr>
-                                            <td>${commande.id}</td>
-                                            <td>${commande.nom}</td>
-                                            <td>${new Date(commande.dateCommande).toLocaleDateString()}</td>
-                                            <td>${commande.statut}</td>
-                                            <td>${commande.ville}</td>
-                                            <td>${commande.codePostal}</td>
-                                            <td>${commande.methodCommande}</td>
-                                            <td>
-                                                <a class="btn btn-outline-warning" href="/employe/commande/detail/${commande.id}">
-                                                    <i class="fas fa-chart-bar"></i> Traiter commande
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    `);
-                                });
+            // Fonction debounce pour réduire les appels répétés lors de la frappe
+            function debounce(func, delay) {
+                let timer;
+                return function (...args) {
+                    clearTimeout(timer);
+                    timer = setTimeout(() => func.apply(this, args), delay);
+                };
+            }
 
-                                // Mise à jour de la pagination
-                                var pagination = $('.pagination');
-                                pagination.empty();
-                                pagination.append(`
-                                    <li class="page-item ${data.number === 0 ? 'disabled' : ''}">
-                                        <a class="page-link" href="#" aria-label="Previous" onclick="loadCommandes(${data.number - 1}, '${sortBy}')">
-                                            <span aria-hidden="true">&laquo;</span>
+            function loadCommandes(page, sortBy) {
+                $.ajax({
+                    url: '/api/employe/commandes',
+                    data: {
+                        page: page,
+                        sortBy: sortBy,
+                        searchId: $('#searchId').val(),
+                        searchVille: $('#searchVille').val(),
+                        searchCodePostal: $('#searchCodePostal').val(),
+                        filterStatut: $('#filterStatut').val(),
+                        filterMethodCommande: $('#filterMethodCommande').val()
+                    },
+                    success: function (data) {
+                        console.log(data);
+                        // Mise à jour de la table des commandes
+                        var commandesTableBody = $('#commandesTableBody');
+                        commandesTableBody.empty();
+                        $.each(data.content, function (index, commande) {
+                            commandesTableBody.append(`
+                                <tr>
+                                    <td>${commande.id}</td>
+                                    <td>${commande.nom}</td>
+                                    <td>${new Date(commande.dateCommande).toLocaleDateString()}</td>
+                                    <td>${commande.statut}</td>
+                                    <td>${commande.ville}</td>
+                                    <td>${commande.codePostal}</td>
+                                    <td>${commande.methodCommande}</td>
+                                    <td>
+                                        <a class="btn btn-outline-warning" href="/employe/commande/detail/${commande.id}">
+                                            <i class="fas fa-chart-bar"></i> Traiter commande
                                         </a>
-                                    </li>
-                                `);
-
-                                for (var i = 0; i < data.totalPages; i++) {
-                                    pagination.append(`
-                                        <li class="page-item ${data.number === i ? 'active' : ''}">
-                                            <a class="page-link" href="#" onclick="loadCommandes(${i}, '${sortBy}')">${i + 1}</a>
-                                        </li>
-                                    `);
-                                }
-
-                                pagination.append(`
-                                    <li class="page-item ${data.number + 1 === data.totalPages ? 'disabled' : ''}">
-                                        <a class="page-link" href="#" aria-label="Next" onclick="loadCommandes(${data.number + 1}, '${sortBy}')">
-                                            <span aria-hidden="true">&raquo;</span>
-                                        </a>
-                                    </li>
-                                `);
-                            }
-                        });
-                    }
-
-                    $(document).ready(function() {
-                        // Initialisation de la fonction au chargement
-                        loadCommandes(0, 'dateCommande');
-
-                        // Événements pour les filtres et le tri
-                        $('#searchId, #searchVille, #searchCodePostal').on('input', function() {
-                            loadCommandes(0, 'dateCommande');
+                                    </td>
+                                </tr>
+                            `);
                         });
 
-                        $('#filterStatut, #filterMethodCommande').on('change', function() {
-                            loadCommandes(0, 'dateCommande');
-                        });
+                        // Mise à jour de la pagination
+                        var pagination = $('.pagination');
+                        pagination.empty();
 
-                        $('.sortable').on('click', function() {
-                            var sortBy = $(this).data('sort');
-                            loadCommandes(0, sortBy);
-                        });
+                        // Précédent
+                        pagination.append(`
+                            <li class="page-item ${data.number === 0 ? 'disabled' : ''}">
+                                <a class="page-link" href="#" aria-label="Previous" onclick="loadCommandes(${data.number - 1}, '${sortBy}')">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        `);
+
+                        // Pages
+                        for (var i = 0; i < data.totalPages; i++) {
+                            pagination.append(`
+                                <li class="page-item ${data.number === i ? 'active' : ''}">
+                                    <a class="page-link" href="#" onclick="loadCommandes(${i}, '${sortBy}')">${i + 1}</a>
+                                </li>
+                            `);
+                        }
+
+                        // Suivant
+                        pagination.append(`
+                            <li class="page-item ${data.number + 1 === data.totalPages ? 'disabled' : ''}">
+                                <a class="page-link" href="#" aria-label="Next" onclick="loadCommandes(${data.number + 1}, '${sortBy}')">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        `);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                    console.error("Erreur lors du chargement des commandes:", {
+                        status: jqXHR.status,
+                        statusText: jqXHR.statusText,
+                        responseText: jqXHR.responseText,
+                        errorThrown: errorThrown
                     });
+
+                    // Affichage plus détaillé de l'erreur à l'utilisateur
+                    alert(`Erreur ${jqXHR.status}: ${jqXHR.statusText}\nDétails: ${jqXHR.responseText}`);
+                }
+
+                });
+            }
+
+            $(document).ready(function () {
+                // Initialisation de la fonction au chargement
+                loadCommandes(0, 'dateCommande');
+
+                // Déclenchement de la recherche avec un debounce (500ms)
+                const handleInputChange = debounce(function () {
+                    loadCommandes(0, 'dateCommande');
+                }, 500);
+
+                $('#searchId, #searchVille, #searchCodePostal').on('input', handleInputChange);
+
+                // Changement des filtres statut et méthode de commande
+                $('#filterStatut, #filterMethodCommande').on('change', function () {
+                    loadCommandes(0, 'dateCommande');
+                });
+
+                // Gestion du tri des colonnes
+                $('.sortable').on('click', function () {
+                    var sortBy = $(this).data('sort');
+                    loadCommandes(0, sortBy);
+                });
+            });
 
 
         </script>
+
 
     </div>
 </div>
