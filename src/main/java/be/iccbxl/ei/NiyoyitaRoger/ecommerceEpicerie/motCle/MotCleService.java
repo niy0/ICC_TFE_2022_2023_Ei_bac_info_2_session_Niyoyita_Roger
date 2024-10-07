@@ -11,8 +11,10 @@ public class MotCleService {
     @Autowired
     private MotCleRepository motCleRepository;
 
-    public MotCle save(MotCle motCle){
-        motCle.setNom(motCle.getNom().toUpperCase());
+    public MotCle save(MotCle motCle) {
+        String nom = motCle.getNom();
+        String nomFormatted = nom.substring(0, 1).toUpperCase() + nom.substring(1).toLowerCase();
+        motCle.setNom(nomFormatted);
         motCleRepository.save(motCle);
         return motCle;
     }
@@ -33,8 +35,8 @@ public class MotCleService {
 
     public void deleteMotCleById(Long id) throws MotCleNotFoundException {
         Long count = motCleRepository.count();
-        if(count == null || count == 0) {
-            throw new MotCleNotFoundException("La marque avec cette Id: "+ id + "n'a pas été supprimé.");
+        if (count == null || count == 0) {
+            throw new MotCleNotFoundException("La marque avec cette Id: " + id + "n'a pas été supprimé.");
         }
         motCleRepository.deleteById(id);
     }

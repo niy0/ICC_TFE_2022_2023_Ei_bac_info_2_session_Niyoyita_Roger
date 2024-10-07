@@ -65,7 +65,7 @@ public class AdminSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain1(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .ignoringRequestMatchers("/addToCart", "/api/checkout/**", "/user/add/favoris", "/produit",
+                        .ignoringRequestMatchers("/addToCart", "/api/checkout/**", "/user/add/favoris", "/admin/user/delete", "/produit",
                                 "https://bf9a-2a02-2788-2b8-3ad-61a6-2f05-76f9-f26f.ngrok-free.app/**")) // Ignorer CSRF pour les endpoints OAuth2
                 .authorizeHttpRequests(auth -> {
                     // Les routes accessibles à tous

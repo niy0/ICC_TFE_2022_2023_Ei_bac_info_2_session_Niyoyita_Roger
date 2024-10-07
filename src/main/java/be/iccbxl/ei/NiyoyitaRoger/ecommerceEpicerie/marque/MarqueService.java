@@ -14,7 +14,9 @@ public class MarqueService {
     private MarqueRepository marqueRepository;
 
     public Marque save(Marque marque) {
-        marque.setNom(marque.getNom().toUpperCase());//a changer
+        String nom = marque.getNom();
+        String nomFormatted = nom.substring(0, 1).toUpperCase() + nom.substring(1).toLowerCase();
+        marque.setNom(nomFormatted);
         marqueRepository.save(marque);
         return marque;
     }

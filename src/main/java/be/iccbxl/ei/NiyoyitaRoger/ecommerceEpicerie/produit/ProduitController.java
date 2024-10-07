@@ -145,7 +145,7 @@ public class ProduitController {
                              HttpSession session,
                              Authentication authentication) {
 
-        Pageable pageable = PageRequest.of(page, 8);
+        Pageable pageable = PageRequest.of(page, 9);
         //Page<Produit> productPage = produitRepository.findAll(pageable);
         Page<Produit> productPage = produitRepository.findProduitsAvecQuantiteMin(pageable);
         List<Categorie> categorieList = categorieService.getAllCategorie();
@@ -924,7 +924,7 @@ public class ProduitController {
     public Page<Produit> getProduits(
             @RequestParam(defaultValue = "nom") String sortBy,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "8") int size,
+            @RequestParam(defaultValue = "9") int size,
             @RequestParam(required = false) String searchQuery, // Un seul champ pour la recherche
             @RequestParam(required = false) String sortPrice,
             @RequestParam(required = false) String sortDate,

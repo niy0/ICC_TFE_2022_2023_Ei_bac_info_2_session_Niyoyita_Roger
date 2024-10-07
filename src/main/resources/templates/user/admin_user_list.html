@@ -12,6 +12,9 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <!-- Bootstrap Bundle JS (inclut Popper) depuis unpkg CDN -->
     <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- CSRF Meta Tags -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <style>
           body {
               background-color: #f0f2f5;
@@ -94,10 +97,6 @@
               transition: transform 0.3s;
               margin-top: 20px;
               width: 100%;
-          }
-
-          .card:hover {
-              transform: translateY(-5px);
           }
 
           .card-title {
@@ -187,6 +186,10 @@
                   overflow-x: auto;
               }
           }
+
+
+
+
 
 
     </style>
@@ -364,109 +367,127 @@
             </div>
         </div>
 
-        <!-- jQuery (Nécessaire avant les scripts Bootstrap) -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <!-- Bootstrap 5 Bundle JS (inclut Popper) -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
         <script>
-          // Déclarez la fonction en dehors de $(document).ready pour la rendre accessible globalement
-          function loadUsers(page, sortBy) {
-              $.ajax({
-                  url: '/api/admin/users',
-                  data: {
-                      page: page,
-                      sortBy: sortBy,
-                      searchId: $('#searchId').val(),
-                      searchNom: $('#searchNom').val(),
-                      searchPrenom: $('#searchPrenom').val(),
-                      searchEmail: $('#searchEmail').val(),
-                      sortRoles: $('#sortRoles').val(),
-                      sortDate: $('#sortDate').val()
-                  },
-                  success: function(data) {
-                      // Mise à jour de la table des utilisateurs
-                      var usersTableBody = $('#usersTableBody');
-                      usersTableBody.empty();
-                      $.each(data.content, function(index, user) {
-                          usersTableBody.append(`
-                              <tr>
-                                  <td>${user.id}</td>
-                                  <td>${user.nom}</td>
-                                  <td>${user.prenom}</td>
-                                  <td>${user.email}</td>
-                                  <td>${user.telephone}</td>
-                                  <td>${user.roles.map(role => role.nom).join(', ')}</td>
-                                  <td>${new Date(user.dateCreation).toLocaleDateString()}</td>
-                                  <td>
-                                      <a class="btn btn-outline-warning" href="/admin/user/${user.id}/edit">
-                                          <i class="fas fa-edit"></i> Edit
-                                      </a>
-                                      <form th:id="|deleteForm-${user.id}|" th:action="@{/admin/user/${user.id}}" th:method="delete" style="display:inline;">
-                                          <a class="btn btn-outline-danger" href="#"
-                                             th:onclick="|if(confirm('Confirmer la suppression de l\'utilisateur : ${user.id}')) document.getElementById('deleteForm-${user.id}').submit(); return false;|">
-                                              <i class="fas fa-trash-alt"></i> Supprimer
-                                          </a>
-                                      </form>
-                                  </td>
-                              </tr>
-                          `);
-                      });
+            // Fonction pour charger les utilisateurs via AJAX
+            function loadUsers(page, sortBy) {
+                $.ajax({
+                    url: '/api/admin/users',
+                    data: {
+                        page: page,
+                        sortBy: sortBy,
+                        searchId: $('#searchId').val(),
+                        searchNom: $('#searchNom').val(),
+                        searchPrenom: $('#searchPrenom').val(),
+                        searchEmail: $('#searchEmail').val(),
+                        sortRoles: $('#sortRoles').val(),
+                        sortDate: $('#sortDate').val()
+                    },
+                    success: function(data) {
+                        // Mise à jour de la table des utilisateurs
+                        var usersTableBody = $('#usersTableBody');
+                        usersTableBody.empty();
+                        $.each(data.content, function(index, user) {
+                            usersTableBody.append(`
+                                <tr>
+                                    <td>${user.id}</td>
+                                    <td>${user.nom}</td>
+                                    <td>${user.prenom}</td>
+                                    <td>${user.email}</td>
+                                    <td>${user.telephone}</td>
+                                    <td>${user.roles.map(role => role.nom).join(', ')}</td>
+                                    <td>${new Date(user.dateCreation).toLocaleDateString()}</td>
+                                    <td>
+                                        <a class="btn btn-outline-warning" href="/admin/user/${user.id}/edit">
+                                            <i class="fas fa-edit"></i> Modifier
+                                        </a>
+                                        <!-- Bouton pour ouvrir le modal de confirmation -->
+                                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
+                                                data-bs-target="#deleteUserModal-${user.id}">
+                                            <i class="fas fa-trash-alt"></i> Supprimer
+                                        </button>
 
-                      // Mise à jour de la pagination
-                      var pagination = $('.pagination');
-                      pagination.empty();
-                      pagination.append(`
-                          <li class="page-item ${data.number === 0 ? 'disabled' : ''}">
-                              <a class="page-link" href="#" aria-label="Previous" onclick="loadUsers(${data.number - 1}, '${sortBy}')">
-                                  <span aria-hidden="true">&laquo;</span>
-                              </a>
-                          </li>
-                      `);
+                                        <!-- Modal de confirmation pour la suppression -->
+                                        <div class="modal fade" id="deleteUserModal-${user.id}" tabindex="-1"
+                                             aria-labelledby="deleteUserModalLabel-${user.id}" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="deleteUserModalLabel-${user.id}">
+                                                            Confirmation de suppression
+                                                        </h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>Êtes-vous sûr de vouloir supprimer l'utilisateur ${user.nom} ${user.prenom} ? Cette action est irréversible.</p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
 
-                      for (var i = 0; i < data.totalPages; i++) {
-                          pagination.append(`
-                              <li class="page-item ${data.number === i ? 'active' : ''}">
-                                  <a class="page-link" href="#" onclick="loadUsers(${i}, '${sortBy}')">${i + 1}</a>
-                              </li>
-                          `);
-                      }
+                                                        <!-- Formulaire de suppression -->
+                                                        <form id="deleteForm-${user.id}" action="/admin/user/delete" method="post" style="display:inline;">
+                                                            <input type="hidden" name="userId" value="${user.id}" />
+                                                            <button type="submit" class="btn btn-danger">Confirmer la suppression</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `);
+                        });
 
-                      pagination.append(`
-                          <li class="page-item ${data.number + 1 === data.totalPages ? 'disabled' : ''}">
-                              <a class="page-link" href="#" aria-label="Next" onclick="loadUsers(${data.number + 1}, '${sortBy}')">
-                                  <span aria-hidden="true">&raquo;</span>
-                              </a>
-                          </li>
-                      `);
-                  }
-              });
-          }
+                        // Mise à jour de la pagination
+                        var pagination = $('.pagination');
+                        pagination.empty();
+                        pagination.append(`
+                            <li class="page-item ${data.number === 0 ? 'disabled' : ''}">
+                                <a class="page-link" href="#" aria-label="Previous" onclick="loadUsers(${data.number - 1}, '${sortBy}')">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        `);
 
-          $(document).ready(function() {
-              // Initialisation de la fonction au chargement
-              loadUsers(0, 'id');
+                        for (var i = 0; i < data.totalPages; i++) {
+                            pagination.append(`
+                                <li class="page-item ${data.number === i ? 'active' : ''}">
+                                    <a class="page-link" href="#" onclick="loadUsers(${i}, '${sortBy}')">${i + 1}</a>
+                                </li>
+                            `);
+                        }
 
-              // Événements pour les filtres et le tri
-              $('#searchId, #searchNom, #searchPrenom, #searchEmail').on('input', function() {
-                  loadUsers(0, 'id');
-              });
+                        pagination.append(`
+                            <li class="page-item ${data.number + 1 === data.totalPages ? 'disabled' : ''}">
+                                <a class="page-link" href="#" aria-label="Next" onclick="loadUsers(${data.number + 1}, '${sortBy}')">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        `);
+                    }
+                });
+            }
 
-              $('#sortRoles, #sortDate').on('change', function() {
-                  loadUsers(0, 'id');
-              });
+            $(document).ready(function() {
 
-              $('.sortable').on('click', function() {
-                  var sortBy = $(this).data('sort');
-                  loadUsers(0, sortBy);
-              });
-          });
+                // Initialisation de la fonction au chargement
+                loadUsers(0, 'id');
 
+                // Événements pour les filtres et le tri
+                $('#searchId, #searchNom, #searchPrenom, #searchEmail').on('input', function() {
+                    loadUsers(0, 'id');
+                });
+
+                $('#sortRoles, #sortDate').on('change', function() {
+                    loadUsers(0, 'id');
+                });
+
+                $('.sortable').on('click', function() {
+                    var sortBy = $(this).data('sort');
+                    loadUsers(0, sortBy);
+                });
+            });
 
         </script>
-    </div>
-    <!-- Footer -->
-    <div class="page-footer">
-        <div th:replace="~{fragments/footer :: footer}"></div>
     </div>
 </div>
 </body>

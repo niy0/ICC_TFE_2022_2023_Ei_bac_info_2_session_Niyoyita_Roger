@@ -170,7 +170,7 @@ public class UserController {
     public Page<User> getUsers(
             @RequestParam(defaultValue = "nom") String sortBy,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "2") int size,
+            @RequestParam(defaultValue = "4") int size,
             @RequestParam(required = false) String searchId,
             @RequestParam(required = false) String searchNom,
             @RequestParam(required = false) String searchPrenom,
@@ -453,17 +453,34 @@ public class UserController {
     }
 
     // Endpoint pour supprimer un utilisateur
-    @DeleteMapping("/admin/user/{userId}/delete")
-    @PreAuthorize("hasRole('ADMIN')") // Seuls les admins peuvent supprimer des utilisateurs
-    public ResponseEntity<String> deleteUser(@PathVariable("userId") Long userId) {
-        String result = userService.deleteUser(userId);
+    @PostMapping("/admin/user/delete")
+    public String deleteUser(@RequestParam("userId") Long userId, Authentication authentication, RedirectAttributes redirectAttributes) {
+        // Récupérer l'utilisateur connecté
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String adminEmail = userDetails.getUsername(); // Email de l'admin connecté
+        User admin = userService.getUserByEmail(adminEmail);
+        User userToDelete = userService.getUserById(userId);
 
-        if (result.equals("Utilisateur supprimé avec succès")) {
-            return ResponseEntity.ok(result);
+        // Vérifier si l'utilisateur connecté a le rôle "Admin"
+        if (admin != null && admin.hasRole("Admin") && userToDelete != null) {
+            // Supprimer l'utilisateur par son ID
+            String result = userService.deleteUser(userToDelete.getId());
+
+            // Vérifier le résultat de la suppression
+            if (result.equals("Utilisateur supprimé avec succès")) {
+                redirectAttributes.addFlashAttribute("message", "L'utilisateur a été supprimé avec succès.");
+                return "redirect:/admin/users"; // Redirige vers la liste des utilisateurs
+            } else {
+                redirectAttributes.addFlashAttribute("errorMessage", "Erreur lors de la suppression de l'utilisateur.");
+                return "redirect:/admin/users"; // Redirige vers la liste des utilisateurs en cas d'erreur
+            }
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
+            // Si l'utilisateur n'est pas Admin
+            redirectAttributes.addFlashAttribute("errorMessage", "Action non autorisée.");
+            return "redirect:/admin/users"; // Redirige vers la liste des utilisateurs
         }
     }
+
 
     @PostMapping("/user/deleteAccount")
     public String deleteOwnAccount(Authentication authentication, RedirectAttributes redirectAttributes) {
@@ -757,6 +774,4 @@ public class UserController {
 
         return "/user/statistiques";
     }
-
-
 }

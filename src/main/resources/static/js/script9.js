@@ -300,7 +300,7 @@ $(document).ready(function () {
         };
 
         console.log("Order Info: ", orderInfo);
-        alert("Order Info:\n" + JSON.stringify(orderInfo, null, 2));
+        //alert("Order Info:\n" + JSON.stringify(orderInfo, null, 2));
 
         fetch('/api/checkout/create-session', {
             method: 'POST',
